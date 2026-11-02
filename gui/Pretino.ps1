@@ -9,12 +9,16 @@ New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 $script:Proc = $null
 $script:Preview = $null
 $script:LogFile = $null
+$script:DupaProgram = $false
 
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Title="Pretino v$AppVersion" Width="760" Height="560" Background="#0d1514" WindowStartupLocation="CenterScreen">
   <Grid Margin="14">
     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-    <TextBlock Text="Pretino.ro - oferte actuale" Foreground="#2dd4bf" FontSize="22" FontWeight="Bold"/>
+    <DockPanel>
+      <Button Name="BProgram" DockPanel.Dock="Right" Content="Actualizeaza programul" Padding="12,6" VerticalAlignment="Center"/>
+      <TextBlock Name="Titlu" Text="Pretino.ro - oferte actuale (v$AppVersion)" Foreground="#2dd4bf" FontSize="22" FontWeight="Bold"/>
+    </DockPanel>
     <TextBlock Name="Stare" Grid.Row="1" Foreground="#9bb0ad" Margin="0,4,0,10" Text="Gata."/>
     <WrapPanel Grid.Row="2" Margin="0,0,0,10">
       <CheckBox Name="Demo" Content="Date DEMO in previzualizare" Foreground="#e6f0ee" IsChecked="True" Margin="0,0,14,0" VerticalAlignment="Center"/>
@@ -29,9 +33,10 @@ $script:LogFile = $null
 </Window>
 "@
 $win = [Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $xaml))
-$c = @{}; foreach ($n in 'Stare','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','Jurnal') { $c[$n] = $win.FindName($n) }
 
-function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive') { $c[$n].IsEnabled = -not $busy } }
+$c = @{}; foreach ($n in 'Stare','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal') { $c[$n] = $win.FindName($n) }
+
+function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram') { $c[$n].IsEnabled = -not $busy } }
 
 function Start-Task($nume, $comanda) {
   if ($script:Proc -and -not $script:Proc.HasExited) { return }
@@ -50,6 +55,14 @@ $timer.Add_Tick({
   if ($script:Proc -and $script:Proc.HasExited) {
     $c.Stare.Text = if ($script:Proc.ExitCode -eq 0) { 'Terminat cu succes.' } else { "Terminat cu eroare (cod $($script:Proc.ExitCode))." }
     $script:Proc = $null; Set-Busy $false
+    if ($script:DupaProgram) {
+      $script:DupaProgram = $false
+      $vNou = (Get-Content (Join-Path $Root 'versiune-program.txt') -ErrorAction SilentlyContinue | Select-Object -First 1)
+      if ($vNou -and $vNou -ne $AppVersion) {
+        $r = [System.Windows.MessageBox]::Show("Versiune noua: v$vNou (acum v$AppVersion). Repornesc programul acum?", 'Actualizare program', 'YesNo', 'Question')
+        if ($r -eq 'Yes') { Start-Process -FilePath (Join-Path $Root 'Pretino.bat'); $win.Close() }
+      } else { $c.Stare.Text = "Programul e la zi (v$AppVersion)." }
+    }
   }
 })
 $timer.Start()
@@ -73,6 +86,7 @@ $c.BOprestePreview.Add_Click({
   if ($script:Preview -and -not $script:Preview.HasExited) { & taskkill /PID $script:Preview.Id /T /F | Out-Null }
   $script:Preview = $null; $c.Stare.Text = 'Previzualizare oprita.'
 })
+$c.BProgram.Add_Click({ $script:DupaProgram = $true; Start-Task 'actualizare-program' 'git pull --ff-only' })
 $c.BActualizare.Add_Click({ Start-Task 'actualizare' 'bun scripts/actualizare.js' })
 $c.BTeste.Add_Click({ Start-Task 'teste' 'bun scripts/test.js' })
 $c.BLive.Add_Click({

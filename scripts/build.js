@@ -13,7 +13,10 @@ const citeste = (f) => JSON.parse(readFileSync(new URL(`../data/${f}`, import.me
 const categorii = citeste("categorii.json");
 const magazine = citeste("magazine.json");
 // doar oferte cu pret redus (pret vechi taiat + pret nou); categoria/subcategoria se corecteaza dupa titlu (lib/clasificare.js)
-const oferte = citeste(DEMO ? "demo-oferte.json" : "oferte.json").filter((o) => o.pretVechi > o.pret).map((o) => ({ ...o, ...clasifica(o) }));
+// magazinele cu „reducereMaxProcent” (ex. evoMAG 45%): reducerile mai mari nu sunt considerate reale si nu se afiseaza
+const maxRed = Object.fromEntries(magazine.filter((m) => m.reducereMaxProcent).map((m) => [m.id, m.reducereMaxProcent]));
+const reala = (o) => !maxRed[o.magazin] || (1 - o.pret / o.pretVechi) * 100 <= maxRed[o.magazin];
+const oferte = citeste(DEMO ? "demo-oferte.json" : "oferte.json").filter((o) => o.pretVechi > o.pret && reala(o)).map((o) => ({ ...o, ...clasifica(o) }));
 const mag = Object.fromEntries(magazine.map((m) => [m.id, m]));
 const cat = Object.fromEntries(categorii.map((c) => [c.slug, c]));
 const lei = (n) => `${Number(n).toLocaleString("ro-RO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} lei`;

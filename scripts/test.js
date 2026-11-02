@@ -93,6 +93,7 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   ok(pag.length === 0 || pag.every((f) => readFileSync(f, "utf8").includes(SCR)), "profitshare: scriptul de linkuri automate e pe toate paginile generate");
   const idx = existsSync("dist/cauta-index.json") ? JSON.parse(readFileSync("dist/cauta-index.json", "utf8")) : null;
   ok(!idx || (idx.o.length > 0 && idx.o.every((o) => o.t && o.u && o.p > 0)), "cautare: indexul de oferte e valid");
+  ok(!idx || idx.o.filter((o) => o.m === "evomag").every((o) => (1 - o.p / o.v) * 100 <= 45), "evoMAG: reducerile peste 45% nu sunt afisate (nu sunt considerate reale)");
   ok(pag.length === 0 || (pag.every((f) => /id="cautare"/.test(readFileSync(f, "utf8"))) && /noindex/.test(readFileSync("dist/cauta/index.html", "utf8")) && !/cauta\//.test(readFileSync("dist/sitemap.xml", "utf8"))), "cautare: casuta de cautare pe toate paginile; pagina /cauta/ noindex si fara sitemap");
   ok(pag.length === 0 || pag.every((f) => /\/stil\.css\?v=[0-9a-f]{8}"/.test(readFileSync(f, "utf8"))), "cache: stil.css si cauta.js au versiune in URL (browserul nu foloseste varianta veche)");
   ok(!idx || (idx.k?.pcgarage?.cod === "GVYDBDQ9" && pag.length === 0 || /Cupon <b>GVYDBDQ9<\/b>/.test(readFileSync("dist/index.html", "utf8")) === idx.o.slice(0, 48).some((o) => o.m === "pcgarage")), "cupon PC Garage: codul e in index si pe cardurile PC Garage");

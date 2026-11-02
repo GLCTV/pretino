@@ -170,3 +170,7 @@
 - Corectie paginare: adresele reale sunt /<cat>/paginaN/filtre/discount/ (inainte se oprea dupa pagina 2). Test adaugat.
 - Doar categoriile PC Garage (meniu + „Cu discount”): linkurile de campanie nu se mai descopera, iar sursele de campanie descoperite anterior se scot la incarcare. Black Friday ca sursa fixa: renuntat.
 - La listele de categorie PC Garage se citeste numarul afisat de magazin (`.products-count`, ex. „18 produse”). Se iau exact atatea produse de sus in jos; cand totalul e atins nu se mai deschide pagina urmatoare (nici pagina goala de la final). Limita de 10 pagini ramane. Test adaugat.
+
+## v1.55 – evoMAG: doar reduceri reale (max 45%)
+- `data/magazine.json`: evomag are `reducereMaxProcent: 45`; la generarea site-ului (`build.js`) ofertele evoMAG cu reducere mai mare nu se afiseaza (catalogul ramane neschimbat). evoMAG: 563 → 486 oferte. Verificare prin istoric de pret: de adaugat dupa ~30 de zile de date.
+- STATUS: local, asteptam OK de la Laur inainte de main.

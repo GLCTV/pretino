@@ -25,6 +25,14 @@
       "titlu": "PC Garage - pagina principala (pentru descoperirea paginilor de oferte)",
       "activ": true,
       "origine": "manual"
+    },
+    {
+      "id": "pcgarage-black-friday",
+      "magazin": "pcgarage",
+      "url": "https://www.pcgarage.ro/cumpara-acum-la-pret-de-black-friday/",
+      "titlu": "PC Garage - Cumpara acum la pret de Black Friday",
+      "activ": true,
+      "origine": "manual"
     }
   ]
 }

@@ -121,3 +121,6 @@
 
 ## v1.39 – pagina mai larga
 - Latimea maxima a continutului 1100 -> 1720 px, padding lateral fluid (12-32 px): pe monitoare mari apar 6 coloane de oferte.
+
+## v1.40 – poze produse
+- Pozele din feed-uri (campul imagine, 2016/2016 oferte) afisate pe carduri si in rezultatele cautarii: hotlink de pe serverele magazinelor, incarcare lenesa, fallback = fara poza daca nu se incarca. Neverificat: daca CDN-urile magazinelor permit hotlink (in sandbox nu am acces la ele; layout testat cu poze de proba). Confidentialitate actualizata.

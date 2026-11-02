@@ -19,7 +19,7 @@ const CSS = `:root{--bg:#f6f8f8;--fg:#10211f;--card:#fff;--mut:#5b6b69;--acc:#0f
 a{color:var(--acc)}header,main,footer{max-width:1720px;margin:0 auto;padding:16px clamp(12px,2vw,32px)}
 header{display:flex;gap:16px;align-items:center;flex-wrap:wrap}header .logo{display:flex;line-height:0;text-decoration:none}header .logo img{height:38px;width:auto;display:block}
 nav{display:flex;gap:12px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.poza{display:block;aspect-ratio:4/3;margin:-4px -4px 4px;border-radius:8px;background:#fff;overflow:hidden}.poza img{width:100%;height:100%;object-fit:contain;display:block}.poza.fara{display:none}.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}
 .pret{font-size:1.3rem;font-weight:700}.vechi{color:var(--mut);text-decoration:line-through;margin-left:8px;font-weight:400;font-size:1rem}
 .badge{background:var(--acc);color:#fff;border-radius:8px;padding:1px 8px;font-size:.85rem;align-self:flex-start}
 .btn{margin-top:auto;display:inline-block;background:var(--acc);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;text-align:center}
@@ -39,9 +39,11 @@ ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și 
 <footer><nav class="legal">${PAGINI_LEGALE.map((p) => `<a href="${p.cale}">${esc(p.nume)}</a>`).join("")}</nav>Pretino.ro afișează oferte din magazine partenere. Unele linkuri pot fi linkuri de afiliere (marcate sponsorizat); prețul pentru tine nu se schimbă. Unde apare „reducere afișată de magazin”, prețul vechi este cel de referință arătat de magazin, nu istoricul Pretino. Verifică mereu prețul final în magazin.</footer></body></html>`;
 }
 
+// poza produsului: URL-ul din feed-ul magazinului (hotlink), incarcata lenes; daca nu se incarca, locul ramane gol
+const poza = (o) => /^https:\/\//.test(o.imagine ?? "") ? `<a class="poza" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true"><img src="${esc(o.imagine)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="300" height="225" onerror="this.parentNode.classList.add('fara')"></a>` : "";
 const card = (o) => {
   const r = reducere(o);
-  return `<article class="card">${r ? `<span class="badge">-${r}%</span>` : ""}<strong>${esc(o.titlu)}</strong>
+  return `<article class="card">${poza(o)}${r ? `<span class="badge">-${r}%</span>` : ""}<strong>${esc(o.titlu)}</strong>
 <span class="mut">${esc(mag[o.magazin]?.nume ?? o.magazin)} · ${esc(cat[o.categorie]?.nume ?? o.categorie)}</span>
 <div><span class="pret">${lei(o.pret)}</span>${r ? `<span class="vechi"${o.referintaMagazin ? ' title="Preț de referință afișat de magazin"' : ""}>${lei(o.pretVechi)}</span>` : ""}</div>${o.referintaMagazin && r ? '<span class="mut">reducere afișată de magazin</span>' : ""}
 <a class="btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">Vezi oferta</a></article>`;
@@ -81,7 +83,7 @@ mkdirSync("dist", { recursive: true });
 if (existsSync("public")) cpSync("public", "dist", { recursive: true });
 writeFileSync("dist/stil.css", CSS);
 // index de cautare (citit de /cauta.js): campuri scurte, ordinea = cele mai mari reduceri primele
-writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), o: sortate.map((o) => ({ t: o.titlu, m: o.magazin, c: o.categorie, p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, u: o.url })) }));
+writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), o: sortate.map((o) => ({ t: o.titlu, m: o.magazin, c: o.categorie, p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "" })) }));
 for (const p of pagini) {
   const dir = "dist" + p.cale;
   mkdirSync(dir, { recursive: true });

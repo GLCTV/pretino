@@ -1,6 +1,6 @@
 # Pretino.ro
 
-Site static de oferte actuale din magazinele din România. Proiect independent (repo `glctv/pretino`, Worker Cloudflare `pretino`, domeniu pretino.ro). Generat cu Bun, fără dependențe externe.
+Site static de oferte actuale din magazinele din România. Proiect independent (repo `glctv/pretino`, Cloudflare Pages `pretino`, domeniu pretino.ro). Generat cu Bun, fără dependențe externe.
 
 ## Structură
 | Cale | Rol |
@@ -23,7 +23,7 @@ Site static de oferte actuale din magazinele din România. Proiect independent (
    CLOUDFLARE_API_TOKEN=...
    CLOUDFLARE_ACCOUNT_ID=...
    ```
-   (token Cloudflare cu drept „Workers Scripts: Edit” (șablonul „Edit Cloudflare Workers”), dedicat Pretino). Chei de afiliere/feed-uri se adaugă tot aici.
+   (token Cloudflare cu drept „Cloudflare Pages: Edit”, dedicat Pretino). Chei de afiliere/feed-uri se adaugă tot aici.
 
 ## Actualizare
 - Program: `Pretino.bat` face `git pull --ff-only` la pornire; modificările urcate pe `main` ajung singure.
@@ -34,10 +34,10 @@ Buton „Pornește previzualizarea” (build + server la `http://localhost:3100`
 
 ## Publicare
 1. Modificările aprobate sunt pe `main`.
-2. Butonul „PUBLICĂ LIVE” (sau `bun scripts/publica.js --live`): verifică ramura/curățenia, urcă `backup/…`, face build, `wrangler deploy`, verifică `version.json` online.
+2. Butonul „PUBLICĂ LIVE” (sau `bun scripts/publica.js --live`): verifică ramura/curățenia, urcă `backup/…`, face build, `wrangler pages deploy`, verifică `version.json` online.
 3. Push-ul pe `main` nu publică. `.github/workflows/deploy.yml` e doar manual (rezervă).
 
 ## Ce e unde
 - **Local (PC):** codul și datele proiectului, `logs/`, `rapoarte/`, `.pretino-local/`, secretele din `%LOCALAPPDATA%\Pretino\`.
 - **GitHub (`glctv/pretino`):** cod, `data/`, documentație, workflow-uri manuale, ramuri `backup/*`. Fără secrete.
-- **Cloudflare:** Worker `pretino` (static assets, încărcat cu wrangler, fără Git), domeniul pretino.ro, token/ID-uri dedicate. Configurația Cloudflare NU e în repo; vezi `PROGRES.md` pentru starea ei.
+- **Cloudflare:** proiect Pages `pretino` (direct upload), domeniul pretino.ro, token/ID-uri dedicate. Configurația Cloudflare NU e în repo; vezi `PROGRES.md` pentru starea ei.

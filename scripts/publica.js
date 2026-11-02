@@ -2,7 +2,7 @@
 // Cere --live explicit; refuză build demo, ramuri diferite de main, modificări necomise sau main nepus pe GitHub.
 import { execSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { SITE_URL, WORKERS_DEV_URL } from "../src/config.js";
+import { CF_PAGES_PROJECT, SITE_URL } from "../src/config.js";
 import { incarcaSecrete, caleSecrete } from "./lib/secrete.js";
 
 const sh = (c) => execSync(c, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
@@ -25,11 +25,11 @@ try { sh(`git push origin HEAD:refs/heads/backup/${ts.slice(0, 8)}-${ts.slice(8,
 
 rulez("bun", ["scripts/build.js"]);
 if (JSON.parse(readFileSync("dist/version.json", "utf8")).demo) stop("build demo – nu se publică.");
-rulez("bunx", ["wrangler@latest", "deploy"]);
+rulez("bunx", ["wrangler@latest", "pages", "deploy", "dist", `--project-name=${CF_PAGES_PROJECT}`, "--branch=main", "--commit-dirty=true"]);
 
 const sha = sh("git rev-parse HEAD");
 for (let i = 0; i < 12; i++) {
-  for (const base of [SITE_URL, WORKERS_DEV_URL]) {
+  for (const base of [SITE_URL, `https://${CF_PAGES_PROJECT}.pages.dev`]) {
     try {
       const j = await (await fetch(`${base}/version.json?x=${Date.now()}`, { signal: AbortSignal.timeout(10000) })).json();
       if (j.sha === sha) { console.log(`Verificat online pe ${base}: ${sha.slice(0, 7)}`); process.exit(0); }

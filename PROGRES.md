@@ -9,7 +9,7 @@
 
 ## Neverificat / lipsește
 - Repo GitHub `glctv/pretino`: de creat (gol, privat) – fără el nu pot face push.
-- Worker Cloudflare `pretino` (pretino.laur-games24.workers.dev), creat de Laur cu Upload static files + domeniul pretino.ro + token dedicat: de creat/atașat.
+- Proiect Cloudflare Pages `pretino` + domeniul pretino.ro + token dedicat: de creat/atașat.
 - Local pe PC: fără shell pe PC în această sesiune; fișierele sunt scrise în `E:\Claude\Pretino`. Nu s-au rulat git/bun/PowerShell pe PC.
 - Adaptori magazine (eMAG, Altex, PC Garage…), conturi/feed-uri de afiliere, imagini produse.
 - Copii de siguranță automate ale datelor (acum: ramuri `backup/*` la publicare).

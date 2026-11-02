@@ -34,6 +34,10 @@ export async function testeCampanii(ok) {
     ok(lp && lp.pret === 2598.99 && lp.pretReferinta === 2648.99 && lp.reducereAfisata === "Discount 50,00 RON", "pcgarage: pret vechi din blocul .pb-extra de langa cardul de categorie"); }
   { const k = parseHtml('<span class="products-count">1.234 produse de la 7 producatori</span><div class="product_box"><div class="product_box_name"><a href="/a/">A</a></div><div class="pb-price"><p class="price">10,00 RON</p></div></div>');
     const r = pg.parseListare(k, URL_C); ok(r.total === 1234 && r.produse.length === 1, "pcgarage: numarul live de produse (.products-count) citit"); }
+  { const h = (n) => `<div class="pagination"><a href="https://www.pcgarage.ro/monitoare-led/pagina2/filtre/discount/">2</a><a href="https://www.pcgarage.ro/monitoare-led/pagina3/filtre/discount/">3</a></div>`;
+    const u1 = pg.parseListare(parseHtml(h()), "https://www.pcgarage.ro/monitoare-led/filtre/discount/").urmatoarea;
+    const u2 = pg.parseListare(parseHtml(h()), "https://www.pcgarage.ro/monitoare-led/pagina2/filtre/discount/").urmatoarea;
+    ok(u1?.includes("/pagina2/filtre/discount/") && u2?.includes("/pagina3/filtre/discount/"), "pcgarage: paginare pe adrese /paginaN/filtre/discount/"); }
   { const { deschide, argumenteVerificare } = await import("./deschide-browser.js"); const ap = [];
     const a = argumenteVerificare("C:\\p", "https://www.pcgarage.ro/");
     ok(a.includes("--user-data-dir=C:\\p") && a.some((x) => /remote-debugging-port=9333/.test(x)) && !a.some((x) => /headless/.test(x)), "verificare manuala: browser vizibil cu port fix local pentru atasare");

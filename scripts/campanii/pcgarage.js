@@ -65,8 +65,9 @@ export function parseListare(root, baza) {
   return { produse: unice.length ? unice : produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: urmatoarea(root, baza), total: total > 0 ? total : null };
 }
 function urmatoarea(root, baza) {
-  const m = baza.match(/\/pagina(\d+)\/?(?:\?.*)?$/);
+  // formele reale: /<cat>/paginaN/ si /<cat>/paginaN/filtre/discount/
+  const m = baza.match(/\/pagina(\d+)(?:\/|$|\?)/);
   const n = m ? Number(m[1]) + 1 : 2;
-  const a = qsa(root, ".pagination a, .lr-pagination a").find((x) => new RegExp(`/pagina${n}/?$`).test(attr(x, "href") ?? ""));
+  const a = qsa(root, ".pagination a, .lr-pagination a").find((x) => new RegExp(`/pagina${n}(/|$|\\?)`).test(attr(x, "href") ?? ""));
   return a ? absolut(attr(a, "href"), baza) : paginaUrmatoare(root, baza);
 }

@@ -66,6 +66,17 @@ ok(i.x.length === 2 && i.x[1].p === 8, "istoric: preț schimbat adaugă intrare"
   ok(eroare, "profitshare: fara feed in secrete.env da eroare clara");
 }
 ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"), "CLAUDE.md, README.md, PROGRES.md există");
+{ const { dinProdus } = await import("./surse/campanii.js");
+  const mg = [{ id: "emag", nume: "eMAG" }, { id: "pcgarage", nume: "PC Garage" }], acum = Date.parse("2026-11-02T15:00:00Z"), v = "2026-11-02T14:00:00Z";
+  const base = { magazin: "emag", titlu: "Laptop X", url: "https://www.emag.ro/x/pd/A/", pret: 1000, pretReferinta: 1500, disponibilitate: "in_stoc", ultimaVerificare: v, campanii: ["c1"] };
+  const camp = { c1: { sursaId: "emag-red-laptopuri" } };
+  const o = dinProdus(base, mg, camp, acum).oferta;
+  ok(o && o.pretVechi === 1500 && o.referintaMagazin === true && o.afiliat === false && o.categorie === "electronice", "campanii->catalog: oferta cu reducere afisata de magazin, fara afiliere");
+  ok(dinProdus({ ...base, pretReferinta: null }, mg, camp, acum).omis, "campanii->catalog: fara pret de referinta nu intra");
+  ok(dinProdus({ ...base, disponibilitate: "out_of_stock" }, mg, camp, acum).omis, "campanii->catalog: fara stoc nu intra");
+  ok(dinProdus({ ...base, ultimaVerificare: "2026-10-20T10:00:00Z" }, mg, camp, acum).omis, "campanii->catalog: date vechi nu intra");
+  ok(dinProdus({ ...base, titlu: "Laptop Resigilat" }, mg, camp, acum).omis, "campanii->catalog: resigilat nu intra");
+  ok(dinProdus({ ...base, pretReferinta: 20000 }, mg, camp, acum).omis, "campanii->catalog: reducere suspecta >90% nu intra"); }
 { const { testeCampanii } = await import("./test-campanii.js"); await testeCampanii(ok); }
 console.log(esecuri ? `\n${esecuri} teste eșuate` : "\nToate testele au trecut");
 process.exit(esecuri ? 1 : 0);

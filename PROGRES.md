@@ -64,3 +64,8 @@
 
 ## v1.23
 - eMAG: 13 surse implicite IT sortate dupa reducere (/categorie/sort-discountdesc/c, max 6 pagini fiecare, verificate in Chrome); surse implicite noi se adauga o singura data in configul existent. Paginile de prezentare (nav/deals, genius etc.) sunt doar informative.
+
+## v1.24 – eMAG si PC Garage in catalog
+- Sursa noua scripts/surse/campanii.js: citeste data/produse-campanii.json (modulul Campanii) si le duce in catalogul Pretino la „Actualizeaza oferte”. Doar produse cu pret de referinta afisat > pret (min 5%, max 90%), in stoc (PC Garage: stoc necunoscut acceptat daca nu e marcat epuizat), verificate in ultimele 3 zile, fara resigilate.
+- Oferta are referintaMagazin=true: cardul spune „reducere afisata de magazin” (nu istoricul Pretino, nu „cel mai mic pret din 30 zile”). Link-uri oficiale, fara afiliere pentru eMAG/PC Garage pana exista un mecanism configurat.
+- magazine.json: emag si pcgarage -> sursa „campanii”, active.

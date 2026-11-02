@@ -32,14 +32,14 @@ function pagina({ titlu, descriere, cale, corp, noindex = false }) {
 ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și nu se publică</div>' : ""}
 <header><a class="logo" href="/">${esc(SITE_NAME)}</a><nav>${categorii.map((c) => `<a href="/categorie/${c.slug}/">${esc(c.nume)}</a>`).join("")}</nav></header>
 <main>${corp}</main>
-<footer>Pretino.ro afișează oferte din magazine partenere. Unele linkuri pot fi linkuri de afiliere (marcate sponsorizat); prețul pentru tine nu se schimbă. Verifică mereu prețul final în magazin.</footer></body></html>`;
+<footer>Pretino.ro afișează oferte din magazine partenere. Unele linkuri pot fi linkuri de afiliere (marcate sponsorizat); prețul pentru tine nu se schimbă. Unde apare „reducere afișată de magazin”, prețul vechi este cel de referință arătat de magazin, nu istoricul Pretino. Verifică mereu prețul final în magazin.</footer></body></html>`;
 }
 
 const card = (o) => {
   const r = reducere(o);
   return `<article class="card">${r ? `<span class="badge">-${r}%</span>` : ""}<strong>${esc(o.titlu)}</strong>
 <span class="mut">${esc(mag[o.magazin]?.nume ?? o.magazin)} · ${esc(cat[o.categorie]?.nume ?? o.categorie)}</span>
-<div><span class="pret">${lei(o.pret)}</span>${r ? `<span class="vechi">${lei(o.pretVechi)}</span>` : ""}</div>
+<div><span class="pret">${lei(o.pret)}</span>${r ? `<span class="vechi"${o.referintaMagazin ? ' title="Preț de referință afișat de magazin"' : ""}>${lei(o.pretVechi)}</span>` : ""}</div>${o.referintaMagazin && r ? '<span class="mut">reducere afișată de magazin</span>' : ""}
 <a class="btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">Vezi oferta</a></article>`;
 };
 const grila = (l) => `<div class="grid">${l.map(card).join("")}</div>`;

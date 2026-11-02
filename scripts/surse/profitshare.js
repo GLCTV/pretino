@@ -5,16 +5,17 @@ import { parsePret, idOferta, inStoc, mapCategorie } from "../lib/oferta.js";
 import { gasesteMagazin } from "../lib/magazine.js";
 
 export function dinRand(x, magazine) {
-  const link = x.link || x.product_url || "";
-  const m = gasesteMagazin(magazine, { nume: x.adv_name, link });
+  const link = x.link || x.product_url || x.product_link || "";
+  const m = gasesteMagazin(magazine, { nume: x.adv_name || x.advertiser_name, link });
   if (!m) return { omis: "magazin necunoscut: " + (x.adv_name || link) };
   if (!inStoc(x.availability)) return { omis: "fara stoc" };
-  const vechi = parsePret(x.price_vat), disc = parsePret(x.price_discounted);
+  const vechi = parsePret(x.price_vat || x.price_with_vat), disc = parsePret(x.price_discounted || x["price_with_discount,_with_vat"]);
   const pret = disc && vechi && disc < vechi ? disc : vechi;
   const pretVechi = disc && vechi && disc < vechi ? vechi : null;
-  const url = x.product_aff_link || link;
-  if (!pret || !url || !x.product_name) return { omis: "date incomplete" };
-  return { oferta: { id: idOferta("ps", link || url), sursa: "profitshare", titlu: x.product_name, categorie: mapCategorie(x.category), magazin: m.id, pret, ...(pretVechi ? { pretVechi } : {}), url, afiliat: Boolean(x.product_aff_link), ...(x.product_pic ? { imagine: x.product_pic } : {}) } };
+  const aff = (x.product_aff_link || x.product_affiliate_link || "").replace(/^\/\//, "https://");
+  const url = aff || link;
+  if (!pret || !url || !(x.product_name)) return { omis: "date incomplete" };
+  return { oferta: { id: idOferta("ps", link || url), sursa: "profitshare", titlu: x.product_name, categorie: mapCategorie(x.category), magazin: m.id, pret, ...(pretVechi ? { pretVechi } : {}), url, afiliat: Boolean(aff), ...((x.product_pic || x.product_picture) ? { imagine: x.product_pic || x.product_picture } : {}) } };
 }
 
 export async function citeste(magazine, secrete, fetchFn = fetch) {

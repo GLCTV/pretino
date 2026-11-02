@@ -111,3 +111,6 @@
 
 ## v1.36 – script Profitshare linkuri automate
 - Scriptul Profitshare (linkuri automate, pretino.ro aprobat) pus in <head> pe toate paginile (nu in preview DEMO). Textele de confidentialitate/cookies il mentioneaza. Neverificat: ce cookie-uri seteaza efectiv; daca e nevoie de banner de consimtamant se adauga separat.
+
+## v1.37
+- Script Profitshare regenerat cu eMAG exclus din lista de advertiseri (v=1793640493).

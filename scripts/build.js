@@ -26,7 +26,7 @@ nav{display:flex;gap:12px;flex-wrap:wrap}.grid{display:grid;grid-template-column
 .demo{background:#b45309;color:#fff;text-align:center;padding:6px}.mut{color:var(--mut)}footer{color:var(--mut);font-size:.9rem}footer .legal{margin-bottom:8px}main h2{margin-top:1.4em}`;
 
 // Script Profitshare „Linkuri automate" (cont Pretino, site validat): transforma linkurile catre magazinele partenere in linkuri de afiliere. Fara el, linkurile raman cele din catalog.
-const PROFITSHARE_SCRIPT = `<!-- Start ProfitShare Zone --><script>(function(){var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="//l.profitshare.ro/files_shared/lps/js/AZC/NI.js?v=1793640025";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(s);})();</script><!-- End ProfitShare Zone -->`;
+const PROFITSHARE_SCRIPT = `<!-- Start ProfitShare Zone --><script>(function(){var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="//l.profitshare.ro/files_shared/lps/js/AZC/NI.js?v=1793640493";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(s);})();</script><!-- End ProfitShare Zone -->`;
 
 function pagina({ titlu, descriere, cale, corp, noindex = false }) {
   const robots = noindex || DEMO ? '<meta name="robots" content="noindex">' : "";

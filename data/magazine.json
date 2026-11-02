@@ -1,11 +1,97 @@
 [
-  { "id": "evomag", "nume": "evoMAG", "domeniu": "evomag.ro", "activ": true, "sursa": "2performant", "afiliere": { "retea": "2performant", "unique": "d4f678b43" } },
-  { "id": "itgalaxy", "nume": "ITGalaxy", "domeniu": "itgalaxy.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
-  { "id": "vexio", "nume": "Vexio", "domeniu": "vexio.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
-  { "id": "pcmadd", "nume": "PCMadd", "domeniu": "pcmadd.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
-  { "id": "citgrup", "nume": "CITGrup", "domeniu": "citgrup.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
-  { "id": "dwyn", "nume": "Dwyn", "domeniu": "dwyn.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
-  { "id": "techstar", "nume": "Techstar", "domeniu": "techstar.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
-  { "id": "pcgarage", "nume": "PC Garage", "domeniu": "pcgarage.ro", "activ": true, "sursa": "campanii", "afiliere": { "retea": null } },
-  { "id": "altex", "nume": "Altex", "domeniu": "altex.ro", "activ": false, "sursa": null, "afiliere": { "retea": null } }
+  {
+    "id": "evomag",
+    "nume": "evoMAG",
+    "domeniu": "evomag.ro",
+    "activ": true,
+    "sursa": "2performant",
+    "afiliere": {
+      "retea": "2performant",
+      "unique": "d4f678b43"
+    }
+  },
+  {
+    "id": "itgalaxy",
+    "nume": "ITGalaxy",
+    "domeniu": "itgalaxy.ro",
+    "activ": true,
+    "sursa": "profitshare",
+    "afiliere": {
+      "retea": "profitshare"
+    }
+  },
+  {
+    "id": "vexio",
+    "nume": "Vexio",
+    "domeniu": "vexio.ro",
+    "activ": true,
+    "sursa": "profitshare",
+    "afiliere": {
+      "retea": "profitshare"
+    }
+  },
+  {
+    "id": "pcmadd",
+    "nume": "PCMadd",
+    "domeniu": "pcmadd.ro",
+    "activ": true,
+    "sursa": "profitshare",
+    "afiliere": {
+      "retea": "profitshare"
+    }
+  },
+  {
+    "id": "citgrup",
+    "nume": "CITGrup",
+    "domeniu": "citgrup.ro",
+    "activ": true,
+    "sursa": "profitshare",
+    "afiliere": {
+      "retea": "profitshare"
+    }
+  },
+  {
+    "id": "dwyn",
+    "nume": "Dwyn",
+    "domeniu": "dwyn.ro",
+    "activ": true,
+    "sursa": "profitshare",
+    "afiliere": {
+      "retea": "profitshare"
+    }
+  },
+  {
+    "id": "techstar",
+    "nume": "Techstar",
+    "domeniu": "techstar.ro",
+    "activ": true,
+    "sursa": "profitshare",
+    "afiliere": {
+      "retea": "profitshare"
+    }
+  },
+  {
+    "id": "pcgarage",
+    "nume": "PC Garage",
+    "domeniu": "pcgarage.ro",
+    "activ": true,
+    "sursa": "campanii",
+    "afiliere": {
+      "retea": null
+    },
+    "cupon": {
+      "cod": "GVYDBDQ9",
+      "text": "1% reducere"
+    }
+  },
+  {
+    "id": "altex",
+    "nume": "Altex",
+    "domeniu": "altex.ro",
+    "activ": false,
+    "sursa": null,
+    "afiliere": {
+      "retea": null
+    }
+  }
 ]

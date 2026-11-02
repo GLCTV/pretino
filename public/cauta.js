@@ -1,4 +1,10 @@
 // Căutare în catalog, în browser (fără server): încarcă /cauta-index.json la prima utilizare.
+document.addEventListener("click", function (e) {
+  var b = e.target.closest && e.target.closest(".copiaza");
+  if (!b) return;
+  var cod = b.getAttribute("data-cod"), ok = function () { b.textContent = "Copiat!"; setTimeout(function () { b.textContent = "Copiază"; }, 2000); };
+  if (navigator.clipboard) navigator.clipboard.writeText(cod).then(ok, function () {}); 
+});
 (function () {
   var form = document.getElementById("cautare");
   if (!form) return;
@@ -53,6 +59,7 @@
       '<span class="mut">' + esc(data.m[o.m] || o.m) + " · " + esc(data.c[o.c] || o.c) + "</span>" +
       '<div><span class="pret">' + lei(o.p) + "</span>" + (r ? '<span class="vechi"' + (o.r ? ' title="Preț de referință afișat de magazin"' : "") + ">" + lei(o.v) + "</span>" : "") + "</div>" +
       (o.r && r ? '<span class="mut">reducere afișată de magazin</span>' : "") +
+      (data.k && data.k[o.m] ? '<div class="cupon"><span>Cupon <b>' + esc(data.k[o.m].cod) + "</b> (" + esc(data.k[o.m].text) + ") – introdu-l în coș</span>" + '<button type="button" class="copiaza" data-cod="' + esc(data.k[o.m].cod) + '">Copiază</button></div>' : "") +
       '<a class="btn" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank">Vezi oferta</a></article>';
   }
   function mai_multe() {

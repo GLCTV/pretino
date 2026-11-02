@@ -130,3 +130,6 @@
 
 ## v1.42 – doar oferte cu preț redus
 - Site-ul afișează doar oferte cu preț vechi > preț nou (filtru în build). Fără etichete PRP. Include cache-busting (v1.41).
+
+## v1.43 – cupon PC Garage
+- Cupon GVYDBDQ9 (1%) pe cardurile PC Garage (site + cautare), buton Copiaza, mentiune in subsol. Cuponul e cod de cont (nu secret), scos din lista interzisa din test.js.

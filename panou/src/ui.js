@@ -12,10 +12,10 @@ button,.tab{font:inherit;border:1px solid var(--bd);background:var(--card);color
 .mesaj{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px}.corp{white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}
 label{display:block;margin:10px 0 4px;color:var(--mut)}input,textarea{width:100%;font:inherit;padding:9px 11px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg)}
 textarea{min-height:200px}.msg{margin:10px 0;padding:9px 12px;border-radius:8px;background:var(--card);border:1px solid var(--bd)}.err{color:var(--rosu)}
-table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd)}.badge{background:var(--acc);color:#fff;border-radius:99px;padding:0 8px;font-size:.8rem}`;
+table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd)}.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}.kpi div{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 14px}.kpi b{display:block;font-size:1.6rem}.kpi span{color:var(--mut);font-size:.9rem}.perioada{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.tabel{overflow-x:auto}.badge{background:var(--acc);color:#fff;border-radius:99px;padding:0 8px;font-size:.8rem}`;
 
 const JS = `
-const $=(s)=>document.querySelector(s);let tab='inbox',deschis=null;
+const $=(s)=>document.querySelector(s);let tab='inbox',deschis=null,zileStat=7;
 const KEY='pretino-panou-key';const ls={g:()=>{try{return localStorage.getItem(KEY)}catch{return null}},s:(v)=>{try{localStorage.setItem(KEY,v)}catch{}},d:()=>{try{localStorage.removeItem(KEY)}catch{}}};
 const api=async(u,o={})=>{const k=ls.g();const h={...(o.headers||{})};if(k)h.Authorization='Bearer '+k;const r=await fetch(u,{...o,headers:h});const j=await r.json().catch(()=>({}));
  if(r.status===401){ls.d();login();const e=new Error(j.eroare||'Autentificare necesara.');e.login=true;throw e;}if(!r.ok)throw new Error(j.eroare||('Eroare '+r.status));return j;};
@@ -45,6 +45,20 @@ async function randeaza(){const v=$('#v');v.replaceChildren();try{
    rd('Oferte în catalog',status.total);rd('Catalog generat',data(status.generat));if(versiune?.built)rd('Ultima publicare',data(versiune.built));if(versiune?.sha)rd('Versiune (git)',versiune.sha.slice(0,7));
    v.append(t,el('h3',{},'Pe magazine'));const t2=el('table',{});for(const[k,n]of Object.entries(status.magazine||{}))t2.append(el('tr',{},el('td',{},k),el('td',{},String(n))));v.append(t2,el('h3',{},'Pe categorii'));
    const t3=el('table',{});for(const[k,n]of Object.entries(status.categorii||{}))t3.append(el('tr',{},el('td',{},k),el('td',{},String(n))));v.append(t3);}
+ }else if(tab==='stats'){const o=el('div',{class:'perioada'});for(const[z,n]of[[1,'Azi'],[7,'7 zile'],[30,'30 zile'],[90,'90 zile']])o.append(el('button',{class:z===zileStat?'pri':'',onclick:()=>{zileStat=z;randeaza();}},n));
+  const s=await api('/api/stats?zile='+zileStat);const dur=(x)=>{x=Math.round(x||0);return x<60?x+' s':Math.floor(x/60)+' min '+String(x%60).padStart(2,'0')+' s';};const nr=(x)=>Number(x).toLocaleString('ro-RO');
+  const t=s.total,medie=t.vizite?t.sec/t.vizite:0,pePag=t.vizualizari?t.sec/t.vizualizari:0;
+  const kpi=el('div',{class:'kpi'});for(const[a,b]of[['Vizite',nr(t.vizite)],['Vizitatori',nr(t.vizitatori)],['Pagini vizualizate',nr(t.vizualizari)],['Timp mediu / vizită',dur(medie)],['Timp mediu / pagină',dur(pePag)],['Pagini / vizită',t.vizite?(t.vizualizari/t.vizite).toFixed(1).replace('.',','):'0']])kpi.append(el('div',{},el('b',{},b),el('span',{},a)));
+  kpi.append(el('div',{},el('b',{},nr(s.clickuri_total)),el('span',{},'Click-uri spre magazine')),el('div',{},el('b',{},nr(s.acum)),el('span',{},'Pe site acum (5 min)')));
+  v.append(o,kpi);
+  const tz=el('table',{});tz.append(el('tr',{},...['Ziua','Vizite','Vizitatori','Pagini','Timp mediu / vizită'].map(x=>el('th',{},x))));
+  for(const r of[...s.pe_zi].reverse())tz.append(el('tr',{},el('td',{},r.zi),el('td',{},nr(r.vizite)),el('td',{},nr(r.vizitatori)),el('td',{},nr(r.vizualizari)),el('td',{},r.vizite?dur(r.sec/r.vizite):'–')));
+  v.append(el('h3',{},'Pe zile'),el('div',{class:'tabel'},tz));
+  if(s.pagini.length){const tp=el('table',{});tp.append(el('tr',{},...['Pagina','Vizualizări','Timp mediu'].map(x=>el('th',{},x))));for(const r of s.pagini)tp.append(el('tr',{},el('td',{},r.cale),el('td',{},nr(r.n)),el('td',{},r.medie==null?'–':dur(r.medie))));v.append(el('h3',{},'Cele mai vizitate pagini'),el('div',{class:'tabel'},tp));}
+  if(s.clickuri.length){const tc=el('table',{});tc.append(el('tr',{},...['Magazin','Click-uri','Click-uri / 100 vizite'].map(x=>el('th',{},x))));for(const r of s.clickuri)tc.append(el('tr',{},el('td',{},r.mag),el('td',{},nr(r.n)),el('td',{},t.vizite?(r.n*100/t.vizite).toFixed(1).replace('.',','):'–')));v.append(el('h3',{},'Click-uri spre magazine (potențial de comision)'),tc);}
+  {const d=s.dispozitive,tot=(d.m||0)+(d.d||0)+(d.t||0);if(tot){const pc=(x)=>Math.round((x||0)*100/tot)+'%';v.append(el('h3',{},'Dispozitive (pagini vizualizate)'),el('p',{},'Telefon '+pc(d.m)+' · Calculator '+pc(d.d)+' · Tabletă '+pc(d.t)));}}
+  if(s.surse.length){const ts=el('table',{});for(const r of s.surse)ts.append(el('tr',{},el('td',{},r.ref),el('td',{},nr(r.n))));v.append(el('h3',{},'De unde vin (site-uri care trimit vizitatori)'),ts);}
+  v.append(el('p',{class:'mut'},'Măsurare anonimă, fără cookie-uri și fără adresa IP. Un vizitator este un cod care se schimbă zilnic, deci pe mai multe zile „Vizitatori” este suma vizitatorilor din fiecare zi (aceeași persoană care revine în zile diferite se numără de mai multe ori). O vizită = paginile văzute de același vizitator, cu pauze de cel mult 30 de minute. Nu includ roboții, vizitele cu „Do Not Track” sau dispozitivele excluse. Datele se păstrează 400 de zile.'));
  }}catch(e){if(!e.login)v.append(el('p',{class:'err'},e.message));}}
 function raspunde(m){tab='write';document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.t==='write')));const s=m.subject||'';
  const v=$('#v');v.replaceChildren();formular(m.from_addr,/^re:/i.test(s)?s:'Re: '+s,'\\n\\n— Răspuns la mesajul din '+data(m.date)+':\\n'+(m.body||'').split('\\n').slice(0,30).map(x=>'> '+x).join('\\n'),m.message_id);}
@@ -58,7 +72,7 @@ export function pagina(nonce) {
   const html = `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Panou Pretino</title>
 <style nonce="${nonce}">${CSS}</style></head><body>
 <header><b>Panou Pretino</b><span class="mut">contact@pretino.ro</span><button id="rel" type="button">Reîncarcă</button><button id="out" type="button">Ieși</button></header>
-<nav><button class="tab" data-t="inbox" aria-selected="true">Primite <span id="nec" class="badge" hidden></span></button><button class="tab" data-t="sent" aria-selected="false">Trimise</button><button class="tab" data-t="write" aria-selected="false">Scrie</button><button class="tab" data-t="status" aria-selected="false">Stare site</button></nav>
+<nav><button class="tab" data-t="inbox" aria-selected="true">Primite <span id="nec" class="badge" hidden></span></button><button class="tab" data-t="sent" aria-selected="false">Trimise</button><button class="tab" data-t="write" aria-selected="false">Scrie</button><button class="tab" data-t="status" aria-selected="false">Stare site</button><button class="tab" data-t="stats" aria-selected="false">Statistici</button></nav>
 <main><div id="m"></div><div id="v"></div></main>
 <script nonce="${nonce}">${JS}</script></body></html>`;
   return new Response(html, { headers: {

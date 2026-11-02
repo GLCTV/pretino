@@ -186,3 +186,10 @@
 - JSON-LD: WebSite + Organization (acasa), BreadcrumbList (pagini cu ierarhie). Fara Product/Offer.
 - `public/_headers` (noindex pe *.pages.dev, cache fonturi/css/js/index). Teste: `scripts/test-seo.js`. Strategie si verificari pentru contul tau: `docs/seo.md`.
 - STATUS: pe ramura `seo-v1`, asteptam OK de la Laur inainte de main.
+
+## v1.58 – Statistici in panou (panou.pretino.ro)
+- Tab nou „Statistici”: vizite, vizitatori, pagini, timp mediu / vizita si / pagina, pe zile, top pagini, surse de trafic, click-uri spre magazine (pe magazin), dispozitive, vizitatori activi acum. Perioade: azi / 7 / 30 / 90 zile.
+- Masurare proprie, anonima: `public/cauta.js` trimite la `/_s/c` (rute Worker pe pretino.ro si www.pretino.ro) pagina, domeniul sursei, secundele cu pagina vizibila si magazinul la click. Fara cookie-uri, fara stocare in browser, fara IP; vizitator = cod zilnic ireversibil. Excluse: roboti, Do Not Track/GPC, previzualizare/DEMO, dispozitive cu `?fara-statistici=1`.
+- `panou/src/stat.js`, `panou/schema.sql` (tabele `vizite`, `clickuri`), `panou/wrangler.sablon.jsonc` (rute), pagini legale (confidentialitate, cookies) actualizate. Teste cu SQLite real in `scripts/test-panou.js`.
+- DE FACUT de Laur dupa OK + main: `bun scripts/panou-deploy.js --deploy` (creeaza tabelele si rutele), apoi PUBLICA LIVE. Pana la ambele, statisticile raman goale. Vizitele tale: deschide o data pretino.ro/?fara-statistici=1 pe fiecare dispozitiv.
+- STATUS: pe ramura `statistici-panou`, asteptam OK de la Laur inainte de main.

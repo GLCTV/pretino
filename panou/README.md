@@ -3,6 +3,7 @@
 Worker Cloudflare propriu Pretino (`pretino-panou`) la `https://panou.pretino.ro`:
 - **Primite**: emailurile trimise la `contact@pretino.ro` (Email Routing → Worker → baza D1 `pretino-mail`) si copie pe Gmail (`FORWARD_TO`).
 - **Trimise / Scrie**: raspuns si mesaje noi din `contact@pretino.ro` prin Resend (limita 30/ora).
+- **Statistici**: vizite, vizitatori, timp mediu, click-uri spre magazine, surse, dispozitive (masurare anonima, fara cookie-uri; datele vin de la site prin rutele `pretino.ro/_s/*`, create de `panou-deploy.js`).
 - **Stare site**: numar de oferte, magazine, categorii, data ultimei publicari (din `https://pretino.ro/status.json` si `version.json`).
 - Acces implicit cu **parola** (secret `PANOU_KEY`, minim 12 caractere; 10 incercari gresite/10 min per IP → blocare temporara). Optional si Cloudflare Access (Worker-ul verifica singur jetonul). Fara parola si fara Access = acces refuzat. Trimitere: Cc/Bcc, max 40 destinatari, limite 30/ora; emailurile se pastreaza 6 luni. Emailurile se afiseaza doar ca text; atasamentele nu se salveaza (raman in copia de pe Gmail).
 

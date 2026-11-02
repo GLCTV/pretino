@@ -4,7 +4,12 @@
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
   "workers_dev": false,
-  "routes": [{ "pattern": "panou.pretino.ro", "custom_domain": true }],
+  "routes": [
+    { "pattern": "panou.pretino.ro", "custom_domain": true },
+    // doar colectarea anonima de statistici (POST /_s/c) ajunge in Worker de pe domeniul site-ului; restul site-ului ramane pe Cloudflare Pages
+    { "pattern": "pretino.ro/_s/*", "zone_name": "pretino.ro" },
+    { "pattern": "www.pretino.ro/_s/*", "zone_name": "pretino.ro" }
+  ],
   "d1_databases": [{ "binding": "DB", "database_name": "pretino-mail", "database_id": "__DATABASE_ID__" }],
   "vars": {
     "FROM": "Pretino <contact@pretino.ro>",

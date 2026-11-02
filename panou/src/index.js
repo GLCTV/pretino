@@ -1,10 +1,11 @@
 // Worker „pretino-panou": (1) primeste emailurile de la contact@pretino.ro (Email Routing -> Worker), le salveaza in D1 si le redirectioneaza si
-// pe adresa personala; (2) serveste panoul (inbox, trimise, scrie, stare site) DOAR dupa Cloudflare Access; (3) trimite emailuri prin Resend.
+// pe adresa personala; (2) serveste panoul (inbox, trimise, scrie, stare site, statistici) DOAR dupa Cloudflare Access; (3) trimite emailuri prin Resend.
 // Secret necesar: RESEND_API_KEY (wrangler secret put). Nimic secret in repo.
 import PostalMime from "postal-mime";
 import { verificaAccess, verificaParola, areAntetParola } from "./auth.js";
 import { htmlInText, taie, valideazaTrimitere, corpResend, adresa } from "./mail.js";
 import { pagina } from "./ui.js";
+import { colecteaza, statistici } from "./stat.js";
 
 const J = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
 const LIMITA_ORA = 30, LIMITA_10MIN = 20, ESECURI_MAX = 10, ZILE_PASTRARE = 180;
@@ -45,6 +46,9 @@ export default {
   // ---- panou + API ----
   async fetch(request, env) {
     const url = new URL(request.url), { pathname: p } = url;
+    // Pe domeniul site-ului (rutele pretino.ro/_s/* si www.pretino.ro/_s/*) se serveste DOAR colectarea anonima de statistici, niciodata panoul.
+    const gazdaSite = new URL(env.SITE_URL).hostname;
+    if (url.hostname === gazdaSite || url.hostname === "www." + gazdaSite) return p === "/_s/c" ? colecteaza(request, env) : J({ eroare: "Negasit." }, 404);
     if (request.method !== "GET" && request.method !== "HEAD") {
       const origin = request.headers.get("Origin");
       if (origin && origin !== url.origin) return J({ eroare: "Origine nepermisa." }, 403);
@@ -84,6 +88,8 @@ export default {
         await curata(env);
         return J({ ok: true, id: rj.id });
       }
+
+      if (p === "/api/stats" && request.method === "GET") return J(await statistici(env, url.searchParams.get("zile")));
 
       if (p === "/api/status" && request.method === "GET") {
         const get = async (f) => { try { const r = await fetch(`${env.SITE_URL}/${f}?x=${Date.now()}`, { cf: { cacheTtl: 0 } }); return r.ok ? await r.json() : null; } catch { return null; } };

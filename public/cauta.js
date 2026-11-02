@@ -1,6 +1,6 @@
 // Pretino.ro – interfata din browser: tema, favorite, copiere cupon, cautare cu sugestii, filtre/sortare pe liste.
 // Catalogul (/cauta-index.json; campuri: id,t,m,c,s,p,v,r,x,u,i) se incarca DOAR cand e nevoie: cautare, filtre/sortare, „Arata mai multe”, favorite.
-// Paginile de lista au deja produsele in HTML (cu linkuri de paginare), deci pornirea nu mai randeaza din nou lista. Fara server, fara cookie-uri; favoritele si tema raman doar in acest browser.
+// Paginile de lista au deja produsele in HTML (cu linkuri de paginare), deci pornirea nu mai randeaza din nou lista. Fara cookie-uri; favoritele si tema raman doar in acest browser; statistici anonime la sfarsitul fisierului.
 (function () {
   "use strict";
   var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
@@ -296,4 +296,41 @@
   } else {
     mai.hidden = cfg.fin >= cfg.total;   // lista din HTML ramane neschimbata; „Arata mai multe” continua dupa ultimul produs al paginii
   }
+})();
+
+/* ---------- statistici anonime (fara cookie-uri, fara stocare in browser, fara IP) ----------
+   Trimite catre /_s/c (acelasi domeniu): pagina fara parametri, domeniul sursei si secundele cat pagina a fost vizibila. Nu se trimit pe previzualizare locala,
+   pe pagini DEMO, la „Do Not Track”/Global Privacy Control, la browsere automate sau pe dispozitivele excluse cu ?fara-statistici=1 (se anuleaza cu ?cu-statistici=1). */
+(function () {
+  "use strict";
+  try {
+    if (!/(^|\.)pretino\.ro$/.test(location.hostname) || document.querySelector(".demo")) return;
+    if (navigator.doNotTrack === "1" || navigator.globalPrivacyControl || navigator.webdriver) return;
+    var CHEIE = "pretino-fara-stat";
+    if (/[?&]fara-statistici=1/.test(location.search)) localStorage.setItem(CHEIE, "1");
+    if (/[?&]cu-statistici=1/.test(location.search)) localStorage.removeItem(CHEIE);
+    if (localStorage.getItem(CHEIE) === "1") return;
+  } catch (e) { /* stocarea indisponibila: se masoara normal */ }
+  var trimite = function (o) {
+    try { fetch("/_s/c", { method: "POST", body: JSON.stringify(o), keepalive: true, credentials: "omit" }).catch(function () {}); } catch (e) { /* ignorat */ }
+  };
+  var pid = Array.prototype.map.call(crypto.getRandomValues(new Uint8Array(8)), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+  var sursa = "";
+  try { var h = new URL(document.referrer).hostname; if (h && h !== location.hostname && h !== "www." + location.hostname) sursa = h; } catch (e) { /* fara sursa */ }
+  var acum = function () { return Date.now(); }, vizibil = document.visibilityState === "visible", start = acum(), total = 0;
+  trimite({ e: "v", p: pid, c: location.pathname, r: sursa });
+  var opreste = function () {
+    if (vizibil) { total += acum() - start; vizibil = false; }
+    trimite({ e: "t", p: pid, s: Math.round(total / 1000) });
+  };
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") opreste(); else if (!vizibil) { vizibil = true; start = acum(); }
+  });
+  addEventListener("pagehide", opreste);
+  // click pe „Vezi oferta”/titlu/poza: se trimite doar magazinul (din cardul produsului), nu produsul si nu o identitate
+  document.addEventListener("click", function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest("a[rel~=sponsored]") : null, card = a && a.closest("article"), m = card && card.querySelector(".magazin a");
+    var slug = m && (m.getAttribute("href") || "").match(/^\/magazin\/([a-z0-9-]+)\/$/);
+    if (slug) trimite({ e: "c", c: location.pathname, m: slug[1] });
+  }, true);
 })();

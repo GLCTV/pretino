@@ -166,6 +166,7 @@
 
 ## v1.53 – numarul live PC Garage
 - Cu numarul live cunoscut, limita de 10 pagini nu se mai aplica: se citesc exact N produse (plasa de siguranta 100 pagini); fara numar ramane limita de 10.
+- Doar produsele cu insigna DISCOUNT (.pbe-type); categoriile se citesc mereu pe /<cat>/filtre/discount/ (surse nefiltrate din config se rescriu); numarul live doar pe adresa filtrata; pagina fara DISCOUNT opreste paginarea.
 - Corectie paginare: adresele reale sunt /<cat>/paginaN/filtre/discount/ (inainte se oprea dupa pagina 2). Test adaugat.
 - Doar categoriile PC Garage (meniu + „Cu discount”): linkurile de campanie nu se mai descopera, iar sursele de campanie descoperite anterior se scot la incarcare. Black Friday ca sursa fixa: renuntat.
 - La listele de categorie PC Garage se citeste numarul afisat de magazin (`.products-count`, ex. „18 produse”). Se iau exact atatea produse de sus in jos; cand totalul e atins nu se mai deschide pagina urmatoare (nici pagina goala de la final). Limita de 10 pagini ramane. Test adaugat.

@@ -29,15 +29,21 @@ export async function testeCampanii(ok) {
   { const m = parseHtml('<ul id="top_menu"><li><a href="https://www.pcgarage.ro/placi-video/">Placi video</a></li><li><a href="/placi-video/">dup</a></li><li><a href="https://www.pcgarage.ro/laptop-mini-laptop/">Laptop</a></li><li><a href="/pc-gaming-fortnite-gameplay-fps/">x</a></li><li><a href="/cos/">cos</a></li><li><a href="/a/b/">adanc</a></li><li><a href="https://alt.ro/x/">alt</a></li></ul><a href="/placi-de-baza/">in afara meniului</a>');
     const d = pg.descopera(m, URL_C);
     ok(d.length === 2 && d.every((x) => x.categorie) && d.map((x) => x.url).join() === "https://www.pcgarage.ro/placi-video/filtre/discount/,https://www.pcgarage.ro/laptop-mini-laptop/filtre/discount/", "pcgarage: categorii din meniu (fara duplicate, cont, gameplay, nivel 2, domenii externe)"); }
-  { const k = parseHtml('<div class="product_box_container"><div class="product_box"><div class="product_box_name"><a href="/laptop-x/">Laptop X</a></div><div class="pb-price"><p class="price">2.598,99 RON</p></div></div><div class="pb-extra"><p class="pbe-price-old">2.648,99 RON</p><p class="pbe-name">Discount 50,00 RON</p></div></div>');
+  { const k = parseHtml('<div class="product_box_container"><div class="product_box"><div class="product_box_name"><a href="/laptop-x/">Laptop X</a></div><div class="pb-price"><p class="price">2.598,99 RON</p></div></div><div class="pb-extra"><p class="pbe-type">DISCOUNT</p><p class="pbe-price-old">2.648,99 RON</p><p class="pbe-name">Discount 50,00 RON</p></div></div>');
     const lp = pg.parseListare(k, URL_C).produse[0];
     ok(lp && lp.pret === 2598.99 && lp.pretReferinta === 2648.99 && lp.reducereAfisata === "Discount 50,00 RON", "pcgarage: pret vechi din blocul .pb-extra de langa cardul de categorie"); }
   { const k = parseHtml('<span class="products-count">1.234 produse de la 7 producatori</span><div class="product_box"><div class="product_box_name"><a href="/a/">A</a></div><div class="pb-price"><p class="price">10,00 RON</p></div></div>');
-    const r = pg.parseListare(k, URL_C); ok(r.total === 1234 && r.produse.length === 1, "pcgarage: numarul live de produse (.products-count) citit"); }
+    const r = pg.parseListare(k, "https://www.pcgarage.ro/notebook-laptop/filtre/discount/"); ok(r.total === 1234 && r.produse.length === 1, "pcgarage: numarul live de produse (.products-count) citit"); }
   { const h = (n) => `<div class="pagination"><a href="https://www.pcgarage.ro/monitoare-led/pagina2/filtre/discount/">2</a><a href="https://www.pcgarage.ro/monitoare-led/pagina3/filtre/discount/">3</a></div>`;
     const u1 = pg.parseListare(parseHtml(h()), "https://www.pcgarage.ro/monitoare-led/filtre/discount/").urmatoarea;
     const u2 = pg.parseListare(parseHtml(h()), "https://www.pcgarage.ro/monitoare-led/pagina2/filtre/discount/").urmatoarea;
     ok(u1?.includes("/pagina2/filtre/discount/") && u2?.includes("/pagina3/filtre/discount/"), "pcgarage: paginare pe adrese /paginaN/filtre/discount/"); }
+  { const card = (n, b) => `<div class="product_box_container"><div class="product_box"><div class="product_box_name"><a href="/${n}/">${n}</a></div><div class="pb-price"><p class="price">10,00 RON</p></div></div><div class="pb-extra">${b ? '<p class="pbe-type">DISCOUNT</p><p class="pbe-price-old">20,00 RON</p>' : ""}</div></div>`;
+    const k = parseHtml('<span class="products-count">500 produse de la 3 producatori</span>' + card("cu", true) + card("fara", false));
+    const r = pg.parseListare(k, "https://www.pcgarage.ro/notebook-laptop/");
+    ok(r.produse.length === 1 && r.produse[0].titlu === "cu" && r.total === null, "pcgarage: doar produse cu insigna DISCOUNT; numarul live doar pe adresa cu filtrul de discount");
+    const g = pg.parseListare(parseHtml(card("fara", false)), "https://www.pcgarage.ro/notebook-laptop/pagina3/filtre/discount/");
+    ok(g.produse.length === 0 && g.urmatoarea === null, "pcgarage: pagina fara produse DISCOUNT opreste paginarea"); }
   { const { deschide, argumenteVerificare } = await import("./deschide-browser.js"); const ap = [];
     const a = argumenteVerificare("C:\\p", "https://www.pcgarage.ro/");
     ok(a.includes("--user-data-dir=C:\\p") && a.some((x) => /remote-debugging-port=9333/.test(x)) && !a.some((x) => /headless/.test(x)), "verificare manuala: browser vizibil cu port fix local pentru atasare");

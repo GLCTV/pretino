@@ -46,6 +46,9 @@ export function incarcaCfg(P) {
   cfg.surse = (cfg.surse ?? []).filter((x) => !esteExclus(x.url, x.titlu) && ADAPTORI[x.magazin]);
   // PC Garage: doar categoriile; sursele de campanie descoperite anterior (fara categorie) se scot; sursele puse manual raman
   cfg.surse = cfg.surse.filter((x) => x.magazin !== "pcgarage" || !x.descoperita || x.categorie);
+  // PC Garage: orice categorie se citeste doar cu filtrul „Cu discount” (adresa /<categorie>/filtre/discount/); duplicatele se elimina
+  for (const x of cfg.surse) if (x.magazin === "pcgarage" && x.categorie) { try { const u = new URL(x.url); if (/^\/[a-z0-9-]+\/$/.test(u.pathname)) x.url = `${u.origin}${u.pathname}filtre/discount/`; } catch {} }
+  { const vz = new Set(); cfg.surse = cfg.surse.filter((x) => !(x.magazin === "pcgarage" && x.categorie) || (!vz.has(x.url) && vz.add(x.url))); }
   return cfg;
 }
 export const esteExclus = (...t) => /resigilat|desigilat|refurbished|renewed/i.test(t.filter(Boolean).join(" "));

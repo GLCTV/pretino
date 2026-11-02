@@ -40,3 +40,6 @@
 ## 2026-11-02 – program v1.15: cititor PC Garage
 - Verificat în Chrome (nov. 2026) pe `/extra-reduceri-*/` și `/notebook-laptop/`: carduri `.product_box` (două variante: listă de campanie `bf_*` și listă de categorie), preț vechi `.bfp_old`/`.aq_prod_p_old`/`.pbe-price-old`, paginare `/paginaN/`. Prima rulare pe PC: 11 pagini de campanii descoperite prin browserul vizibil.
 - Pagini citite fără listă de produse (home, regulamente) sunt raportate ca „informative”, nu ca eroare; pagina goală/neînțeleasă rămâne eroare. Entități HTML decodate în titluri; titlul paginii are prioritate pentru sursele descoperite.
+
+## 2026-11-02 – program v1.16
+- eMAG răspunde la cereri HTTP simple cu 511 (verificare anti-bot) → acum e tratat ca blocare și modulul trece pe browserul vizibil (ca la PC Garage), în loc de eroare simplă.

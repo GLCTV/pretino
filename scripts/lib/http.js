@@ -6,7 +6,7 @@ export class BlocatError extends Error { constructor(msg, motiv) { super(msg); t
 
 // Pagini de validare/verificare anti-bot (nu se completeaza si nu se ocolesc)
 export function esteBlocare(url, status, corp = "") {
-  if (status === 403 || status === 401 || status === 429) return `HTTP ${status}`;
+  if (status === 403 || status === 401 || status === 429 || status === 511) return `HTTP ${status}`;
   if (/validare-acces|captcha|challenge|access-denied/i.test(url)) return "pagina de validare acces";
   const t = corp.slice(0, 6000);
   if (/cf-turnstile|g-recaptcha|hcaptcha|Validare acces|Just a moment|verificare de securitate|Access Denied/i.test(t)) return "verificare anti-bot in pagina";

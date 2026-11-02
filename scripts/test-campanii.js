@@ -40,6 +40,7 @@ export async function testeCampanii(ok) {
   ok(parseHtml("<p>&rsaquo; % Desigilate &amp; &#259;</p>").children[0].children[0].text.includes("&rsaquo;") && text0(parseHtml("<p>&rsaquo; % Desigilate</p>")) === "› % Desigilate", "dom: entitati HTML decodate");
   ok(http.esteBlocare("https://www.pcgarage.ro/validare-acces/", 200, fx("pcgarage-validare.html")) && !http.esteBlocare("https://www.emag.ro/", 200, fx("emag-listare.html")), "http: pagina de validare anti-bot e detectata ca blocare");
 
+  ok(http.esteBlocare("https://www.emag.ro/nav/deals", 511, "") === "HTTP 511", "http: HTTP 511 (autentificare de retea / anti-bot) tratat ca blocare, nu ca eroare de server");
   const h = {};
   ist.observa(h, "a", 100, "2026-10-01"); ist.observa(h, "a", 100, "2026-10-10");
   ok(ist.scadereIstoric(h, "a", 80, "2026-10-12") === null, "istoric campanii: observatii insuficiente => fara scadere");

@@ -5,3 +5,8 @@ logs
 rapoarte
 *.env
 secrete.env
+# Modul Campanii: date de rulare locale (nu se publica, nu blocheaza actualizarea programului)
+data/campanii.json
+data/produse-campanii.json
+data/istoric-campanii.json
+data/campanii-surse.json

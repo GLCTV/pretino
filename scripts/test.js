@@ -66,5 +66,6 @@ ok(i.x.length === 2 && i.x[1].p === 8, "istoric: preț schimbat adaugă intrare"
   ok(eroare, "profitshare: fara feed in secrete.env da eroare clara");
 }
 ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"), "CLAUDE.md, README.md, PROGRES.md există");
+{ const { testeCampanii } = await import("./test-campanii.js"); await testeCampanii(ok); }
 console.log(esecuri ? `\n${esecuri} teste eșuate` : "\nToate testele au trecut");
 process.exit(esecuri ? 1 : 0);

@@ -1,0 +1,13 @@
+{
+  "limite": { "concurentaPerMagazin": 2, "pauzaMs": 700, "maxPaginiListaPerSursa": 15, "maxSurseDescoperite": 25, "adancimeDescoperire": 1, "timeoutMs": 25000, "reincercari": 3 },
+  "magazine": {
+    "emag": { "nume": "eMAG", "domenii": ["emag.ro"], "activ": true },
+    "pcgarage": { "nume": "PC Garage", "domenii": ["pcgarage.ro"], "activ": true }
+  },
+  "surse": [
+    { "id": "emag-deals", "magazin": "emag", "url": "https://www.emag.ro/nav/deals", "titlu": "Ofertele eMAG", "activ": true, "origine": "manual" },
+    { "id": "emag-genius-deals", "magazin": "emag", "url": "https://www.emag.ro/genius-deals", "titlu": "Genius Deals", "activ": true, "origine": "manual" },
+    { "id": "emag-black-friday", "magazin": "emag", "url": "https://www.emag.ro/guide/black-friday", "titlu": "Black Friday eMAG", "activ": true, "origine": "manual" },
+    { "id": "pcgarage-home", "magazin": "pcgarage", "url": "https://www.pcgarage.ro/", "titlu": "PC Garage - pagina principala (pentru descoperirea paginilor de oferte)", "activ": true, "origine": "manual" }
+  ]
+}

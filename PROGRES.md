@@ -19,3 +19,16 @@
 - Magazine active: eMAG, ITGalaxy, Vexio, PCMadd, CITGrup, Dwyn, Techstar (Profitshare), evoMAG (2Performant). PC Garage: inactiv, fără adaptor (nu are feed; necesită citire din site, cu verificare anti-bot) – de făcut.
 - LIPSEȘTE de la Laur: feed-urile și codurile PROPRII Pretino în `%LOCALAPPDATA%\Pretino\secrete.env` (`PRETINO_PROFITSHARE_FEEDS`, `PRETINO_TWOPERF_FEEDS`, `PRETINO_TWOPERF_AFF_CODE`) + `unique` evoMAG în `data/magazine.json`. Nu se refolosesc cele de la ConfigurațiePC.
 - Neverificat pe date reale (formatul real al coloanelor din feed-uri poate cere ajustări).
+
+## 2026-11-02 – feed-uri reale (v1.6–v1.12)
+- Verificat pe date reale: Profitshare (ITGalaxy, Techstar, Vexio, Dwyn, PCMadd, CITGrup) și evoMAG (2Performant, link afiliat per produs din coloana `aff_code`) → 2001 oferte cu reducere reală. Categoriile sunt mapate după listele reale din feed-uri; produsele refurbished/second hand sunt excluse.
+- eMAG: advertiserul NU oferă feed de produse (confirmat în Profitshare). PC Garage: nu e în Profitshare; are validare anti-bot Cloudflare.
+
+## 2026-11-02 – program v1.13: modul „Campanii și oferte”
+- Cod: `scripts/campanii.js` (orchestrator + CLI), `scripts/campanii/{emag,pcgarage,generic}.js`, `scripts/lib/{dom,http,istoric-campanii}.js`, teste în `scripts/test-campanii.js` (fișiere de probă în `tests/fixtures`, fetch simulat, fără rețea).
+- Date locale (gitignored, nu se publică): `data/campanii-surse.json` (creat din `data/campanii-surse.default.json`), `data/campanii.json`, `data/produse-campanii.json`, `data/istoric-campanii.json`; progres `logs/campanii-progres.json`; raport `rapoarte/ultimul-raport-campanii.txt`; stare rulare `.pretino-local/campanii-rulare.json`; backup înainte de aplicare `.pretino-local/backup-campanii/` (ultimele 5).
+- Interfață (program): selectare eMAG/PC Garage, lista surselor (adaugă/editează/activează/dezactivează/șterge URL), „Caută campanii”, „Actualizează campanii și oferte”, „Oprește” (salvează progresul), „Reia”, progres + contoare, lista campaniilor cu detalii și deschiderea paginii oficiale, raport final. Rulează în fundal.
+- eMAG: structura cardurilor verificată în Chrome (nov. 2026): `.card-item` cu `data-offer-id/-product-id/-name/-url`, preț `.product-new-price`, preț afișat tăiat `<s>` în `.rrp-lp30d-content` (eticheta exactă neverificată – NU e tratat ca „cel mai mic preț din 30 zile”), reducere `.badge-discount`, paginare `/pN/c`. Vânzătorul (eMAG vs Marketplace) nu apare pe cardurile din liste → „Necunoscut”.
+- PC Garage: validarea anti-bot (Cloudflare Turnstile, `/validare-acces/`) NU se completează și NU se ocolește → sursa e raportată „blocată”; structura paginilor neanalizată (doar date structurate JSON-LD/microdata); reîncercare sau introducere manuală.
+- NEVERIFICAT: citirea HTTP simplă de pe PC pe emag.ro (eMAG poate bloca cererile fără browser → apare „blocat”; fără browser automat implementat); sintaxa PowerShell a noului panel (netestată în cloud); sursele descoperite automat.
+- Nu publică nimic pe site; aprobarea de publicare și eligibilitatea pentru afiliere sunt câmpuri separate (implicit „fals”/„necunoscut”).

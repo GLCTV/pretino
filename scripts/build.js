@@ -10,7 +10,7 @@ const DEMO = process.argv.includes("--demo");
 const citeste = (f) => JSON.parse(readFileSync(new URL(`../data/${f}`, import.meta.url), "utf8"));
 const categorii = citeste("categorii.json");
 const magazine = citeste("magazine.json");
-const oferte = citeste(DEMO ? "demo-oferte.json" : "oferte.json");
+const oferte = citeste(DEMO ? "demo-oferte.json" : "oferte.json").filter((o) => o.pretVechi > o.pret); // doar oferte cu pret redus (pret vechi taiat + pret nou)
 const mag = Object.fromEntries(magazine.map((m) => [m.id, m]));
 const cat = Object.fromEntries(categorii.map((c) => [c.slug, c]));
 

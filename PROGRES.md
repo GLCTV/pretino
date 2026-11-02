@@ -127,3 +127,6 @@
 
 ## v1.41 – cache
 - stil.css si cauta.js au ?v=<hash> in URL: dupa publicare, browserele nu mai folosesc stilul vechi din cache (se vedea pagina ingusta / poze scapate din card dupa v1.40).
+
+## v1.42 – doar oferte cu preț redus
+- Site-ul afișează doar oferte cu preț vechi > preț nou (filtru în build). Fără etichete PRP. Include cache-busting (v1.41).

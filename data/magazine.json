@@ -1,5 +1,4 @@
 [
-  { "id": "emag", "nume": "eMAG", "domeniu": "emag.ro", "activ": true, "sursa": "campanii", "afiliere": { "retea": null } },
   { "id": "evomag", "nume": "evoMAG", "domeniu": "evomag.ro", "activ": true, "sursa": "2performant", "afiliere": { "retea": "2performant", "unique": "d4f678b43" } },
   { "id": "itgalaxy", "nume": "ITGalaxy", "domeniu": "itgalaxy.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
   { "id": "vexio", "nume": "Vexio", "domeniu": "vexio.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },

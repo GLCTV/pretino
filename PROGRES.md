@@ -105,3 +105,6 @@
 
 ## v1.34
 - panou-deploy: optiunea --login (ignora tokenul din secrete.env, foloseste wrangler login).
+
+## v1.35 – eMAG scos
+- Scos eMAG din catalog (1851 oferte), surse de campanii, magazine.json, cod de citire, program si teste. Raman PC Garage si retelele (Profitshare/2Performant). Local pe PC: data/campanii-surse.json, campanii.json si produse-campanii.json se curata singure la urmatoarea rulare a campaniilor.

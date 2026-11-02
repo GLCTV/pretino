@@ -1,4 +1,4 @@
-// Sursa „campanii": produsele citite din paginile publice eMAG / PC Garage de modulul „Campanii si oferte" (data/produse-campanii.json).
+// Sursa „campanii": produsele citite din paginile publice PC Garage de modulul „Campanii si oferte" (data/produse-campanii.json).
 // Fara feed si fara link de afiliere configurat: URL-ul ramane cel oficial al magazinului (afiliat=false).
 // „pretVechi" = pretul de referinta AFISAT DE MAGAZIN (nu cel mai mic pret din 30 de zile) - oferta primeste referintaMagazin=true.
 import { readFileSync, existsSync } from "node:fs";
@@ -22,9 +22,8 @@ export function dinProdus(p, magazine, campanii = {}, acum = Date.now()) {
   if (!(ref > p.pret)) return { omis: "fara pret de referinta afisat" };
   const red = (1 - p.pret / ref) * 100;
   if (red > REDUCERE_MAX) return { omis: "reducere suspecta (>60%)" };
-  const dinListaIT = (p.campanii ?? []).some((c) => String(campanii[c]?.sursaId ?? "").startsWith("emag-red-"));
   const dinSursa = (p.campanii ?? []).map((c) => campanii[c]?.categoriePretino).find(Boolean); // categoria Pretino a listei din care vine produsul
-  const categorie = dinSursa ?? mapCategorie([p.categorie, p.titlu].filter(Boolean).join(" ")) ?? (dinListaIT ? "electronice" : null);
+  const categorie = dinSursa ?? mapCategorie([p.categorie, p.titlu].filter(Boolean).join(" ")) ?? null;
   return { oferta: { id: idOferta("camp", p.url), sursa: "campanii", titlu: p.titlu, categorie, magazin: m.id, pret: p.pret, pretVechi: ref, referintaMagazin: true, url: p.url, afiliat: false, ...(p.vandut && p.vandut !== "Necunoscut" ? { vandut: p.vandut } : {}), ...(p.imagine ? { imagine: p.imagine } : {}) } };
 }
 

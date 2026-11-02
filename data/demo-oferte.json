@@ -1,5 +1,5 @@
 [
-  { "id": "demo-1", "titlu": "Exemplu produs A (DEMO)", "categorie": "electronice", "magazin": "emag", "pret": 799, "pretVechi": 999, "url": "https://example.com/a", "actualizat": "2026-11-02T12:00:00Z" },
+  { "id": "demo-1", "titlu": "Exemplu produs A (DEMO)", "categorie": "electronice", "magazin": "pcgarage", "pret": 799, "pretVechi": 999, "url": "https://example.com/a", "actualizat": "2026-11-02T12:00:00Z" },
   { "id": "demo-2", "titlu": "Exemplu produs B (DEMO)", "categorie": "electrocasnice", "magazin": "altex", "pret": 349.9, "pretVechi": 399.9, "url": "https://example.com/b", "actualizat": "2026-11-02T12:00:00Z" },
   { "id": "demo-3", "titlu": "Exemplu produs C (DEMO)", "categorie": "electronice", "magazin": "pcgarage", "pret": 129, "url": "https://example.com/c", "actualizat": "2026-11-02T12:00:00Z" }
 ]

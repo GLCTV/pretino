@@ -1,7 +1,7 @@
-// Modul „Campanii si oferte” Pretino: citeste paginile publice eMAG / PC Garage si salveaza campaniile si produsele din ele.
+// Modul „Campanii si oferte” Pretino: citeste paginile publice PC Garage si salveaza campaniile si produsele din ele.
 // Independent de orice alt proiect. Nu publica nimic pe site. Nu ocoleste CAPTCHA/anti-bot (raporteaza „blocat”).
 //
-//   bun scripts/campanii.js --campanii [--magazin emag|pcgarage|toate]     descopera campanii si le citeste metadatele
+//   bun scripts/campanii.js --campanii [--magazin pcgarage|toate]     descopera campanii si le citeste metadatele
 //   bun scripts/campanii.js --complet  [--magazin ...] [--reia]             + toate produsele din liste (cu paginare)
 //   bun scripts/campanii.js --surse | --sursa-adauga <magazin> <url> [titlu] | --sursa-activeaza|--sursa-dezactiveaza|--sursa-sterge <id>
 //   bun scripts/campanii.js --campanie-manuala <magazin> <url> <titlu>       introducere manuala (cand accesul e blocat)
@@ -14,10 +14,9 @@ import { lanseazaBrowser, fetchDinBrowser } from "./lib/browser.js";
 import { parseHtml } from "./lib/dom.js";
 import { observa, scadereIstoric } from "./lib/istoric-campanii.js";
 import { metaCampanie } from "./campanii/generic.js";
-import * as emag from "./campanii/emag.js";
 import * as pcgarage from "./campanii/pcgarage.js";
 
-export const ADAPTORI = { emag, pcgarage };
+export const ADAPTORI = { pcgarage };
 const hash = (s) => createHash("sha1").update(String(s)).digest("hex").slice(0, 12);
 const citeste = (f, impl) => { try { return JSON.parse(readFileSync(f, "utf8")); } catch { return impl; } };
 const scrie = (f, o) => { mkdirSync(join(f, ".."), { recursive: true }); writeFileSync(f, JSON.stringify(o, null, 2) + "\n"); };
@@ -39,12 +38,12 @@ export function incarcaCfg(P) {
   // surse implicite noi (aparute intr-o versiune ulterioara) se adauga o singura data; cele sterse de utilizator nu revin
   try {
     const impl = citeste(join(P.surse, "..", "campanii-surse.default.json"), { surse: [] });
-    cfg.defaultVazute ??= (impl.surse ?? []).filter((x) => !x.id.startsWith("emag-red-")).map((x) => x.id);
+    cfg.defaultVazute ??= (impl.surse ?? []).map((x) => x.id);
     for (const x of impl.surse ?? []) { const e = cfg.surse.find((y) => y.id === x.id); if (e && x.categoriePretino && !e.categoriePretino) e.categoriePretino = x.categoriePretino; }
     for (const x of impl.surse ?? []) if (!cfg.defaultVazute.includes(x.id)) { cfg.defaultVazute.push(x.id); if (!cfg.surse.some((y) => y.url === x.url)) cfg.surse.push({ ...x }); }
   } catch {}
   // produsele resigilate / desigilate / refurbished nu intereseaza: sursele lor se scot
-  cfg.surse = (cfg.surse ?? []).filter((x) => !esteExclus(x.url, x.titlu));
+  cfg.surse = (cfg.surse ?? []).filter((x) => !esteExclus(x.url, x.titlu) && ADAPTORI[x.magazin]);
   return cfg;
 }
 export const esteExclus = (...t) => /resigilat|desigilat|refurbished|renewed/i.test(t.filter(Boolean).join(" "));
@@ -241,8 +240,8 @@ function faBackup(P) {
 function aplica(P, st, azi, k, mod) {
   const campanii = citeste(P.campanii, {}), produse = citeste(P.produse, {}), istoric = citeste(P.istoric, {});
   // curatare date vechi: campanii si produse resigilate / desigilate
-  for (const [id, c] of Object.entries(campanii)) if (esteExclus(c.url, c.titlu)) delete campanii[id];
-  for (const [id, p] of Object.entries(produse)) if (p.conditie === "desigilat" || esteExclus(p.url, p.titlu)) delete produse[id];
+  for (const [id, c] of Object.entries(campanii)) if (esteExclus(c.url, c.titlu) || !ADAPTORI[c.magazin]) delete campanii[id];
+  for (const [id, p] of Object.entries(produse)) if (p.conditie === "desigilat" || esteExclus(p.url, p.titlu) || !ADAPTORI[p.magazin]) delete produse[id];
   for (const c of Object.values(campanii)) if (Array.isArray(c.produse)) c.produse = c.produse.filter((id) => produse[id]);
   const acum = new Date().toISOString();
   const esuate = new Set(st.erori.map((e) => e.sursa));

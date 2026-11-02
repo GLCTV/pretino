@@ -49,7 +49,7 @@ export function metaCampanie(root, url, baza = url) {
   const continut = [titlu, descriere, corp.slice(0, 20000)].filter(Boolean).join(". ");
   const date = extrageDate(continut);
   return {
-    titlu: titlu ? titlu.replace(/\s*[|\-–]\s*(eMAG\.ro|PC Garage).*$/i, "").trim() : null,
+    titlu: titlu ? titlu.replace(/\s*[|\-–]\s*(PC Garage).*$/i, "").trim() : null,
     descriere, url, imagine, imagineSursa: imagine ? url : null,
     inceput: date.inceput, sfarsit: date.sfarsit,
     reducereAnuntata: extrageReducere([titlu, descriere].filter(Boolean).join(" ")) ?? extrageReducere(corp.slice(0, 4000)),

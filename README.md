@@ -42,5 +42,5 @@ Buton „Pornește previzualizarea” (build + server la `http://localhost:3100`
 - **GitHub (`glctv/pretino`):** cod, `data/`, documentație, workflow-uri manuale, ramuri `backup/*`. Fără secrete.
 - **Cloudflare:** proiect Pages `pretino` (direct upload), domeniul pretino.ro, token/ID-uri dedicate. Configurația Cloudflare NU e în repo; vezi `PROGRES.md` pentru starea ei.
 
-## Campanii și oferte (eMAG / PC Garage)
-Modul din program care citește paginile publice ale celor două magazine (campanii, liste de produse) și le salvează local pentru consultare. Nu publică nimic pe site. Comenzi: `bun scripts/campanii.js --campanii|--complet [--magazin emag|pcgarage|toate] [--reia]`, `--surse`, `--sursa-adauga <magazin> <url> [titlu]`, `--sursa-activeaza|--sursa-dezactiveaza|--sursa-sterge <id>`, `--campanie-manuala <magazin> <url> <titlu>`. Detalii în PROGRES.md.
+## Campanii și oferte (PC Garage)
+Modul din program care citește paginile publice ale magazinului PC Garage (campanii, liste de produse) și le salvează local pentru consultare. Nu publică nimic pe site. Comenzi: `bun scripts/campanii.js --campanii|--complet [--magazin pcgarage|toate] [--reia]`, `--surse`, `--sursa-adauga <magazin> <url> [titlu]`, `--sursa-activeaza|--sursa-dezactiveaza|--sursa-sterge <id>`, `--campanie-manuala <magazin> <url> <titlu>`. Detalii în PROGRES.md.

@@ -57,7 +57,7 @@ ok(i.x.length === 2 && i.x[1].p === 8, "istoric: preț schimbat adaugă intrare"
   ok(parsePret("1.299,99") === 1299.99 && parsePret("799.99") === 799.99 && parsePret("1,299.50") === 1299.5, "pret: formate RO si EN");
   const rows = parseCsv(readFileSync("tests/fixtures/profitshare.csv", "utf8"));
   const r = rows.map((x) => ps.dinRand(x, magazine));
-  ok(r[0].oferta && r[0].oferta.pret === 3999 && r[0].oferta.pretVechi === 4999 && r[0].oferta.magazin === "emag" && r[0].oferta.categorie === "electronice", "profitshare: oferta cu reducere citita corect");
+  ok(r[0].oferta && r[0].oferta.pret === 3999 && r[0].oferta.pretVechi === 4999 && r[0].oferta.magazin === "itgalaxy" && r[0].oferta.categorie === "electronice", "profitshare: oferta cu reducere citita corect");
   ok(r[0].oferta.url === "https://l.profitshare.ro/l/1", "profitshare: foloseste linkul de afiliere");
   ok(r[1].oferta && !areReducereReala(r[1].oferta), "profitshare: fara pret redus nu e reducere reala");
   ok(r[2].omis === "fara stoc", "profitshare: produs epuizat omis");
@@ -75,12 +75,12 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   ok(PAGINI_LEGALE.every((p) => p.corp().includes("[COMPLETEAZĂ") === !completat), "pagini legale: operatorul completat -> fara marcaje; necompletat -> marcate (publicarea se opreste)");
   ok(!completat || PAGINI_LEGALE.find((p) => p.cale === "/contact/").corp().includes(OPERATOR.email), "pagini legale: emailul de contact apare pe pagina Contact"); }
 { const { dinProdus } = await import("./surse/campanii.js");
-  const mg = [{ id: "emag", nume: "eMAG" }, { id: "pcgarage", nume: "PC Garage" }], acum = Date.parse("2026-11-02T15:00:00Z"), v = "2026-11-02T14:00:00Z";
-  const base = { magazin: "emag", titlu: "Laptop X", url: "https://www.emag.ro/x/pd/A/", pret: 1000, pretReferinta: 1500, disponibilitate: "in_stoc", ultimaVerificare: v, campanii: ["c1"] };
-  const camp = { c1: { sursaId: "emag-red-laptopuri" } };
+  const mg = [{ id: "pcgarage", nume: "PC Garage" }], acum = Date.parse("2026-11-02T15:00:00Z"), v = "2026-11-02T14:00:00Z";
+  const base = { magazin: "pcgarage", titlu: "Laptop X", url: "https://www.pcgarage.ro/x/pd/A/", pret: 1000, pretReferinta: 1500, disponibilitate: "in_stoc", ultimaVerificare: v, campanii: ["c1"] };
+  const camp = { c1: { sursaId: "pcgarage-laptopuri", categoriePretino: "electronice" } };
   const o = dinProdus(base, mg, camp, acum).oferta;
   ok(o && o.pretVechi === 1500 && o.referintaMagazin === true && o.afiliat === false && o.categorie === "electronice", "campanii->catalog: oferta cu reducere afisata de magazin, fara afiliere");
-  ok(dinProdus(base, mg, { c1: { sursaId: "emag-red-frigidere", categoriePretino: "electrocasnice" } }, acum).oferta?.categorie === "electrocasnice", "campanii->catalog: categoria vine din lista sursa");
+  ok(dinProdus(base, mg, { c1: { sursaId: "pcgarage-frigidere", categoriePretino: "electrocasnice" } }, acum).oferta?.categorie === "electrocasnice", "campanii->catalog: categoria vine din lista sursa");
   ok(dinProdus({ ...base, pretReferinta: null }, mg, camp, acum).omis, "campanii->catalog: fara pret de referinta nu intra");
   ok(dinProdus({ ...base, disponibilitate: "out_of_stock" }, mg, camp, acum).omis, "campanii->catalog: fara stoc nu intra");
   ok(dinProdus({ ...base, ultimaVerificare: "2026-10-20T10:00:00Z" }, mg, camp, acum).omis, "campanii->catalog: date vechi nu intra");

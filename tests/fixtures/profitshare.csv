@@ -1,5 +1,5 @@
 product_name,manufacturer,category,availability,price_vat,price_discounted,link,product_aff_link,product_pic,adv_name
-Laptop Test 15,Acme,Laptopuri > Gaming,in stock,"4.999,00","3.999,00",https://www.emag.ro/laptop-test/pd/1,https://l.profitshare.ro/l/1,https://img/1.jpg,eMAG
+Laptop Test 15,Acme,Laptopuri > Gaming,in stock,"4.999,00","3.999,00",https://www.itgalaxy.ro/laptop-test/pd/1,https://l.profitshare.ro/l/1,https://img/1.jpg,ITGalaxy
 Telefon Fara Reducere,Acme,Telefoane,in stock,"1.000,00",,https://www.itgalaxy.ro/tel/2,https://l.profitshare.ro/l/2,,ITGalaxy
-Frigider Epuizat,Acme,Frigidere,out of stock,"2.000,00","1.500,00",https://www.emag.ro/frig/pd/3,https://l.profitshare.ro/l/3,,eMAG
+Frigider Epuizat,Acme,Frigidere,out of stock,"2.000,00","1.500,00",https://www.itgalaxy.ro/frig/pd/3,https://l.profitshare.ro/l/3,,ITGalaxy
 Produs Magazin Strain,Acme,Telefoane,in stock,100,50,https://www.necunoscut.ro/x,https://l.profitshare.ro/l/4,,Necunoscut

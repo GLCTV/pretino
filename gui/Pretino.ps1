@@ -30,10 +30,10 @@ $script:DupaProgram = $false
     </WrapPanel>
     <Border Grid.Row="3" BorderBrush="#2dd4bf" BorderThickness="0,1,0,0" Padding="0,8,0,8" Margin="0,0,0,8">
       <StackPanel>
-        <TextBlock Text="Campanii si oferte (eMAG / PC Garage) - doar citire si consultare, nu publica nimic pe site" Foreground="#2dd4bf" FontWeight="Bold" Margin="0,0,0,6"/>
+        <TextBlock Text="Campanii si oferte (PC Garage) - doar citire si consultare, nu publica nimic pe site" Foreground="#2dd4bf" FontWeight="Bold" Margin="0,0,0,6"/>
         <WrapPanel Margin="0,0,0,6">
           <TextBlock Text="Magazin:" Foreground="#e6f0ee" VerticalAlignment="Center" Margin="0,0,6,0"/>
-          <ComboBox Name="CMagazin" Width="100" SelectedIndex="0" Margin="0,0,10,0"><ComboBoxItem Content="toate"/><ComboBoxItem Content="emag"/><ComboBoxItem Content="pcgarage"/></ComboBox>
+          <ComboBox Name="CMagazin" Width="100" SelectedIndex="0" Margin="0,0,10,0"><ComboBoxItem Content="toate"/><ComboBoxItem Content="pcgarage"/></ComboBox>
           <Button Name="CCauta" Content="Cauta campanii" Padding="10,4" Margin="0,0,8,0"/>
           <Button Name="CActualizeaza" Content="Actualizeaza campanii si oferte" Padding="10,4" Margin="0,0,8,0"/>
           <Button Name="COpreste" Content="Opreste" Padding="10,4" Margin="0,0,8,0"/>
@@ -47,7 +47,7 @@ $script:DupaProgram = $false
           <DockPanel Grid.Column="1"><TextBlock DockPanel.Dock="Top" Text="Campanii gasite" Foreground="#9bb0ad"/><ListBox Name="CCampanii" Height="110" Background="#142120" Foreground="#e6f0ee"/></DockPanel>
         </Grid>
         <WrapPanel Margin="0,0,0,6">
-          <TextBox Name="CUrl" Width="360" Margin="0,0,6,0" ToolTip="URL pe domeniul eMAG sau PC Garage"/>
+          <TextBox Name="CUrl" Width="360" Margin="0,0,6,0" ToolTip="URL pe domeniul PC Garage"/>
           <TextBox Name="CTitlu" Width="130" Margin="0,0,6,0" ToolTip="Titlu (optional)"/>
           <Button Name="CAdauga" Content="Adauga URL sursa" Padding="8,3" Margin="0,0,6,0"/>
           <Button Name="CManual" Content="Adauga campanie manual" Padding="8,3" Margin="0,0,6,0"/>
@@ -189,7 +189,7 @@ function Run-Camp($argList) {
   Pop-Location
   return $o
 }
-function Mag-DinUrl($u) { if ($u -match 'emag\.ro') { return 'emag' } elseif ($u -match 'pcgarage\.ro') { return 'pcgarage' } else { return $null } }
+function Mag-DinUrl($u) { if ($u -match 'pcgarage\.ro') { return 'pcgarage' } else { return $null } }
 
 $campTimer = New-Object System.Windows.Threading.DispatcherTimer
 $campTimer.Interval = [TimeSpan]::FromMilliseconds(1200)
@@ -215,13 +215,13 @@ $c.COpreste.Add_Click({
 $c.CRaport.Add_Click({ $script:LogFile = Join-Path $Root 'rapoarte\ultimul-raport-campanii.txt'; if (-not (Test-Path $script:LogFile)) { $c.Jurnal.Text = 'Niciun raport de campanii inca.' } })
 $c.CAdauga.Add_Click({
   $u = $c.CUrl.Text.Trim(); $m = Mag-DinUrl $u
-  if (-not $m) { $c.Stare.Text = 'URL invalid: trebuie sa fie pe emag.ro sau pcgarage.ro.'; return }
+  if (-not $m) { $c.Stare.Text = 'URL invalid: trebuie sa fie pe pcgarage.ro.'; return }
   $c.Stare.Text = (Run-Camp @('--sursa-adauga', $m, $u, $c.CTitlu.Text.Trim())).Split("`n")[0]
   Load-Surse
 })
 $c.CManual.Add_Click({
   $u = $c.CUrl.Text.Trim(); $m = Mag-DinUrl $u
-  if (-not $m) { $c.Stare.Text = 'URL invalid: trebuie sa fie pe emag.ro sau pcgarage.ro.'; return }
+  if (-not $m) { $c.Stare.Text = 'URL invalid: trebuie sa fie pe pcgarage.ro.'; return }
   $c.Stare.Text = (Run-Camp @('--campanie-manuala', $m, $u, $c.CTitlu.Text.Trim())).Split("`n")[0]
   Load-Campanii
 })

@@ -147,7 +147,7 @@ ${magId ? "" : `<details class="fsec" open><summary>Magazine ${icoana("sus")}</s
 <details class="fsec" open><summary>Reducere ${icoana("sus")}</summary><div id="f-red"><label class="opt"><input type="radio" name="red" value="0" checked><span>Orice reducere</span></label>${[20, 30, 40, 50].map((x) => `<label class="opt"><input type="radio" name="red" value="${x}"><span>Minim ${x}%</span></label>`).join("")}</div></details>
 <button class="reset" type="button" id="reset">${icoana("reset")}Resetează filtrele</button></aside>
 <section aria-live="polite"><div class="rez-cap"><h2>Oferte disponibile<small id="nr-rez">${lista.length} oferte</small></h2>
-<div class="sort"><button class="btn-filtre" type="button" id="btn-filtre">${icoana("filtre")}Filtre</button><label class="sort-et" for="sortare">Sortează după:</label><select id="sortare"><option value="red">Reducere descrescătoare</option><option value="econ">Economie descrescătoare</option><option value="pret-cresc">Preț crescător</option><option value="pret-desc">Preț descrescător</option></select></div></div>
+<div class="sort"><button class="btn-filtre" type="button" id="btn-filtre">${icoana("filtre")}Filtre</button><label class="sort-et" for="sortare">Sortează după:</label><select id="sortare" aria-label="Sortează ofertele după"><option value="red">Reducere descrescătoare</option><option value="econ">Economie descrescătoare</option><option value="pret-cresc">Preț crescător</option><option value="pret-desc">Preț descrescător</option></select></div></div>
 <div class="grid" id="lista">${felie.map((o, i) => card(o, i)).join("")}</div>
 <div class="rez-gol" id="rez-gol" ${lista.length ? "hidden" : ""}><b>Nu am găsit oferte</b>Încearcă alte filtre sau o altă căutare.</div>
 <button id="mai" type="button" hidden>Arată mai multe</button>${navPagini(cale, p, nPagini)}</section></div><div class="vala" id="vala" hidden></div></main>`;
@@ -160,7 +160,7 @@ ${magId ? "" : `<details class="fsec" open><summary>Magazine ${icoana("sus")}</s
 const utilitar = ({ mod, cale, titlu, h1, intro, descriere }) => listare({ mod, meta: () => ({ titlu, h1, intro, descriere, migaja: h1 }), cale, lista: [], indexabil: false, migaje: [{ nume: "Acasă", cale: "/" }] });
 
 const pagini = []; // { cale, html, index }
-const chipLink = (href, ic, nume, activ, extra = "") => `<a class="chip"${extra} href="${href}" aria-pressed="${activ ? "true" : "false"}"${activ ? ' aria-current="page"' : ""}>${ic ? icoana(ic) : ""}${esc(nume)}</a>`;
+const chipLink = (href, ic, nume, activ, extra = "") => `<a class="chip"${extra} href="${href}"${activ ? ' aria-current="page"' : ""}>${ic ? icoana(ic) : ""}${esc(nume)}</a>`;
 
 // Acasa
 pagini.push(...listare({ mod: "acasa", meta: (p) => ({ ...metaAcasa(p), migaja: "Acasă" }), cale: "/", lista: sortate, indexabil: oferte.length > 0 }));

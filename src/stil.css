@@ -87,7 +87,7 @@ h1{margin:0;padding-top:3px;font:800 38px/1.15 var(--font);letter-spacing:-.2px}
 .chip{display:inline-flex;align-items:center;gap:13px;height:38px;padding:0 19px 0 22px;border-radius:var(--r-pill);border:1.5px solid var(--bd-chip);background:transparent;color:var(--fg);font:600 13.6px var(--font);cursor:pointer;text-decoration:none;white-space:nowrap}
 .chip .ic{width:26px;height:26px;stroke-width:1.35;margin:-3px 0}
 .chip:hover{border-color:var(--acc)}
-.chip[aria-pressed=true]{background:var(--grad);border-color:transparent;color:var(--acc-fg);padding:0 25px}
+.chip[aria-current]{background:var(--grad);border-color:transparent;color:var(--acc-fg);padding:0 25px}
 .cont{display:grid;grid-template-columns:257px minmax(0,1fr);gap:22px;margin-top:24px;align-items:start}
 
 /* ---------- filtre ---------- */

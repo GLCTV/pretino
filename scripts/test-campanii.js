@@ -102,6 +102,8 @@ export async function testeCampanii(ok) {
   ok(b1.complet && notificat === 1 && inchis && Object.keys(JSON.parse(rf(join(dir3, "data", "campanii.json")))).length === 1, "anti-bot: browser vizibil, utilizatorul anuntat, asteptare verificare manuala, apoi continuare");
   const rulari = rf(join(dir3, "logs", "campanii-progres.json"));
   ok(!/asteapta_utilizator/.test(rulari), "anti-bot: dupa verificare starea revine la normal");
+  const bl = await import("./lib/browser.js");
+  ok(bl.blocatInBrowser({ url: "https://www.emag.ro/nav/deals", status: 511, html: "x".repeat(60000) }) === null && bl.blocatInBrowser({ url: "https://www.emag.ro/nav/deals", status: 511, html: "" }) === "HTTP 511" && bl.blocatInBrowser({ url: "https://www.pcgarage.ro/validare-acces/", status: 200, html: "" }), "browser: pagina reala mare nu mai e blocata chiar daca statusul ramas e 511; pagina goala 511 ramane blocata");
   // verificare necompletata la timp => blocat, fara stergere de date
   let p2 = 0;
   const browserBlocat = async () => ({ navigheaza: async () => {}, stare: async () => ({ url: "https://www.emag.ro/validare-acces/", html: fx("pcgarage-validare.html"), status: 200 }), adaInFata: async () => {}, inchide: async () => {} });

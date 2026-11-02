@@ -7,6 +7,13 @@ import { join } from "node:path";
 import { esteBlocare, BlocatError } from "./http.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// In browser, un status 403/511 cu o pagina mare, fara marcaje de verificare, inseamna ca verificarea automata a trecut (continutul real bate statusul)
+export function blocatInBrowser(s) {
+  const html = s.html ?? "";
+  const marcaje = esteBlocare(s.url ?? "", 200, html);
+  if (marcaje) return marcaje;
+  return html.length < 5000 && esteBlocare(s.url ?? "", s.status, "") ? `HTTP ${s.status}` : null;
+}
 
 export function gasesteBrowser(env = process.env) {
   const c = [env.PRETINO_BROWSER,
@@ -35,7 +42,7 @@ class Cdp {
 export async function lanseazaBrowser({ exe = gasesteBrowser(), profil, port = 9333, headless = false } = {}) {
   if (!exe) throw new Error("nu am gasit Chrome sau Edge pe acest PC (poti seta PRETINO_BROWSER)");
   mkdirSync(profil, { recursive: true });
-  const proc = spawn(exe, [`--remote-debugging-port=${port}`, "--remote-debugging-address=127.0.0.1", `--user-data-dir=${profil}`, "--no-first-run", "--no-default-browser-check", ...(headless ? ["--headless=new", "--no-sandbox"] : []), "about:blank"], { stdio: "ignore" });
+  const proc = spawn(exe, [`--remote-debugging-port=${port}`, "--remote-debugging-address=127.0.0.1", `--user-data-dir=${profil}`, "--no-first-run", "--no-default-browser-check", "--start-maximized", "--disable-popup-blocking", ...(headless ? ["--headless=new", "--no-sandbox"] : []), "about:blank"], { stdio: "ignore" });
   let tinta = null;
   for (let i = 0; i < 80 && !tinta; i++) {
     try { tinta = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find((t) => t.type === "page"); } catch {}
@@ -48,10 +55,12 @@ export async function lanseazaBrowser({ exe = gasesteBrowser(), profil, port = 9
   await cdp.trimite("Page.enable"); await cdp.trimite("Network.enable");
   let status = 200;
   cdp.ascultatori.push((m) => { if (m.method === "Network.responseReceived" && m.params.type === "Document") status = m.params.response.status; });
+  await cdp.trimite("Page.bringToFront").catch(() => {});
   const ev = async (expr) => (await cdp.trimite("Runtime.evaluate", { expression: expr, returnByValue: true })).result?.value;
   return {
     async navigheaza(url, timeoutMs = 45000) {
       status = 200;
+      await cdp.trimite("Page.bringToFront").catch(() => {});
       await cdp.trimite("Page.navigate", { url });
       const t0 = Date.now();
       while (Date.now() - t0 < timeoutMs) { if ((await ev("document.readyState").catch(() => null)) === "complete") break; await sleep(400); }
@@ -73,15 +82,19 @@ export function fetchDinBrowser(browser, opt = {}) {
     const rez = lant.then(async () => {
       await browser.navigheaza(url);
       let s = await browser.stare();
-      if (esteBlocare(s.url, s.status, s.html ?? "")) {
+      if (blocatInBrowser(s)) {
         await browser.adaInFata();
         onAsteapta({ url, mesaj: "Magazinul cere verificare anti-bot. Completeaz-o in fereastra de browser deschisa; programul continua singur dupa aceea." });
         const t0 = Date.now();
-        while (esteBlocare(s.url, s.status, s.html ?? "")) {
+        let tick = 0, incalzit = false;
+        while (blocatInBrowser(s)) {
           if (oprit()) throw new Error("oprit de utilizator");
           if (Date.now() - t0 > timeoutUtilizatorMs) { onReluat(); throw new BlocatError(`verificarea anti-bot nu a fost completata la timp (${url})`, "verificare necompletata"); }
           await sleep(pauzaVerificareMs);
           s = await browser.stare();
+          // pagina goala prea mult timp: incarca pagina principala a magazinului (verificarea apare uneori acolo); verificarea ramane a utilizatorului
+          if (!incalzit && ++tick >= 8 && (s.html ?? "").length < 2000) { incalzit = true; try { await browser.navigheaza(new URL(url).origin + "/"); s = await browser.stare(); } catch {} }
+          if (tick % 5 === 0) opt.onDiag?.({ url: s.url, status: s.status, lungime: (s.html ?? "").length, titlu: ((s.html ?? "").match(/<title[^>]*>([^<]*)/i) ?? [])[1] ?? null });
         }
         onReluat();
         // dupa verificare, daca pagina nu e cea dorita, o cerem din nou

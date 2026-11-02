@@ -101,6 +101,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
       fetchBrowser = fetchDinBrowser(browser, {
         oprit, pauzaVerificareMs: lim.pauzaVerificareMs, timeoutUtilizatorMs: lim.timeoutVerificareMs,
         onAsteapta: (x) => { progres.asteapta = { id: Date.now(), magazin: progres.curent ?? null, url: x.url, mesaj: x.mesaj }; salveazaProgres({ stare: "asteapta_utilizator" }); log(`  >> ASTEPT UTILIZATORUL: ${x.mesaj} (${x.url})`); },
+        onDiag: (d) => log(`  [browser] asteptare: ${d.url} | status ${d.status} | ${d.lungime} caractere | titlu: ${d.titlu}`),
         onReluat: () => { progres.asteapta = null; salveazaProgres({ stare: "ruleaza" }); },
       });
     }

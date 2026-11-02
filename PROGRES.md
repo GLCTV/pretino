@@ -46,3 +46,6 @@
 
 ## 2026-11-02 – program v1.17: PC Garage – prețuri vechi, reduceri, pagini „desigilate”
 - Verificat în Chrome: pe paginile „desigilate” titlul e în `.bf_ptitle a` (înainte nu se recunoșteau), cu preț vechi `.bfp_old` și reducere în RON `.bf_pdiscount`; pe `/extra-reduceri-*/` reducerea e „X% reducere în cos” (`.bf_bonus_text`, păstrată exact, fără preț vechi); paginile de categorie (ex. `/notebook-laptop/`) nu afișează preț vechi, doar etichete (ex. „Cumpără acum la preț de Black Friday”), salvate în `etichete`. Câmp nou `conditie: "desigilat"`.
+
+## 2026-11-02 – program v1.18: browser vizibil mai robust
+- Raportat: la eMAG (HTTP 511) fereastra de browser se deschidea goală. Fereastra se maximizează și e adusă în față; în browser, conținutul real (pagină mare, fără marcaje de verificare) are prioritate față de statusul 511; după ~16 s de pagină goală se încarcă o dată pagina principală a magazinului; jurnalul afișează la fiecare ~10 s starea paginii (URL, status, lungime, titlu). NEREZOLVAT dacă eMAG afișează ceva ce trebuie făcut manual – de verificat pe PC.

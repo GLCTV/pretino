@@ -163,3 +163,6 @@
 - Clasificare noua pe titlu (`scripts/lib/clasificare.js`), iconite proprii (`scripts/lib/iconite.js`), stil `src/stil.css`, font Montserrat local (OFL).
 - Doar date reale (oferte cu pret redus); linkurile de afiliere pastrate (`sponsored nofollow noopener`). Responsive: telefon 2 produse/rand, filtre in panou; fara scroll orizontal 390–1920 px.
 - STATUS: local, asteptam OK de la Laur inainte de main. Neverificat: imagini produse (in cloud nu exista), tema luminoasa pe toate paginile.
+
+## v1.53 – numarul live PC Garage
+- La listele de categorie PC Garage se citeste numarul afisat de magazin (`.products-count`, ex. „18 produse”). Se iau exact atatea produse de sus in jos; cand totalul e atins nu se mai deschide pagina urmatoare (nici pagina goala de la final). Limita de 10 pagini ramane. Test adaugat.

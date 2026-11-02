@@ -63,7 +63,10 @@ export function parseListare(root, baza) {
   }
   const vazut = new Set();
   const unice = produse.filter((p) => !vazut.has(p.url) && vazut.add(p.url));
-  return { produse: unice.length ? unice : produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: urmatoarea(root, baza) };
+  // numarul live al produselor din pagina de categorie („18 produse de la 7 producatori”, .products-count)
+  const mt = text(qs(root, ".products-count")).match(/(\d[\d.]*)\s+produs/i);
+  const total = mt ? Number(mt[1].replace(/\./g, "")) : null;
+  return { produse: unice.length ? unice : produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: urmatoarea(root, baza), total: total > 0 ? total : null };
 }
 function urmatoarea(root, baza) {
   const m = baza.match(/\/pagina(\d+)\/?(?:\?.*)?$/);

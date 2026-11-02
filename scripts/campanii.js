@@ -93,7 +93,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
 
   let st = reia ? citeste(P.stare, null) : null;
   if (!st || st.terminat || st.mod !== mod) st = null;
-  st ??= { id: new Date().toISOString(), mod, magazin, inceput: new Date().toISOString(), terminat: false, oprit: false, gata: [], urmatoare: {}, campanii: {}, produse: {}, erori: [], neverificate: [], informativ: [], contoare: { paginiCitite: 0, campaniiNoi: 0, campaniiActualizate: 0, produseCitite: 0, erori: 0, surseNoi: 0 } };
+  st ??= { id: new Date().toISOString(), mod, magazin, inceput: new Date().toISOString(), terminat: false, oprit: false, gata: [], urmatoare: {}, numarate: {}, campanii: {}, produse: {}, erori: [], neverificate: [], informativ: [], contoare: { paginiCitite: 0, campaniiNoi: 0, campaniiActualizate: 0, produseCitite: 0, erori: 0, surseNoi: 0 } };
   st.oprit = false;
   const k = st.contoare;
   const progres = { stare: "ruleaza", mod, magazine: {}, contoare: k, inceput: st.inceput, actualizat: null };
@@ -138,6 +138,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
       if (oprit()) { st.oprit = true; break; }
       progres.magazine[m].sursaCurenta = s.url;
       log(`[${m}] ${s.url}`);
+      st.numarate ??= {};
       let url = st.urmatoare[s.id] ?? s.url, pagina = 0;
       const vazute = new Set();
       try {
@@ -163,7 +164,15 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
             }
           }
           if (mod === "complet") {
-            const { produse, urmatoarea } = ad.parseListare(root, r.url);
+            const { produse: produseP, urmatoarea: urmP, total } = ad.parseListare(root, r.url);
+            // numarul live afisat de magazin: se iau exact atatea produse (de sus in jos) si se trece mai departe doar daca mai lipsesc
+            let produse = produseP, urmatoarea = urmP;
+            if (total) {
+              const luate = (st.numarate[s.id] ?? 0);
+              produse = produseP.slice(0, Math.max(0, total - luate));
+              st.numarate[s.id] = luate + produse.length;
+              if (st.numarate[s.id] >= total) urmatoarea = null;
+            }
             if (!produse.length && pagina === 1) {
               try {
                 const dir2 = join(dir, "rapoarte", "esantioane-pagini"); mkdirSync(dir2, { recursive: true });
@@ -193,7 +202,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
           } else url = null;
           salveazaStare(); salveazaProgres();
         }
-        if (!st.oprit) { st.gata.push(s.id); delete st.urmatoare[s.id]; }
+        if (!st.oprit) { st.gata.push(s.id); delete st.urmatoare[s.id]; delete st.numarate[s.id]; }
       } catch (e) {
         if (e.message === "oprit de utilizator") { st.oprit = true; }
         else if (e.blocat && browserMod !== "nu" && !inBrowser[m]) {

@@ -32,6 +32,8 @@ export async function testeCampanii(ok) {
   { const k = parseHtml('<div class="product_box_container"><div class="product_box"><div class="product_box_name"><a href="/laptop-x/">Laptop X</a></div><div class="pb-price"><p class="price">2.598,99 RON</p></div></div><div class="pb-extra"><p class="pbe-price-old">2.648,99 RON</p><p class="pbe-name">Discount 50,00 RON</p></div></div>');
     const lp = pg.parseListare(k, URL_C).produse[0];
     ok(lp && lp.pret === 2598.99 && lp.pretReferinta === 2648.99 && lp.reducereAfisata === "Discount 50,00 RON", "pcgarage: pret vechi din blocul .pb-extra de langa cardul de categorie"); }
+  { const k = parseHtml('<span class="products-count">1.234 produse de la 7 producatori</span><div class="product_box"><div class="product_box_name"><a href="/a/">A</a></div><div class="pb-price"><p class="price">10,00 RON</p></div></div>');
+    const r = pg.parseListare(k, URL_C); ok(r.total === 1234 && r.produse.length === 1, "pcgarage: numarul live de produse (.products-count) citit"); }
   { const { deschide, argumenteVerificare } = await import("./deschide-browser.js"); const ap = [];
     const a = argumenteVerificare("C:\\p", "https://www.pcgarage.ro/");
     ok(a.includes("--user-data-dir=C:\\p") && a.some((x) => /remote-debugging-port=9333/.test(x)) && !a.some((x) => /headless/.test(x)), "verificare manuala: browser vizibil cu port fix local pentru atasare");

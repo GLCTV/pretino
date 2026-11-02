@@ -114,3 +114,7 @@
 
 ## v1.37
 - Script Profitshare regenerat cu eMAG exclus din lista de advertiseri (v=1793640493).
+
+## v1.38 – logo + cautare
+- Logo nou (B „P care scade”, bicolor teal + portocaliu/chihlimbar), favicon/iconite/manifest, ghid in docs/logo/GHID-LOGO.md.
+- Casuta de cautare in header (logo stanga), sugestii si pagina /cauta/ (noindex), index client-side dist/cauta-index.json (~600 KB, incarcat la focus). Testata local in browser. Neverificat: aspect pe telefoane reale.

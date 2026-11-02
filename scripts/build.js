@@ -16,7 +16,7 @@ const cat = Object.fromEntries(categorii.map((c) => [c.slug, c]));
 const CSS = `:root{--bg:#f6f8f8;--fg:#10211f;--card:#fff;--mut:#5b6b69;--acc:#0f766e;--bd:#dbe4e2}
 @media(prefers-color-scheme:dark){:root{--bg:#0d1514;--fg:#e6f0ee;--card:#142120;--mut:#9bb0ad;--acc:#2dd4bf;--bd:#243735}}
 *{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--fg)}
-a{color:var(--acc)}header,main,footer{max-width:1100px;margin:0 auto;padding:16px}
+a{color:var(--acc)}header,main,footer{max-width:1720px;margin:0 auto;padding:16px clamp(12px,2vw,32px)}
 header{display:flex;gap:16px;align-items:center;flex-wrap:wrap}header .logo{display:flex;line-height:0;text-decoration:none}header .logo img{height:38px;width:auto;display:block}
 nav{display:flex;gap:12px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}

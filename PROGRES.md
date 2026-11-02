@@ -118,3 +118,6 @@
 ## v1.38 – logo + cautare
 - Logo nou (B „P care scade”, bicolor teal + portocaliu/chihlimbar), favicon/iconite/manifest, ghid in docs/logo/GHID-LOGO.md.
 - Casuta de cautare in header (logo stanga), sugestii si pagina /cauta/ (noindex), index client-side dist/cauta-index.json (~600 KB, incarcat la focus). Testata local in browser. Neverificat: aspect pe telefoane reale.
+
+## v1.39 – pagina mai larga
+- Latimea maxima a continutului 1100 -> 1720 px, padding lateral fluid (12-32 px): pe monitoare mari apar 6 coloane de oferte.

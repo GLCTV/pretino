@@ -8,13 +8,15 @@ import { gasesteMagazin } from "../lib/magazine.js";
 const pick = (x, ...ks) => { for (const k of ks) if (x[k]) return x[k]; return ""; };
 
 export function dinRand(x, magazine, affCode) {
-  const link = pick(x, "product_url", "url", "link", "product_link");
+  const link = pick(x, "merchant_url", "product_url", "url", "link", "product_link");
   const m = gasesteMagazin(magazine, { nume: pick(x, "merchant_program", "campaign_name", "advertiser", "shop"), link });
   if (!m) return { omis: "magazin necunoscut: " + link };
   if (!inStoc(pick(x, "availability", "stock", "in_stock", "stoc", "disponibilitate")) || /^(0|false|no|nu)$/i.test(pick(x, "product_active", "active", "is_active"))) return { omis: "fara stoc" };
   const pret = parsePret(pick(x, "sale_price", "price", "price_vat", "pret")), vechi = parsePret(pick(x, "old_price", "full_price", "price_old"));
-  const aff = pick(x, "marketer_link", "aff_link", "affiliate_link", "affiliate_url", "aff_url", "tracking_link")
+  let aff = pick(x, "marketer_link", "aff_link", "affiliate_link", "affiliate_url", "aff_url", "tracking_link")
     || (affCode && m.afiliere?.unique ? `https://event.2performant.com/events/click?ad_type=quicklink&aff_code=${affCode}&unique=${m.afiliere.unique}&redirect_to=${encodeURIComponent(link)}` : "");
+  if (aff && link && /redirect_to=$/.test(aff)) aff += encodeURIComponent(link);
+  if (/redirect_to=$/.test(aff)) return { omis: "fara link produs" };
   const titlu = pick(x, "product_title", "title", "name", "product_name");
   const url = aff || link;
   if (!pret || !url || !titlu) return { omis: "date incomplete" };
@@ -26,13 +28,16 @@ export async function citeste(magazine, secrete, fetchFn = fetch) {
   const feeds = (secrete.PRETINO_TWOPERF_FEEDS ?? "").split(/[\s,]+/).filter(Boolean);
   if (!feeds.length) throw new Error("lipsește PRETINO_TWOPERF_FEEDS din secrete.env");
   const oferte = [], omise = {};
+  let esantion = "";
   for (const f of feeds) {
     const res = await fetchFn(f, { signal: AbortSignal.timeout(120000) });
     if (!res.ok) throw new Error(`feed 2Performant: HTTP ${res.status}`);
-    for (const x of parseCsv(await res.text())) {
+    const rows = parseCsv(await res.text());
+    if (!esantion && rows[0]) esantion = `coloane: ${Object.keys(rows[0]).join(" | ")}\nrand1: ${JSON.stringify(rows[0])}\nrand2: ${JSON.stringify(rows[1] ?? {})}\n`;
+    for (const x of rows) {
       const r = dinRand(x, magazine, secrete.PRETINO_TWOPERF_AFF_CODE);
       if (r.oferta) oferte.push(r.oferta); else omise[r.omis] = (omise[r.omis] ?? 0) + 1;
     }
   }
-  return { oferte, omise };
+  return { oferte, omise, esantion };
 }

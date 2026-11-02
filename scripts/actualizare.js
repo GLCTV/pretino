@@ -12,6 +12,7 @@ const magazine = citesteJson("magazine.json");
 const categorii = new Set(citesteJson("categorii.json").map((c) => c.slug));
 const secrete = incarcaSecrete();
 const precedente = citesteJson("oferte.json");
+mkdirSync("rapoarte", { recursive: true });
 const raport = [];
 const surse = [...new Set(magazine.filter((m) => m.activ && m.sursa).map((m) => m.sursa))];
 let rezultat = [];
@@ -23,7 +24,8 @@ for (const sursa of surse) {
   if (!existsSync(adaptor)) { raport.push(`[${sursa}] activ, dar lipseste scripts/surse/${sursa}.js (oferte vechi pastrate: ${pastrate.length})`); rezultat.push(...pastrate); continue; }
   try {
     const { citeste } = await import(adaptor.href);
-    const { oferte, omise } = await citeste(magazine.filter((m) => m.activ && m.sursa === sursa), secrete);
+    const { oferte, omise, esantion } = await citeste(magazine.filter((m) => m.activ && m.sursa === sursa), secrete);
+    if (esantion) writeFileSync(`rapoarte/esantion-${sursa}.txt`, esantion);
     const bune = [], respinse = { ...omise };
     for (const o of oferte) {
       if (!o.categorie || !categorii.has(o.categorie)) { respinse["fara categorie"] = (respinse["fara categorie"] ?? 0) + 1; continue; }
@@ -44,7 +46,6 @@ if (schimbat) {
   writeFileSync(f("oferte.json"), JSON.stringify(rezultat, null, 1) + "\n");
   writeFileSync(f("istoric-preturi.json"), JSON.stringify(actualizeazaIstoric(citesteJson("istoric-preturi.json"), rezultat)) + "\n");
 }
-mkdirSync("rapoarte", { recursive: true });
 const text = `Actualizare Pretino ${new Date().toISOString()}\n${raport.join("\n")}\nTotal oferte: ${schimbat ? rezultat.length : precedente.length}\n`;
 writeFileSync("rapoarte/ultimul-raport.txt", text);
 console.log(text);

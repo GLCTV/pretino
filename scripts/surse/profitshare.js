@@ -21,13 +21,16 @@ export async function citeste(magazine, secrete, fetchFn = fetch) {
   const feeds = (secrete.PRETINO_PROFITSHARE_FEEDS ?? "").split(/[\s,]+/).filter(Boolean);
   if (!feeds.length) throw new Error("lipsește PRETINO_PROFITSHARE_FEEDS din secrete.env");
   const oferte = [], omise = {};
+  let esantion = "";
   for (const f of feeds) {
     const res = await fetchFn(f, { signal: AbortSignal.timeout(120000) });
     if (!res.ok) throw new Error(`feed Profitshare: HTTP ${res.status}`);
-    for (const x of parseCsv(await res.text())) {
+    const rows = parseCsv(await res.text());
+    if (!esantion && rows[0]) esantion = `coloane: ${Object.keys(rows[0]).join(" | ")}\nrand1: ${JSON.stringify(rows[0])}\nrand2: ${JSON.stringify(rows[1] ?? {})}\n`;
+    for (const x of rows) {
       const r = dinRand(x, magazine);
       if (r.oferta) oferte.push(r.oferta); else omise[r.omis] = (omise[r.omis] ?? 0) + 1;
     }
   }
-  return { oferte, omise };
+  return { oferte, omise, esantion };
 }

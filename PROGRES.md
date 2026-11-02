@@ -90,3 +90,5 @@
 - Pagini noi: /despre/, /contact/, /confidentialitate/, /cookies/, /termeni/ (scripts/lib/legal.js, sablon RO), legate din subsolul tuturor paginilor.
 - Operatorul se completeaza in src/config.js (OPERATOR: nume, email, cui optional). PUBLICA LIVE se opreste cat timp raman marcaje „[COMPLETEAZĂ”.
 - De facut: cand se adauga scriptul Profitshare (dupa aprobare), verificat daca seteaza cookie-uri la incarcare -> bannerul de consimtamant + actualizat /cookies/.
+
+- Email contact: contact@pretino.ro (Cloudflare Email Routing -> Gmail), pus in src/config.js. Mai lipseste OPERATOR.nume. Etapa 2 (trimitere din contact@) neinceputa.

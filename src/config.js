@@ -8,6 +8,6 @@ export const PREVIEW_PORT = 3100;
 // Date despre operatorul site-ului, afisate in paginile legale. COMPLETEAZA-LE inainte de publicare (publicarea LIVE se opreste cat timp raman marcaje „[COMPLETEAZĂ”).
 export const OPERATOR = {
   nume: "",    // ex. numele tau complet sau denumirea firmei (PFA / SRL)
-  email: "",   // adresa de contact publica (ex. contact@pretino.ro)
+  email: "contact@pretino.ro",   // adresa de contact publica (redirectionata prin Cloudflare Email Routing)
   cui: "",     // optional: CUI / CIF, daca ai firma sau PFA
 };

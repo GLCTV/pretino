@@ -151,3 +151,6 @@
 
 ## v1.49 – buton verificare manuala
 - Buton „Deschide Chrome pentru verificare” (scripts/deschide-browser.js): Chrome normal, fara depanare automata, cu profilul Pretino; treci verificarea Cloudflare, inchizi fereastra, apoi rulezi campaniile. Nu garanteaza ca Cloudflare accepta; de verificat pe PC.
+
+## v1.50 – atasare la Chrome verificat manual
+- Butonul „Deschide Chrome pentru verificare” porneste Chrome cu port local fix 9333; campaniile se ataseaza la el (daca e deschis) in loc sa porneasca alt browser. Utilizatorul NU inchide fereastra. Fara fereastra deschisa, comportamentul vechi. Nu garanteaza ca Cloudflare accepta; de verificat pe PC.

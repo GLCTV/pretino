@@ -212,7 +212,7 @@ $c.CVerifica.Add_Click({
   Push-Location $Root
   try { $o = (& bun scripts/deschide-browser.js 2>&1 | Out-String).Trim() } catch { $o = "$_" }
   Pop-Location
-  $c.Stare.Text = "$o  (dupa ce site-ul PC Garage se deschide normal, inchide fereastra Chrome si porneste campaniile)"
+  $c.Stare.Text = "$o  (dupa ce site-ul PC Garage se deschide normal, LASA fereastra Chrome deschisa si porneste campaniile)"
 })
 $c.COpreste.Add_Click({
   New-Item -ItemType Directory -Force -Path (Split-Path $StopFlag) | Out-Null

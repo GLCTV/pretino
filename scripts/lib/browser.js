@@ -70,6 +70,10 @@ async function lanseazaCu(exe, { profil: profilRel, headless }) {
   const ws = new WebSocket(tinta.webSocketDebuggerUrl);
   await new Promise((ok, ko) => { ws.onopen = ok; ws.onerror = () => ko(new Error("conexiune CDP esuata")); });
   const cdp = new Cdp(ws);
+  return interfata(cdp, ws, async () => { try { await cdp.trimite("Browser.close"); } catch {} try { ws.close(); } catch {} try { proc.kill(); } catch {} await sleep(500); curataProfil(profil); });
+}
+
+async function interfata(cdp, ws, inchideFn) {
   await cdp.trimite("Page.enable"); await cdp.trimite("Network.enable");
   let status = 200;
   cdp.ascultatori.push((m) => { if (m.method === "Network.responseReceived" && m.params.type === "Document") status = m.params.response.status; });
@@ -94,12 +98,26 @@ async function lanseazaCu(exe, { profil: profilRel, headless }) {
     },
     stare: async () => ({ url: await ev("location.href"), html: await ev("document.documentElement.outerHTML"), status }),
     adaInFata: () => cdp.trimite("Page.bringToFront").catch(() => {}),
-    async inchide() { try { await cdp.trimite("Browser.close"); } catch {} try { ws.close(); } catch {} try { proc.kill(); } catch {} await sleep(500); curataProfil(profil); },
+    inchide: inchideFn,
   };
+}
+
+
+// Se ataseaza la un Chrome deja deschis de utilizator (butonul „Deschide Chrome pentru verificare”, port fix), unde verificarea anti-bot a fost trecuta manual. Nu porneste si nu inchide browserul.
+export const PORT_VERIFICARE = 9333;
+export async function ataseazaLaBrowser({ port = PORT_VERIFICARE, fetchFn = fetch } = {}) {
+  let tinte;
+  try { tinte = await (await fetchFn(`http://127.0.0.1:${port}/json/list`)).json(); } catch { return null; }
+  const tinta = tinte.find((t) => t.type === "page" && /pcgarage\.ro/.test(t.url)) ?? tinte.find((t) => t.type === "page");
+  if (!tinta?.webSocketDebuggerUrl) return null;
+  const ws = new WebSocket(tinta.webSocketDebuggerUrl);
+  await new Promise((ok, ko) => { ws.onopen = ok; ws.onerror = () => ko(new Error("conexiune CDP esuata")); });
+  return interfata(new Cdp(ws), ws, async () => { try { ws.close(); } catch {} });
 }
 
 // Incearca pe rand Chrome, apoi Edge (sau PRETINO_BROWSER / exe dat)
 export async function lanseazaBrowser({ exe, profil, headless = false } = {}) {
+  if (!exe && !headless) { const atasat = await ataseazaLaBrowser().catch(() => null); if (atasat) return atasat; } // browser deschis de utilizator si verificat manual
   const lista = exe ? [exe] : gasesteBrowsere();
   if (!lista.length) throw new Error("nu am gasit Chrome sau Edge pe acest PC (poti seta PRETINO_BROWSER)");
   const erori = [];

@@ -34,9 +34,11 @@ export async function testeCampanii(ok) {
     ok(lp && lp.pret === 2598.99 && lp.pretReferinta === 2648.99 && lp.reducereAfisata === "Discount 50,00 RON", "pcgarage: pret vechi din blocul .pb-extra de langa cardul de categorie"); }
   { const { deschide, argumenteVerificare } = await import("./deschide-browser.js"); const ap = [];
     const a = argumenteVerificare("C:\\p", "https://www.pcgarage.ro/");
-    ok(a.includes("--user-data-dir=C:\\p") && !a.some((x) => /remote-debugging|headless/.test(x)), "verificare manuala: browser normal, fara depanare automata");
+    ok(a.includes("--user-data-dir=C:\\p") && a.some((x) => /remote-debugging-port=9333/.test(x)) && !a.some((x) => /headless/.test(x)), "verificare manuala: browser vizibil cu port fix local pentru atasare");
     try { deschide({ env: { PRETINO_BROWSER: process.execPath }, dir: process.env.TEMP ?? "/tmp", lanseaza: (e, ar) => { ap.push(ar); return { unref() {} }; } }); } catch {}
     ok(ap.length === 1 && ap[0].some((x) => /browser-profil$/.test(x)), "verificare manuala: foloseste profilul dedicat Pretino"); }
+  { const { ataseazaLaBrowser } = await import("./lib/browser.js");
+    ok((await ataseazaLaBrowser({ fetchFn: async () => { throw new Error("refuz"); } })) === null && (await ataseazaLaBrowser({ fetchFn: async () => ({ json: async () => [{ type: "service_worker" }] }) })) === null, "atasare: fara browser deschis (sau fara pagina) -> null, programul porneste propriul browser"); }
   const mc = gen.metaCampanie(root, URL_C);
   ok(mc.reducereAnuntata === "pana la 30%" && mc.codPromotional === "TOAMNA25" && mc.sfarsit === "2026-11-10" && mc.conditii.length >= 2, "campanie: reducere exacta, cod explicit, data sfarsit, conditii");
   ok(gen.extrageCod("Reducere mare pentru tine, comanda acum") === null && gen.extrageDate("fara date").sfarsit === null, "campanie: nu inventeaza cod sau date");

@@ -154,3 +154,6 @@
 
 ## v1.50 – atasare la Chrome verificat manual
 - Butonul „Deschide Chrome pentru verificare” porneste Chrome cu port local fix 9333; campaniile se ataseaza la el (daca e deschis) in loc sa porneasca alt browser. Utilizatorul NU inchide fereastra. Fara fereastra deschisa, comportamentul vechi. Nu garanteaza ca Cloudflare accepta; de verificat pe PC.
+
+## v1.51 – limita 10 pagini
+- Categoriile PC Garage (filtrul Cu discount): maximum 10 pagini pe categorie (era 30).

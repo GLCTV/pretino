@@ -10,7 +10,7 @@ const stop = (m) => { console.error("OPRIT: " + m); process.exit(1); };
 if (!process.argv.includes("--live")) stop("lipsește --live (publicarea se pornește doar manual din program).");
 
 if (sh("git rev-parse --abbrev-ref HEAD") !== "main") stop("nu ești pe ramura main.");
-if (sh("git status --porcelain")) stop("există modificări necomise.");
+if (sh("git status --porcelain --untracked-files=no")) stop("există modificări necomise.");
 sh("git fetch origin main");
 if (sh("git rev-parse HEAD") !== sh("git rev-parse origin/main")) stop("main local diferă de origin/main (fă push/pull întâi).");
 

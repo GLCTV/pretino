@@ -10,8 +10,15 @@ const PERMISE = /(oferte|promo|campanie|campanii|black-?friday|reduceri|outlet|l
 export function esteLinkCampanie(url) {
   try { const u = new URL(url); return /(^|\.)pcgarage\.ro$/.test(u.hostname) && PERMISE.test(u.pathname) && !/\/(cos|cont|login|validare-acces)(\/|$)/i.test(u.pathname); } catch { return false; }
 }
+// categorii de produse din meniul principal (ul.top_menu): /<slug>/ pe un singur nivel; fara pagini de cont/info si fara pagini de „gameplay" (sisteme de test)
+const NU_CATEGORIE = /gameplay|testat|^\/(cos|cont|logout|info|p|sisteme|noutati|angajari|desigilate|adauga-wishlist|vizualizare-wishlist)\/$/i;
 export function descopera(root, baza) {
   const out = new Map();
+  for (const a of qsa(root, ".top_menu a[href]")) {
+    const curat = absolut(attr(a, "href"), baza)?.split("?")[0];
+    if (!curat || out.has(curat)) continue;
+    try { const u = new URL(curat); if (/(^|\.)pcgarage\.ro$/.test(u.hostname) && /^\/[a-z0-9-]+\/$/.test(u.pathname) && !NU_CATEGORIE.test(u.pathname)) out.set(curat, { url: curat, titlu: text(a).slice(0, 80) || u.pathname.replace(/\//g, ""), categorie: true }); } catch { /* ignora */ }
+  }
   for (const a of qsa(root, "a[href]")) {
     const u = absolut(attr(a, "href"), baza);
     const curat = u?.split("?")[0];

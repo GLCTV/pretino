@@ -156,8 +156,8 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
             // descoperire (doar din sursele configurate, adancime 1, cu limite)
             if (!s.descoperita && lim.adancimeDescoperire >= 1) {
               for (const d of ad.descopera(root, r.url)) {
-                if (esteExclus(d.url, d.titlu) || cfg.surse.some((x) => x.url === d.url) || cfg.surse.filter((x) => x.magazin === m && x.descoperita).length >= lim.maxSurseDescoperite) continue;
-                const nou = { id: `${m}-${hash(d.url)}`, magazin: m, url: d.url, titlu: d.titlu, activ: true, descoperita: true, origine: s.url, adaugata: new Date().toISOString() };
+                if (esteExclus(d.url, d.titlu) || cfg.surse.some((x) => x.url === d.url) || cfg.surse.filter((x) => x.magazin === m && x.descoperita && Boolean(x.categorie) === Boolean(d.categorie)).length >= (d.categorie ? 400 : lim.maxSurseDescoperite)) continue;
+                const nou = { id: `${m}-${hash(d.url)}`, magazin: m, url: d.url, titlu: d.titlu, activ: true, descoperita: true, ...(d.categorie ? { categorie: true } : {}), origine: s.url, adaugata: new Date().toISOString() };
                 cfg.surse.push(nou); coada.push(nou); k.surseNoi++;
               }
             }

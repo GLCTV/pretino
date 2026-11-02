@@ -133,3 +133,6 @@
 
 ## v1.43 – cupon PC Garage
 - Cupon GVYDBDQ9 (1%) pe cardurile PC Garage (site + cautare), buton Copiaza, mentiune in subsol. Cuponul e cod de cont (nu secret), scos din lista interzisa din test.js.
+
+## v1.44 – categorii PC Garage
+- Descoperire automata a categoriilor din meniul PC Garage (ul.top_menu, ~290), separat de limita campaniilor (max 400). Listele de categorie au pret vechi taiat (verificat in Chrome pe /notebook-laptop/: 9 din 20 cu pret vechi). Nu s-a rulat inca pe PC.

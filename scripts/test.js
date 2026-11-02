@@ -90,7 +90,8 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   const SCR = "l.profitshare.ro/files_shared/lps/js/AZC/NI.js";
   const html = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? html(d + "/" + e.name) : e.name.endsWith(".html") ? [d + "/" + e.name] : []));
   const pag = existsSync("dist") ? html("dist") : [];
-  ok(pag.length === 0 || pag.every((f) => readFileSync(f, "utf8").includes(SCR)), "profitshare: scriptul de linkuri automate e pe toate paginile generate"); }
+  ok(pag.length === 0 || pag.every((f) => readFileSync(f, "utf8").includes(SCR)), "profitshare: scriptul de linkuri automate e pe toate paginile generate");
+  ok(pag.every((f) => !/emag\.ro/i.test(readFileSync(f, "utf8"))), "eMAG interzis (regula Profitshare): niciun link emag.ro in paginile generate"); }
 { const { testePanou } = await import("./test-panou.js"); await testePanou(ok); }
 { const { testeCampanii } = await import("./test-campanii.js"); await testeCampanii(ok); }
 console.log(esecuri ? `\n${esecuri} teste eșuate` : "\nToate testele au trecut");

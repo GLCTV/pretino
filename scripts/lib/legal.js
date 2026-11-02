@@ -25,7 +25,7 @@ export const PAGINI_LEGALE = [
   { cale: "/confidentialitate/", titlu: "Politica de confidențialitate", nume: "Confidențialitate", descriere: `Cum tratăm datele personale pe ${SITE_NAME}.`, corp: () => `<h1>Politica de confidențialitate</h1>
 <p>Ultima actualizare: ${DATA}. Operator de date: ${op()}${cui()}, contact ${email()}.</p>
 <h2>Ce date prelucrăm</h2>
-<p>${esc(SITE_NAME)} nu are conturi, formulare sau comentarii și nu îți cerem date personale. Site-ul este găzduit pe Cloudflare Pages, care poate înregistra tehnic adresa IP și date despre cerere (de exemplu pagina vizitată, data, browserul) pentru securitate și funcționare. Nu folosim instrumente de analiză sau publicitate proprii.</p>
+<p>${esc(SITE_NAME)} nu are conturi, formulare sau comentarii și nu îți cerem date personale. Site-ul este găzduit pe Cloudflare Pages, care poate înregistra tehnic adresa IP și date despre cerere (de exemplu pagina vizitată, data, browserul) pentru securitate și funcționare. Nu folosim instrumente de analiză sau publicitate proprii. Paginile încarcă un script al rețelei de afiliere Profitshare (de la l.profitshare.ro), care transformă linkurile către magazinele partenere în linkuri de afiliere și poate primi date tehnice despre vizită (de exemplu adresa IP și linkul apăsat).</p>
 <h2>Linkuri către magazine și afiliere</h2>
 <p>Când apeși pe „Vezi oferta” ajungi pe site-ul magazinului. Linkurile de afiliere trec prin serverele rețelelor de afiliere (de exemplu Profitshare sau 2Performant), care pot salva un identificator în browserul tău (cookie) ca să poată atribui o eventuală comandă. Aceste rețele și magazinele își au propriile politici de confidențialitate, pe care ți le recomandăm să le citești.</p>
 <h2>Drepturile tale</h2>
@@ -33,7 +33,7 @@ export const PAGINI_LEGALE = [
 <p>Pagina se poate modifica; versiunea curentă este mereu cea de pe ${esc(SITE_URL)}/confidentialitate/.</p>` },
   { cale: "/cookies/", titlu: "Politica de cookies", nume: "Cookies", descriere: `Ce cookie-uri sunt folosite pe ${SITE_NAME}.`, corp: () => `<h1>Politica de cookies</h1>
 <p>Ultima actualizare: ${DATA}.</p>
-<p>${esc(SITE_NAME)} nu setează cookie-uri proprii și nu folosește analiză sau publicitate proprie.</p>
+<p>${esc(SITE_NAME)} nu setează cookie-uri proprii și nu folosește analiză sau publicitate proprie. Paginile încarcă însă scriptul Profitshare pentru linkurile de afiliere, care poate folosi cookie-uri sau stocare locală pentru a atribui comenzile.</p>
 <p>Când apeși pe un link către un magazin, rețeaua de afiliere sau magazinul pot seta cookie-uri în browserul tău, pentru a atribui comanda și pentru funcționarea magazinului. Acestea sunt controlate de ei, nu de noi. Poți șterge sau bloca cookie-urile din setările browserului.</p>
 <p>Întrebări: ${email()}.</p>` },
   { cale: "/termeni/", titlu: "Termeni și condiții", nume: "Termeni", descriere: `Termenii de utilizare ai ${SITE_NAME}.`, corp: () => `<h1>Termeni și condiții</h1>

@@ -25,11 +25,14 @@ nav{display:flex;gap:12px;flex-wrap:wrap}.grid{display:grid;grid-template-column
 .btn{margin-top:auto;display:inline-block;background:var(--acc);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;text-align:center}
 .demo{background:#b45309;color:#fff;text-align:center;padding:6px}.mut{color:var(--mut)}footer{color:var(--mut);font-size:.9rem}footer .legal{margin-bottom:8px}main h2{margin-top:1.4em}`;
 
+// Script Profitshare „Linkuri automate" (cont Pretino, site validat): transforma linkurile catre magazinele partenere in linkuri de afiliere. Fara el, linkurile raman cele din catalog.
+const PROFITSHARE_SCRIPT = `<!-- Start ProfitShare Zone --><script>(function(){var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="//l.profitshare.ro/files_shared/lps/js/AZC/NI.js?v=1793640025";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(s);})();</script><!-- End ProfitShare Zone -->`;
+
 function pagina({ titlu, descriere, cale, corp, noindex = false }) {
   const robots = noindex || DEMO ? '<meta name="robots" content="noindex">' : "";
   return `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="profitshareid" content="7dd842fc7074c28872c609438ead55e6"><title>${esc(titlu)}</title><meta name="description" content="${esc(descriere)}">${robots}
-<link rel="canonical" href="${SITE_URL}${cale}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/stil.css"></head><body>
+<link rel="canonical" href="${SITE_URL}${cale}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/stil.css">${DEMO ? "" : PROFITSHARE_SCRIPT}</head><body>
 ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și nu se publică</div>' : ""}
 <header><a class="logo" href="/">${esc(SITE_NAME)}</a><nav>${categorii.map((c) => `<a href="/categorie/${c.slug}/">${esc(c.nume)}</a>`).join("")}</nav></header>
 <main>${corp}</main>

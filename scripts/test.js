@@ -86,6 +86,11 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   ok(dinProdus({ ...base, ultimaVerificare: "2026-10-20T10:00:00Z" }, mg, camp, acum).omis, "campanii->catalog: date vechi nu intra");
   ok(dinProdus({ ...base, titlu: "Laptop Resigilat" }, mg, camp, acum).omis, "campanii->catalog: resigilat nu intra");
   ok(dinProdus({ ...base, pretReferinta: 20000 }, mg, camp, acum).omis, "campanii->catalog: reducere suspecta >60% nu intra"); }
+{ const { readdirSync } = await import("node:fs");
+  const SCR = "l.profitshare.ro/files_shared/lps/js/AZC/NI.js";
+  const html = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? html(d + "/" + e.name) : e.name.endsWith(".html") ? [d + "/" + e.name] : []));
+  const pag = existsSync("dist") ? html("dist") : [];
+  ok(pag.length === 0 || pag.every((f) => readFileSync(f, "utf8").includes(SCR)), "profitshare: scriptul de linkuri automate e pe toate paginile generate"); }
 { const { testePanou } = await import("./test-panou.js"); await testePanou(ok); }
 { const { testeCampanii } = await import("./test-campanii.js"); await testeCampanii(ok); }
 console.log(esecuri ? `\n${esecuri} teste eșuate` : "\nToate testele au trecut");

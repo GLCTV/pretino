@@ -108,3 +108,6 @@
 
 ## v1.35 – eMAG scos
 - Scos eMAG din catalog (1851 oferte), surse de campanii, magazine.json, cod de citire, program si teste. Raman PC Garage si retelele (Profitshare/2Performant). Local pe PC: data/campanii-surse.json, campanii.json si produse-campanii.json se curata singure la urmatoarea rulare a campaniilor.
+
+## v1.36 – script Profitshare linkuri automate
+- Scriptul Profitshare (linkuri automate, pretino.ro aprobat) pus in <head> pe toate paginile (nu in preview DEMO). Textele de confidentialitate/cookies il mentioneaza. Neverificat: ce cookie-uri seteaza efectiv; daca e nevoie de banner de consimtamant se adauga separat.

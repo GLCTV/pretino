@@ -15,7 +15,7 @@ function fisiere(d, acc = []) {
   }
   return acc;
 }
-const toate = fisiere(".");
+const toate = fisiere(".").map((f) => f.replace(/\\/g, "/")); // căi cu / și pe Windows
 const cod = toate.filter((f) => /\.(js|ps1|bat|yml|json|html|css)$/.test(f) && !f.endsWith("scripts/test.js"));
 
 // 1. Independență: codul nu citește/folosește resurse ale altui proiect

@@ -124,3 +124,6 @@
 
 ## v1.40 – poze produse
 - Pozele din feed-uri (campul imagine, 2016/2016 oferte) afisate pe carduri si in rezultatele cautarii: hotlink de pe serverele magazinelor, incarcare lenesa, fallback = fara poza daca nu se incarca. Neverificat: daca CDN-urile magazinelor permit hotlink (in sandbox nu am acces la ele; layout testat cu poze de proba). Confidentialitate actualizata.
+
+## v1.41 – cache
+- stil.css si cauta.js au ?v=<hash> in URL: dupa publicare, browserele nu mai folosesc stilul vechi din cache (se vedea pagina ingusta / poze scapate din card dupa v1.40).

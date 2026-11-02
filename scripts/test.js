@@ -94,6 +94,7 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   const idx = existsSync("dist/cauta-index.json") ? JSON.parse(readFileSync("dist/cauta-index.json", "utf8")) : null;
   ok(!idx || (idx.o.length > 0 && idx.o.every((o) => o.t && o.u && o.p > 0)), "cautare: indexul de oferte e valid");
   ok(pag.length === 0 || (pag.every((f) => /id="cautare"/.test(readFileSync(f, "utf8"))) && /noindex/.test(readFileSync("dist/cauta/index.html", "utf8")) && !/cauta\//.test(readFileSync("dist/sitemap.xml", "utf8"))), "cautare: casuta de cautare pe toate paginile; pagina /cauta/ noindex si fara sitemap");
+  ok(pag.length === 0 || pag.every((f) => /\/stil\.css\?v=[0-9a-f]{8}"/.test(readFileSync(f, "utf8"))), "cache: stil.css si cauta.js au versiune in URL (browserul nu foloseste varianta veche)");
   ok(pag.every((f) => !/emag\.ro/i.test(readFileSync(f, "utf8"))), "eMAG interzis (regula Profitshare): niciun link emag.ro in paginile generate"); }
 { const { testePanou } = await import("./test-panou.js"); await testePanou(ok); }
 { const { testeCampanii } = await import("./test-campanii.js"); await testeCampanii(ok); }

@@ -1,4 +1,4 @@
-# Programul Pretino (WPF). Versiunea proprie a programului e în ..\versiune-program.txt.
+﻿# Programul Pretino (WPF). Versiunea proprie a programului e în ..\versiune-program.txt.
 Add-Type -AssemblyName PresentationFramework
 $Root = Split-Path -Parent $PSScriptRoot
 $AppVersion = (Get-Content (Join-Path $Root 'versiune-program.txt') -ErrorAction SilentlyContinue | Select-Object -First 1)

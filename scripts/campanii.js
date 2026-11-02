@@ -197,7 +197,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
               if (st.campanii[cid] && !st.campanii[cid].produse.includes(pid)) st.campanii[cid].produse.push(pid);
               if (!ex) k.produseCitite++;
             }
-            const maxP = s.maxPagini ?? lim.maxPaginiListaPerSursa;
+            const maxP = total ? 100 : (s.maxPagini ?? lim.maxPaginiListaPerSursa); // cu numarul live al magazinului, limita e acel numar (100 pagini = doar plasa de siguranta)
             st.urmatoare[s.id] = urmatoarea && pagina < maxP ? urmatoarea : undefined;
             if (urmatoarea && pagina >= maxP && !s.sortatDupaReducere) { st.neverificate.push({ magazin: m, sursa: s.url, motiv: `oprit la limita de ${maxP} pagini` }); }
             url = st.urmatoare[s.id];

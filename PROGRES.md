@@ -148,3 +148,6 @@
 
 ## v1.48 – ritm browser PC Garage
 - In modul browser: pauza minima 3 s intre pagini (daca nu e fortata din test), flaguri contra incetinirii filelor in fundal. Profil propriu .pretino-local/browser-profil (nu se foloseste nimic din alt proiect). Cloudflare: verificarea nu se ocoleste; programul asteapta rezolvarea manuala.
+
+## v1.49 – buton verificare manuala
+- Buton „Deschide Chrome pentru verificare” (scripts/deschide-browser.js): Chrome normal, fara depanare automata, cu profilul Pretino; treci verificarea Cloudflare, inchizi fereastra, apoi rulezi campaniile. Nu garanteaza ca Cloudflare accepta; de verificat pe PC.

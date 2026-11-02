@@ -38,7 +38,8 @@ $script:DupaProgram = $false
           <Button Name="CActualizeaza" Content="Actualizeaza campanii si oferte" Padding="10,4" Margin="0,0,8,0"/>
           <Button Name="COpreste" Content="Opreste" Padding="10,4" Margin="0,0,8,0"/>
           <Button Name="CReia" Content="Reia verificarea intrerupta" Padding="10,4" Margin="0,0,8,0"/>
-          <Button Name="CRaport" Content="Raport" Padding="10,4"/>
+          <Button Name="CRaport" Content="Raport" Padding="10,4" Margin="0,0,8,0"/>
+          <Button Name="CVerifica" Content="Deschide Chrome pentru verificare" Padding="10,4"/>
         </WrapPanel>
         <TextBlock Name="CProgres" Foreground="#9bb0ad" TextWrapping="Wrap" Margin="0,0,0,6" Text="Campanii: nicio verificare in aceasta sesiune."/>
         <Grid Margin="0,0,0,6">
@@ -64,7 +65,7 @@ $script:DupaProgram = $false
 "@
 $win = [Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $xaml))
 
-$c = @{}; foreach ($n in 'Stare','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii') { $c[$n] = $win.FindName($n) }
+$c = @{}; foreach ($n in 'Stare','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii') { $c[$n] = $win.FindName($n) }
 
 function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram') { $c[$n].IsEnabled = -not $busy } }
 
@@ -207,6 +208,12 @@ Load-Surse; Load-Campanii; Show-Progres
 $c.CCauta.Add_Click({ Start-Camp '--campanii' })
 $c.CActualizeaza.Add_Click({ Start-Camp '--complet' })
 $c.CReia.Add_Click({ Start-Camp '--complet --reia' })
+$c.CVerifica.Add_Click({
+  Push-Location $Root
+  try { $o = (& bun scripts/deschide-browser.js 2>&1 | Out-String).Trim() } catch { $o = "$_" }
+  Pop-Location
+  $c.Stare.Text = "$o  (dupa ce site-ul PC Garage se deschide normal, inchide fereastra Chrome si porneste campaniile)"
+})
 $c.COpreste.Add_Click({
   New-Item -ItemType Directory -Force -Path (Split-Path $StopFlag) | Out-Null
   Set-Content -Path $StopFlag -Value 'stop'

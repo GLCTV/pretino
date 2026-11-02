@@ -1,5 +1,6 @@
 // Pretino.ro – interfata din browser: tema, favorite, copiere cupon, cautare cu sugestii, filtre/sortare pe liste.
-// Catalogul se incarca o singura data din /cauta-index.json (campuri: id,t,m,c,s,p,v,r,u,i). Fara server, fara cookie-uri; favoritele si tema raman doar in acest browser.
+// Catalogul (/cauta-index.json; campuri: id,t,m,c,s,p,v,r,x,u,i) se incarca DOAR cand e nevoie: cautare, filtre/sortare, „Arata mai multe”, favorite.
+// Paginile de lista au deja produsele in HTML (cu linkuri de paginare), deci pornirea nu mai randeaza din nou lista. Fara server, fara cookie-uri; favoritele si tema raman doar in acest browser.
 (function () {
   "use strict";
   var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
@@ -63,15 +64,16 @@
     if (!t.length) return [];
     return data.o.filter(function (o) { return t.every(function (x) { return o.k.indexOf(x) >= 0; }); });
   }
-  function card(o) {
+  var COND = { 1: "Resigilat", 2: "Refurbished" };
+  function card(o, i) {
     var poza = '<a class="poza' + (o.i ? "" : " fara") + '" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true">' +
-      (o.i ? '<img src="' + esc(o.i) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="275" height="167" onerror="this.parentNode.classList.add(\'fara\')">' : "") + "</a>";
+      (o.i ? '<img src="' + esc(o.i) + '" alt="" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="167" onerror="this.parentNode.classList.add(\'fara\')">' : "") + "</a>";
     var k = data.k && data.k[o.m];
-    var cupon = k ? '<div class="cupon"><span>Cupon <b>' + esc(k.cod) + "</b> (" + esc(k.text) + ') – introdu-l în coș</span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
+    var cupon = k ? '<div class="cupon"><span>Cupon <b>' + esc(k.cod) + "</b> (" + esc(k.text) + ') în coș · prețul afișat nu îl include</span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
     return '<article class="card">' + poza + '<span class="badge">-' + o.r2 + '%</span>' +
       '<button class="fav" type="button" data-id="' + esc(o.id) + '" aria-pressed="false" aria-label="Adaugă la favorite">' + ICON_INIMA + "</button>" +
       '<a class="titlu" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank">' + esc(o.t) + "</a>" +
-      '<span class="magazin">' + esc(data.m[o.m] || o.m) + "</span>" +
+      '<span class="magazin"><a href="/magazin/' + esc(o.m) + '/">' + esc(data.m[o.m] || o.m) + "</a>" + (o.x ? '<span class="cond">' + COND[o.x] + "</span>" : "") + "</span>" +
       '<div class="pretrand"><span class="pret">' + lei(o.p) + '</span><span class="vechi"' + (o.r ? ' title="Preț de referință afișat de magazin"' : "") + ">" + lei(o.v) + '</span><span class="econ">Economisești<b>' + lei(o.v - o.p) + "</b></span></div>" +
       cupon + '<a class="btn" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank">Vezi oferta ' + ICON_EXTERN + "</a></article>";
   }
@@ -104,23 +106,37 @@
     document.addEventListener("click", function (e) { if (!form.contains(e.target)) inchide(); });
   }
 
-  /* ---------- liste: filtre, sortare ---------- */
+  /* ---------- liste: filtre, sortare, „Arata mai multe” ---------- */
   var main = document.querySelector("main[data-lista]");
   if (!main) return;
   var cfg = JSON.parse(main.getAttribute("data-lista"));
-  var lista = $("lista"), mai = $("mai"), gol = $("rez-gol"), nrRez = $("nr-rez"), PAS = 48;
+  var lista = $("lista"), mai = $("mai"), gol = $("rez-gol"), nrRez = $("nr-rez"), PAS = cfg.pe || 48;
   var elMin = $("p-min"), elMax = $("p-max"), rMin = $("p-min-r"), rMax = $("p-max-r"), umplere = $("umplere"), sortSel = $("sortare");
   var state = { sub: "", mags: [], min: 0, max: cfg.max, red: 0, sort: "red" };
   var baza = [], rez = [], shown = 0, maxScope = cfg.max;
   var params = new URLSearchParams(location.search);
+  var pregatit = false, client = false;   // client = lista e (re)construita din catalog in browser; altfel ramane HTML-ul primit
+  var SORT = {
+    red: function (a, b) { return b.r2 - a.r2 || a.p - b.p || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0); },
+    econ: function (a, b) { return (b.v - b.p) - (a.v - a.p) || a.p - b.p; },
+    "pret-cresc": function (a, b) { return a.p - b.p; },
+    "pret-desc": function (a, b) { return b.p - a.p; }
+  };
+  var PARAMETRI = ["sub", "m", "min", "max", "red", "sort"];
+  var areParametri = PARAMETRI.some(function (k) { return params.has(k); });
+  var numar = function (v) { var n = Number(v); return isFinite(n) && n >= 0 ? n : null; };
 
+  // parametri din URL: valorile invalide sunt ignorate (nu produc liste goale sau erori)
   function citesteUrl() {
-    state.sub = params.get("sub") || "";
-    state.mags = (params.get("m") || "").split(",").filter(Boolean);
-    state.red = Number(params.get("red")) || 0;
-    state.sort = params.get("sort") || "red";
-    state.min = Number(params.get("min")) || 0;
-    state.max = params.get("max") ? Number(params.get("max")) : null;
+    var sub = params.get("sub") || "";
+    state.sub = /^[a-z0-9-]+$/.test(sub) ? sub : "";
+    state.mags = (params.get("m") || "").split(",").filter(function (x) { return /^[a-z0-9-]+$/.test(x); });
+    var red = Number(params.get("red"));
+    state.red = [20, 30, 40, 50].indexOf(red) >= 0 ? red : 0;
+    var sort = params.get("sort");
+    state.sort = SORT[sort] ? sort : "red";
+    state.min = numar(params.get("min")) || 0;
+    state.max = params.get("max") === null ? null : numar(params.get("max"));
   }
   function scrieUrl() {
     var p = new URLSearchParams();
@@ -132,15 +148,12 @@
     if (state.red) p.set("red", state.red);
     if (state.sort !== "red") p.set("sort", state.sort);
     var s = p.toString();
-    try { history.replaceState(null, "", location.pathname + (s ? "?" + s : "")); } catch (e) { /* ignorat */ }
+    // dupa filtrare in browser lista porneste de la inceput: adresa revine la prima pagina a listei (cfg.baza)
+    try { history.replaceState(null, "", (cfg.baza || location.pathname) + (s ? "?" + s : "")); } catch (e) { /* ignorat */ }
   }
-  var SORT = {
-    red: function (a, b) { return b.r2 - a.r2 || a.p - b.p; },
-    econ: function (a, b) { return (b.v - b.p) - (a.v - a.p) || a.p - b.p; },
-    "pret-cresc": function (a, b) { return a.p - b.p; },
-    "pret-desc": function (a, b) { return b.p - a.p; }
-  };
+  function ascundePagini() { var n = document.querySelector(".pagini"); if (n) n.hidden = true; }
   function aplica() {
+    client = true; ascundePagini();
     var mn = state.min, mx = state.max === null ? Infinity : state.max;
     rez = baza.filter(function (o) {
       return (!state.sub || o.s === state.sub) && (!state.mags.length || state.mags.indexOf(o.m) >= 0) && o.p >= mn && o.p <= mx && o.r2 >= state.red;
@@ -151,10 +164,18 @@
   }
   function randeaza() {
     var next = rez.slice(shown, shown + PAS);
-    lista.insertAdjacentHTML("beforeend", next.map(card).join(""));
+    lista.insertAdjacentHTML("beforeend", next.map(function (o, i) { return card(o, shown + i); }).join(""));
     shown += next.length; mai.hidden = shown >= rez.length; marcheazaFav();
   }
-  mai.addEventListener("click", randeaza);
+  // „Arata mai multe” pe lista primita in HTML: continua de unde se termina pagina curenta (aceeasi ordine ca in HTML, fara dubluri sau salturi)
+  function maiMulte() {
+    cuDate(function () {
+      if (client) return randeaza();
+      if (!shown) { rez = baza; shown = cfg.fin; }
+      randeaza(); ascundePagini();
+    });
+  }
+  mai.addEventListener("click", maiMulte);
 
   function sincronizeazaPret(sursa) {
     var a, b;
@@ -175,7 +196,7 @@
     for (var i = 0; i < radios.length; i++) radios[i].checked = Number(radios[i].value) === state.red;
     var cbs = document.querySelectorAll('#f-mag input');
     for (var j = 0; j < cbs.length; j++) cbs[j].checked = state.mags.indexOf(cbs[j].value) >= 0;
-    var chips = document.querySelectorAll(".subcats .chip");
+    var chips = document.querySelectorAll(".subcats .chip[data-sub]");
     for (var k = 0; k < chips.length; k++) chips[k].setAttribute("aria-pressed", chips[k].getAttribute("data-sub") === state.sub ? "true" : "false");
     sortSel.value = state.sort;
   }
@@ -188,7 +209,7 @@
   }
   function pregatesteScope() {
     var q = params.get("q") || "";
-    if (cfg.mod === "categorie") baza = data.o.filter(function (o) { return o.c === cfg.cat; });
+    if (cfg.mod === "categorie") baza = data.o.filter(function (o) { return o.c === cfg.cat && (!cfg.sub || o.s === cfg.sub); });
     else if (cfg.mod === "magazin") baza = data.o.filter(function (o) { return o.m === cfg.mag; });
     else if (cfg.mod === "cauta") baza = cauta(q);
     else if (cfg.mod === "favorite") baza = data.o.filter(function (o) { return favorite.indexOf(o.id) >= 0; });
@@ -200,11 +221,25 @@
       $("h1").textContent = q ? "Rezultate pentru „" + q + "”" : "Căutare";
       $("sub-titlu").textContent = q ? "Oferte care conțin toți termenii căutați." : "Scrie ce cauți în caseta de sus.";
       var mg = $("migaja-curenta"); if (mg) mg.textContent = "Căutare";
-      document.title = (q ? "„" + q + "” – " : "") + "Căutare – Pretino.ro";
+      document.title = (q ? "„" + q + "” – " : "") + "Căutare | Pretino";
     }
     if (cfg.mod === "favorite") { var s = $("sub-titlu"); if (s) s.textContent = baza.length ? "Ofertele pe care le-ai salvat în acest browser." : "Nu ai salvat nicio ofertă. Apasă pe inimă la o ofertă ca să o găsești aici."; }
   }
-  function reseteaza() { state.sub = ""; state.mags = []; state.min = 0; state.max = null; state.red = 0; state.sort = "red"; seteazaControale(); aplica(); }
+  function pregateste() {
+    pregatit = true; pregatesteScope();
+    if (cfg.mod === "cauta" || cfg.mod === "favorite") construiesteMagazine();
+    // valori invalide din URL fata de catalogul real: magazine / subcategorii inexistente se ignora
+    state.mags = state.mags.filter(function (m) { return !!data.m[m]; });
+    if (state.sub && !baza.some(function (o) { return o.s === state.sub; })) state.sub = "";
+    if (state.max !== null && state.max > maxScope) state.max = null;
+    seteazaControale();
+  }
+  // ruleaza fn dupa incarcarea catalogului (o singura data, doar la prima interactiune)
+  function cuDate(fn) {
+    if (pregatit) return fn();
+    load().then(function () { if (!pregatit) pregateste(); fn(); }).catch(function () { /* fara catalog ramane lista din HTML */ });
+  }
+  function reseteaza() { state.sub = ""; state.mags = []; state.min = 0; state.max = null; state.red = 0; state.sort = "red"; seteazaControale(); if (client) cuDate(aplica); }
 
   // evenimente
   var ft = $("filtre");
@@ -213,21 +248,29 @@
     if (t.name === "m") state.mags = Array.prototype.map.call(document.querySelectorAll('#f-mag input:checked'), function (x) { return x.value; });
     else if (t.name === "red") state.red = Number(t.value);
     else return;
-    aplica();
+    cuDate(aplica);
   });
-  var pretTimer = null, pretAplica = function () { clearTimeout(pretTimer); pretTimer = setTimeout(aplica, 120); };
+  var pretTimer = null, pretAplica = function () { clearTimeout(pretTimer); pretTimer = setTimeout(function () { cuDate(aplica); }, 120); };
   elMin.addEventListener("input", function () { sincronizeazaPret("min"); pretAplica(); });
   elMax.addEventListener("input", function () { sincronizeazaPret("max"); pretAplica(); });
   rMin.addEventListener("input", function () { sincronizeazaPret("rmin"); pretAplica(); });
   rMax.addEventListener("input", function () { sincronizeazaPret("rmax"); pretAplica(); });
   $("reset").addEventListener("click", reseteaza);
-  sortSel.addEventListener("change", function () { state.sort = sortSel.value; aplica(); });
+  sortSel.addEventListener("change", function () { state.sort = sortSel.value; cuDate(aplica); });
+  // chipurile cu data-sub sunt filtre in browser (subcategorii fara pagina proprie); celelalte sunt linkuri normale catre pagini
   document.addEventListener("click", function (e) {
-    var c = e.target.closest && e.target.closest(".subcats .chip");
+    var c = e.target.closest && e.target.closest(".subcats .chip[data-sub]");
     if (!c) return;
-    e.preventDefault(); state.sub = c.getAttribute("data-sub") || ""; seteazaControale(); aplica();
+    e.preventDefault();
+    var nou = c.getAttribute("data-sub") || "";
+    if (nou === state.sub && !client) return;   // deja afisata
+    state.sub = nou; seteazaControale(); cuDate(aplica);
   });
-  onFav = function () { if (cfg.mod === "favorite" && data) { pregatesteScope(); aplica(); } };
+  onFav = function () { if (cfg.mod === "favorite" && pregatit) { pregatesteScope(); aplica(); } };
+  // pregatire discreta a catalogului cand utilizatorul se apropie de controale (fara cost la incarcarea paginii)
+  [ft, document.querySelector(".sort"), mai, $("btn-filtre")].forEach(function (el) {
+    if (el) ["pointerover", "focusin", "touchstart"].forEach(function (ev) { el.addEventListener(ev, function () { load().catch(function () {}); }, { once: true, passive: true }); });
+  });
 
   // panou de filtre pe ecrane mici
   var vala = $("vala"), btnF = $("btn-filtre");
@@ -239,12 +282,18 @@
 
   // pornire
   citesteUrl();
-  if (cfg.mod === "cauta" || cfg.mod === "favorite") lista.innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>';
-  load().then(function () {
-    pregatesteScope(); construiesteMagazine();
-    if (state.max === null || state.max > maxScope) state.max = null;
-    seteazaControale(); aplica();
-  }).catch(function () {
-    if (cfg.mod === "cauta" || cfg.mod === "favorite") { lista.innerHTML = ""; gol.hidden = false; gol.innerHTML = "<b>Nu am putut încărca ofertele</b>Verifică conexiunea și reîncarcă pagina."; }
-  });
+  // adresa veche ?sub=<subcategorie> -> pagina proprie a subcategoriei (acelasi continut), pastrand ceilalti parametri
+  if (cfg.mod === "categorie" && !cfg.sub && state.sub && (cfg.subRute || []).indexOf(state.sub) >= 0) {
+    params.delete("sub"); var rest = params.toString();
+    location.replace("/categorie/" + cfg.cat + "/" + state.sub + "/" + (rest ? "?" + rest : "")); return;
+  }
+  if (cfg.mod === "cauta" || cfg.mod === "favorite" || areParametri) {
+    // lista se construieste in browser (cautare, favorite sau filtre din adresa); pentru cautare/favorite HTML-ul nu are produse
+    if (cfg.mod === "cauta" || cfg.mod === "favorite") lista.innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+    load().then(function () { pregateste(); aplica(); }).catch(function () {
+      if (cfg.mod === "cauta" || cfg.mod === "favorite") { lista.innerHTML = ""; gol.hidden = false; gol.innerHTML = "<b>Nu am putut încărca ofertele</b>Verifică conexiunea și reîncarcă pagina."; }
+    });
+  } else {
+    mai.hidden = cfg.fin >= cfg.total;   // lista din HTML ramane neschimbata; „Arata mai multe” continua dupa ultimul produs al paginii
+  }
 })();

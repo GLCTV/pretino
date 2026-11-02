@@ -18,7 +18,7 @@ export const PAGINI_LEGALE = [
 <h2>Afiliere</h2>
 <p>Unele linkuri sunt linkuri de afiliere (marcate <em>sponsored</em>). Dacă cumperi după un astfel de link, putem primi un comision de la magazin. Prețul pentru tine nu se schimbă, iar comisionul nu influențează ce oferte afișăm.</p>
 <p>Operator: ${op()}${cui()}. Contact: ${email()}.</p>` },
-  { cale: "/contact/", titlu: "Contact", nume: "Contact", descriere: `Cum ne poți contacta pe ${SITE_NAME}.`, corp: () => `<h1>Contact</h1>
+  { cale: "/contact/", titlu: "Contact", nume: "Contact", descriere: `Contactează echipa ${SITE_NAME}: întrebări, sesizări despre o ofertă greșită sau cereri legate de datele tale.`, corp: () => `<h1>Contact</h1>
 <p>Pentru întrebări, sesizări despre o ofertă greșită sau cereri legate de datele tale, scrie-ne la ${email()}.</p>
 <p>Operator: ${op()}${cui()}.</p>
 <p>Nu putem modifica prețuri, comenzi sau livrări: acestea țin de magazinul de unde cumperi.</p>` },
@@ -36,7 +36,7 @@ export const PAGINI_LEGALE = [
 <p>${esc(SITE_NAME)} nu setează cookie-uri proprii și nu folosește analiză sau publicitate proprie. Paginile încarcă însă scriptul Profitshare pentru linkurile de afiliere, care poate folosi cookie-uri sau stocare locală pentru a atribui comenzile.</p>
 <p>Când apeși pe un link către un magazin, rețeaua de afiliere sau magazinul pot seta cookie-uri în browserul tău, pentru a atribui comanda și pentru funcționarea magazinului. Acestea sunt controlate de ei, nu de noi. Poți șterge sau bloca cookie-urile din setările browserului.</p>
 <p>Întrebări: ${email()}.</p>` },
-  { cale: "/termeni/", titlu: "Termeni și condiții", nume: "Termeni", descriere: `Termenii de utilizare ai ${SITE_NAME}.`, corp: () => `<h1>Termeni și condiții</h1>
+  { cale: "/termeni/", titlu: "Termeni și condiții", nume: "Termeni", descriere: `Termenii și condițiile de utilizare ale ${SITE_NAME}: rolul informativ al site-ului, prețuri, afiliere și răspundere.`, corp: () => `<h1>Termeni și condiții</h1>
 <p>Ultima actualizare: ${DATA}. Site operat de ${op()}${cui()}.</p>
 <ul>
 <li>${esc(SITE_NAME)} are doar rol informativ: nu vindem produse și nu suntem parte în contractul dintre tine și magazin.</li>

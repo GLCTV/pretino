@@ -1,0 +1,16 @@
+# Cloudflare Pages: antete HTTP (fisierul se copiaza in dist/).
+# Adresa tehnica *.pages.dev nu trebuie indexata (domeniul oficial este pretino.ro)
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+# Fisiere statice cu versiune in URL (?v=<hash>) sau care nu se schimba: cache lung
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/stil.css
+  Cache-Control: public, max-age=31536000, immutable
+/cauta.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# Catalogul de cautare se schimba la fiecare publicare: cache scurt
+/cauta-index.json
+  Cache-Control: public, max-age=300

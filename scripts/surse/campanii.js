@@ -4,8 +4,8 @@
 import { readFileSync, existsSync } from "node:fs";
 import { idOferta, mapCategorie } from "../lib/oferta.js";
 
-const MAX_ZILE = 3;           // date mai vechi de atat nu intra in catalog (pretul s-ar putea sa nu mai fie valabil)
-const REDUCERE_MAX = 60;      // peste acest procent preturile de referinta afisate (adesea puse de vanzatori Marketplace) sunt prea nesigure
+export const MAX_ZILE = 3;           // date mai vechi de atat nu intra in catalog (pretul s-ar putea sa nu mai fie valabil)
+export const REDUCERE_MAX = 60;      // peste acest procent preturile de referinta afisate (adesea puse de vanzatori Marketplace) sunt prea nesigure
 const EXCLUS = /resigilat|desigilat|refurbished|renewed/i;
 const citesteJson = (c, impl) => { try { return existsSync(c) ? JSON.parse(readFileSync(c, "utf8")) : impl; } catch { return impl; } };
 
@@ -33,5 +33,7 @@ export async function citeste(magazine, _secrete, { produseCale = new URL("../..
   const produse = Object.values(citesteJson(f(produseCale), {})), campanii = citesteJson(f(campaniiCale), {});
   const oferte = [], omise = {};
   for (const p of produse) { const r = dinProdus(p, magazine, campanii, acum); if (r.oferta) oferte.push(r.oferta); else omise[r.omis] = (omise[r.omis] ?? 0) + 1; }
-  return { oferte, omise };
+  // data verificarii = cea mai recenta „ultimaVerificare” dintre produsele citite (nu momentul rularii actualizarii) (nu momentul rularii actualizarii)
+  const ver = produse.map((p) => Date.parse(p.ultimaVerificare ?? "")).filter((t) => t > 0);
+  return { oferte, omise, verificat: ver.length ? new Date(Math.max(...ver)).toISOString() : undefined };
 }

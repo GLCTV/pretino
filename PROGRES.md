@@ -178,3 +178,11 @@
 ## v1.56 – data actualizarii pe site
 - `Actualizeaza oferte` scrie `data/actualizat.json`; site-ul arata sub titlu „Preturi actualizate: <data, ora>” + avertisment ca pretul final se verifica la magazin, pe toate paginile cu lista de oferte. Fara fisier (prima data) se arata doar ziua din istoric. `publica.js` comite si `actualizat.json` odata cu catalogul.
 - STATUS: local, asteptam OK de la Laur inainte de main (impreuna cu v1.55).
+
+## v1.57 – SEO (10 etape)
+- Pagini proprii pentru subcategorii (`/categorie/<cat>/<sub>/`, ≥15 oferte), paginare HTML reala (`/pagina-N/`, 48/pagina, canonical propriu, linkuri `<a>`), 404 peste limita; JS nu mai re-randeaza lista la incarcare (cauta-index.json se cere doar la interactiune); „Arata mai multe” continua exact dupa pagina curenta; `?sub=` vechi redirectat in browser spre ruta noua.
+- Titluri/descrieri/H1/intro dupa intentie (`src/seo.js`), homepage: „Oferte si reduceri online din Romania | Pretino”. Breadcrumb cu linkuri, magazine legate din carduri + subsol, material „Cum interpretam reducerile”.
+- Data verificarii per sursa (`data/actualizat.json`), politica date vechi (7 zile), duplicate certe, marcaj resigilat/refurbished, cupon cu precizarea ca pretul afisat nu il include.
+- JSON-LD: WebSite + Organization (acasa), BreadcrumbList (pagini cu ierarhie). Fara Product/Offer.
+- `public/_headers` (noindex pe *.pages.dev, cache fonturi/css/js/index). Teste: `scripts/test-seo.js`. Strategie si verificari pentru contul tau: `docs/seo.md`.
+- STATUS: pe ramura `seo-v1`, asteptam OK de la Laur inainte de main.

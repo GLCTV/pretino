@@ -17,6 +17,9 @@ const raport = [];
 const surse = [...new Set(magazine.filter((m) => m.activ && m.sursa).map((m) => m.sursa))];
 let rezultat = [];
 let schimbat = false;
+// data ultimei verificari REUSITE a fiecarei surse (data/actualizat.json -> surse): la o eroare ramane data veche
+let actualizat = { la: null, surse: {} };
+try { actualizat = { surse: {}, ...citesteJson("actualizat.json") }; actualizat.surse ??= {}; } catch { /* prima rulare */ }
 
 for (const sursa of surse) {
   const adaptor = new URL(`./surse/${sursa}.js`, import.meta.url);
@@ -24,7 +27,7 @@ for (const sursa of surse) {
   if (!existsSync(adaptor)) { raport.push(`[${sursa}] activ, dar lipseste scripts/surse/${sursa}.js (oferte vechi pastrate: ${pastrate.length})`); rezultat.push(...pastrate); continue; }
   try {
     const { citeste } = await import(adaptor.href);
-    const { oferte, omise, esantion, categorii: catFeed } = await citeste(magazine.filter((m) => m.activ && m.sursa === sursa), secrete);
+    const { oferte, omise, esantion, categorii: catFeed, verificat } = await citeste(magazine.filter((m) => m.activ && m.sursa === sursa), secrete);
     if (esantion) writeFileSync(`rapoarte/esantion-${sursa}.txt`, esantion);
     if (catFeed) writeFileSync(`rapoarte/categorii-${sursa}.txt`, Object.entries(catFeed).sort((p, q) => q[1].n - p[1].n).slice(0, 300).map(([k, v]) => `${v.n}\t${k}`).join("\n"));
     const bune = [], respinse = { ...omise };
@@ -35,6 +38,7 @@ for (const sursa of surse) {
     }
     rezultat.push(...bune);
     schimbat = true;
+    actualizat.surse[sursa] = verificat ?? new Date().toISOString(); // „verificat” = data reala a datelor citite (ex. campanii), altfel momentul citirii cu succes
     raport.push(`[${sursa}] ${bune.length} oferte cu reducere din ${oferte.length} citite. Omise: ${Object.entries(respinse).map(([k, v]) => `${k}=${v}`).join(", ") || "-"}`);
   } catch (e) {
     rezultat.push(...pastrate);
@@ -46,7 +50,8 @@ if (!surse.length) raport.push("Nicio sursa activa (data/magazine.json). Catalog
 if (schimbat) {
   writeFileSync(f("oferte.json"), JSON.stringify(rezultat, null, 1) + "\n");
   writeFileSync(f("istoric-preturi.json"), JSON.stringify(actualizeazaIstoric(citesteJson("istoric-preturi.json"), rezultat)) + "\n");
-  writeFileSync(f("actualizat.json"), JSON.stringify({ la: new Date().toISOString() }) + "\n"); // afisat pe site: „Preturi actualizate la ...”
+  actualizat.la = new Date().toISOString();
+  writeFileSync(f("actualizat.json"), JSON.stringify(actualizat) + "\n"); // afisat pe site: „Preturi actualizate la ...”
 }
 const text = `Actualizare Pretino ${new Date().toISOString()}\n${raport.join("\n")}\nTotal oferte: ${schimbat ? rezultat.length : precedente.length}\n`;
 writeFileSync("rapoarte/ultimul-raport.txt", text);

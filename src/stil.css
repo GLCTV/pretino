@@ -77,6 +77,8 @@ main{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 40px}
 .hero{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding:8px 11px 0;position:relative;min-height:0}
 h1{margin:0;padding-top:3px;font:800 38px/1.15 var(--font);letter-spacing:-.2px}
 .sub{margin:1px 0 0;font-size:16.7px;color:var(--fg2);font-weight:400}
+.intro{margin:6px 0 0;font-size:14.5px;color:var(--fg2);max-width:780px;line-height:1.45}
+.actualizat a{color:var(--acc-txt)}
 .actualizat{margin:6px 0 0;font-size:13.5px;color:var(--mut);font-weight:500}
 .actualizat time{color:var(--fg2);font-weight:600}
 .hero-poza{position:absolute;right:20px;top:-38px;width:290px;height:170px;pointer-events:none;display:flex;justify-content:center;align-items:flex-end}
@@ -146,6 +148,8 @@ h1{margin:0;padding-top:3px;font:800 38px/1.15 var(--font);letter-spacing:-.2px}
 .titlu{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:6px 3px 0;font:700 14px/1.22 var(--font);min-height:calc(2 * 1.22em);color:var(--fg);text-decoration:none;overflow-wrap:anywhere}
 .titlu:hover{color:var(--acc-txt)}
 .magazin{margin:2px 3px 0;font-size:12.5px;color:var(--mut);font-weight:500}
+.magazin a{color:inherit;text-decoration:none}.magazin a:hover,.magazin a:focus-visible{color:var(--acc-txt);text-decoration:underline}
+.cond{margin-left:6px;padding:0 6px;border:1px solid var(--bd-chip);border-radius:6px;font-size:11px;font-weight:700;color:var(--fg2);white-space:nowrap}
 .pretrand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin:-1px 3px 9px;min-height:34px}
 .pret{font:800 18.4px/1.1 var(--font);white-space:nowrap}
 .vechi{color:var(--mut);text-decoration:line-through;font-size:13px;white-space:nowrap}
@@ -164,9 +168,18 @@ h1{margin:0;padding-top:3px;font:800 38px/1.15 var(--font);letter-spacing:-.2px}
 @keyframes sk{to{background-position:-200% 0}}
 @media(prefers-reduced-motion:reduce){.skel{animation:none}}
 
+/* ---------- paginare (linkuri HTML reale) ---------- */
+.pagini{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:22px 0 0}
+.pagini[hidden]{display:none}
+.pagini a,.pagini span{min-width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1.5px solid var(--bd-chip);border-radius:10px;color:var(--fg);text-decoration:none;font:700 14px var(--font)}
+.pagini a:hover,.pagini a:focus-visible{border-color:var(--acc)}
+.pagini [aria-current=page]{background:var(--grad);color:var(--acc-fg);border-color:transparent}
+.pagini .gol{border:0;min-width:0;padding:0 2px;color:var(--mut)}
+
 /* ---------- subsol ---------- */
 footer{max-width:var(--maxw);margin:0 auto;padding:18px var(--pad) 32px;color:var(--mut);font-size:12.5px;border-top:1px solid var(--bd)}
-footer .legal{margin-bottom:8px;display:flex;gap:16px;flex-wrap:wrap}
+footer .legal,footer .magazine-f{margin-bottom:8px;display:flex;gap:6px 16px;flex-wrap:wrap}
+footer .magazine-f b{color:var(--fg2);font-weight:700}
 footer a{color:var(--acc-txt)}
 main.simplu{max-width:880px;padding-top:24px}
 main.simplu h1{font-size:30px}

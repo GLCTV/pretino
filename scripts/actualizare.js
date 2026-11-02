@@ -46,6 +46,7 @@ if (!surse.length) raport.push("Nicio sursa activa (data/magazine.json). Catalog
 if (schimbat) {
   writeFileSync(f("oferte.json"), JSON.stringify(rezultat, null, 1) + "\n");
   writeFileSync(f("istoric-preturi.json"), JSON.stringify(actualizeazaIstoric(citesteJson("istoric-preturi.json"), rezultat)) + "\n");
+  writeFileSync(f("actualizat.json"), JSON.stringify({ la: new Date().toISOString() }) + "\n"); // afisat pe site: „Preturi actualizate la ...”
 }
 const text = `Actualizare Pretino ${new Date().toISOString()}\n${raport.join("\n")}\nTotal oferte: ${schimbat ? rezultat.length : precedente.length}\n`;
 writeFileSync("rapoarte/ultimul-raport.txt", text);

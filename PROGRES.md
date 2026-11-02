@@ -174,3 +174,7 @@
 ## v1.55 – evoMAG: doar reduceri reale (max 45%)
 - `data/magazine.json`: evomag are `reducereMaxProcent: 45`; la generarea site-ului (`build.js`) ofertele evoMAG cu reducere mai mare nu se afiseaza (catalogul ramane neschimbat). evoMAG: 563 → 486 oferte. Verificare prin istoric de pret: de adaugat dupa ~30 de zile de date.
 - STATUS: local, asteptam OK de la Laur inainte de main.
+
+## v1.56 – data actualizarii pe site
+- `Actualizeaza oferte` scrie `data/actualizat.json`; site-ul arata sub titlu „Preturi actualizate: <data, ora>” + avertisment ca pretul final se verifica la magazin, pe toate paginile cu lista de oferte. Fara fisier (prima data) se arata doar ziua din istoric. `publica.js` comite si `actualizat.json` odata cu catalogul.
+- STATUS: local, asteptam OK de la Laur inainte de main (impreuna cu v1.55).

@@ -18,6 +18,15 @@ const maxRed = Object.fromEntries(magazine.filter((m) => m.reducereMaxProcent).m
 const reala = (o) => !maxRed[o.magazin] || (1 - o.pret / o.pretVechi) * 100 <= maxRed[o.magazin];
 const oferte = citeste(DEMO ? "demo-oferte.json" : "oferte.json").filter((o) => o.pretVechi > o.pret && reala(o)).map((o) => ({ ...o, ...clasifica(o) }));
 const mag = Object.fromEntries(magazine.map((m) => [m.id, m]));
+// data ultimei actualizari a catalogului (data/actualizat.json); fara ea, cea mai recenta zi din istoricul de preturi
+let fataOra = false; // fara data exacta (doar ziua din istoric) nu se afiseaza o ora inventata
+const dataActualizarii = (() => {
+  try { const t = new Date(citeste("actualizat.json").la); if (!isNaN(t)) return t; } catch {}
+  fataOra = true;
+  try { const z = Object.values(citeste("istoric-preturi.json")).flat().map((e) => e.d).sort().pop(); if (z) return new Date(`${z}T12:00:00+02:00`); } catch {}
+  return null;
+})();
+const actualizatText = dataActualizarii && !DEMO ? `Prețuri actualizate: ${dataActualizarii.toLocaleString("ro-RO", { timeZone: "Europe/Bucharest", day: "numeric", month: "long", year: "numeric", ...(fataOra ? {} : { hour: "2-digit", minute: "2-digit" }) })}` : "";
 const cat = Object.fromEntries(categorii.map((c) => [c.slug, c]));
 const lei = (n) => `${Number(n).toLocaleString("ro-RO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} lei`;
 
@@ -78,7 +87,7 @@ function listare({ mod, titlu, descriere, cale, h1, sub, catSlug = null, magId =
   const date = JSON.stringify({ mod, cat: catSlug, mag: magId, max: pasMax }).replace(/</g, "\\u003c");
   const corp = `<main data-lista='${date}'>
 <nav class="migaje" aria-label="Navigare">${mod === "acasa" ? `<span>Acasă</span>` : `<a href="/">Acasă</a><span aria-hidden="true">/</span><span id="migaja-curenta">${esc(catSlug ? categorii.find((c) => c.slug === catSlug)?.nume : mag[magId]?.nume ?? h1)}</span>`}</nav>
-<div class="hero"><div><h1 id="h1">${esc(h1)}</h1><p class="sub" id="sub-titlu">${esc(sub)}</p></div>${ilustr ? ilustratie(ilustr) : ""}</div>
+<div class="hero"><div><h1 id="h1">${esc(h1)}</h1><p class="sub" id="sub-titlu">${esc(sub)}</p>${actualizatText ? `<p class="actualizat"><time datetime="${dataActualizarii.toISOString()}">${esc(actualizatText)}</time> · prețurile se pot schimba în magazin; verifică prețul final pe pagina magazinului.</p>` : ""}</div>${ilustr ? ilustratie(ilustr) : ""}</div>
 ${arataSub.length ? `<div class="subcats" role="group" aria-label="Subcategorii"><a class="chip" data-sub="" href="${cale}" aria-pressed="true">Toate</a>${arataSub.map((s) => `<a class="chip" data-sub="${s.id}" href="${cale}?sub=${s.id}" aria-pressed="false">${icoana(s.icoana)}${esc(s.nume)}</a>`).join("")}</div>` : '<div class="subcats-gol"></div>'}
 <div class="cont">
 <aside class="filtre" id="filtre" aria-label="Filtre"><button class="filtre-x" type="button" id="filtre-x" aria-label="Închide filtrele">${icoana("x")}</button>

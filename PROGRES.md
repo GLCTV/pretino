@@ -136,3 +136,6 @@
 
 ## v1.44 – categorii PC Garage
 - Descoperire automata a categoriilor din meniul PC Garage (ul.top_menu, ~290), separat de limita campaniilor (max 400). Listele de categorie au pret vechi taiat (verificat in Chrome pe /notebook-laptop/: 9 din 20 cu pret vechi). Nu s-a rulat inca pe PC.
+
+## v1.45 – fix descoperire categorii
+- In HTML-ul brut meniul PC Garage e ul id="top_menu" (clasa se adauga din JS); selectorul foloseste acum [id=top_menu] (parserul propriu nu suporta #id). Verificat in Chrome: HTML brut are top_menu, linkuri absolute.

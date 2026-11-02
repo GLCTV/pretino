@@ -10,6 +10,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, readd
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { creeazaClient } from "./lib/http.js";
+import { lanseazaBrowser, fetchDinBrowser } from "./lib/browser.js";
 import { parseHtml } from "./lib/dom.js";
 import { observa, scadereIstoric } from "./lib/istoric-campanii.js";
 import { metaCampanie } from "./campanii/generic.js";
@@ -71,7 +72,7 @@ export function stareCampanie(c, azi, verificataAcum, aveaProduse) {
 }
 
 // ---------- rulare ----------
-export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", reia = false, fetchFn = fetch, azi = new Date().toISOString().slice(0, 10), pauzaMs, log = console.log, backup = true } = {}) {
+export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", reia = false, fetchFn = fetch, browserMod = "auto", fabricaBrowser = lanseazaBrowser, azi = new Date().toISOString().slice(0, 10), pauzaMs, log = console.log, backup = true } = {}) {
   const P = cai(dir);
   const cfg = incarcaCfg(P);
   const lim = { ...LIMITE_IMPLICITE, ...(cfg.limite ?? {}) };
@@ -89,8 +90,22 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
   const salveazaProgres = (extra = {}) => { Object.assign(progres, extra, { actualizat: new Date().toISOString() }); try { scrie(P.progres, progres); } catch {} };
   const salveazaStare = () => scrie(P.stare, st);
 
-  const clienti = {};
-  const client = (m) => (clienti[m] ??= creeazaClient({ concurenta: lim.concurentaPerMagazin, pauzaMs: lim.pauzaMs, timeoutMs: lim.timeoutMs, reincercari: lim.reincercari, fetchFn, oprit }));
+  const clienti = {}, inBrowser = {};
+  let browser = null, fetchBrowser = null;
+  const clientNou = (m, f) => creeazaClient({ concurenta: inBrowser[m] ? 1 : lim.concurentaPerMagazin, pauzaMs: lim.pauzaMs, timeoutMs: lim.timeoutMs, reincercari: inBrowser[m] ? 0 : lim.reincercari, fetchFn: f, oprit });
+  const client = (m) => (clienti[m] ??= clientNou(m, inBrowser[m] ? fetchBrowser : fetchFn));
+  // trecere la browserul vizibil (utilizatorul completeaza verificarea anti-bot; programul nu o completeaza)
+  const treciInBrowser = async (m) => {
+    if (!browser) {
+      browser = await fabricaBrowser({ profil: join(dir, ".pretino-local", "browser-profil") });
+      fetchBrowser = fetchDinBrowser(browser, {
+        oprit, pauzaVerificareMs: lim.pauzaVerificareMs, timeoutUtilizatorMs: lim.timeoutVerificareMs,
+        onAsteapta: (x) => { progres.asteapta = { id: Date.now(), magazin: progres.curent ?? null, url: x.url, mesaj: x.mesaj }; salveazaProgres({ stare: "asteapta_utilizator" }); log(`  >> ASTEPT UTILIZATORUL: ${x.mesaj} (${x.url})`); },
+        onReluat: () => { progres.asteapta = null; salveazaProgres({ stare: "ruleaza" }); },
+      });
+    }
+    inBrowser[m] = true; delete clienti[m];
+  };
   const erori = (m, sursa, motiv, blocat = false) => { k.erori++; st.erori.push({ magazin: m, sursa, motiv, blocat }); log(`  EROARE [${m}] ${sursa}: ${motiv}`); };
 
   for (const m of magazineActive) {
@@ -101,6 +116,8 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
     const incercate = new Set();
     let blocat = false;
     progres.magazine[m] = { stare: "ruleaza", surse: coada.length, sursaCurenta: null, pagini: 0 };
+    progres.curent = m;
+    if (browserMod === "da") await treciInBrowser(m);
     salveazaProgres();
     for (let i = 0; i < coada.length; i++) {
       const s = coada[i];
@@ -153,6 +170,11 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
         if (!st.oprit) { st.gata.push(s.id); delete st.urmatoare[s.id]; }
       } catch (e) {
         if (e.message === "oprit de utilizator") { st.oprit = true; }
+        else if (e.blocat && browserMod !== "nu" && !inBrowser[m]) {
+          log(`  acces blocat (${e.motiv}) - trec la browserul vizibil pentru verificare manuala`);
+          try { await treciInBrowser(m); incercate.delete(s.url); i--; delete st.urmatoare[s.id]; continue; }
+          catch (e2) { erori(m, s.url, `blocat si browserul nu a putut porni: ${e2.message}`, true); blocat = true; progres.magazine[m].stare = "blocat"; }
+        }
         else if (e.blocat) { erori(m, s.url, e.message, true); blocat = true; progres.magazine[m].stare = "blocat"; if (st.campanii[`c-${hash(s.url)}`]) st.campanii[`c-${hash(s.url)}`].verificat = false; }
         else { erori(m, s.url, e.message); if (st.campanii[`c-${hash(s.url)}`]) st.campanii[`c-${hash(s.url)}`].verificat = false; }
       }
@@ -163,6 +185,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
     if (st.oprit) break;
   }
 
+  if (browser) await browser.inchide();
   scrie(P.surse, cfg);
   if (st.oprit) {
     salveazaStare(); salveazaProgres({ stare: "oprit" });
@@ -263,7 +286,7 @@ if (import.meta.main) {
       scrie(P.campanii, campanii); console.log("Campanie introdusa manual: " + url);
     } else {
       const mod = a.includes("--complet") ? "complet" : "campanii";
-      const r = await ruleaza({ mod, magazin: val("--magazin") ?? "toate", reia: a.includes("--reia") });
+      const r = await ruleaza({ mod, magazin: val("--magazin") ?? "toate", reia: a.includes("--reia"), browserMod: val("--browser") ?? "auto" });
       console.log(readFileSync(P.raport, "utf8"));
       process.exit(r.oprit ? 0 : 0);
     }

@@ -32,3 +32,7 @@
 - PC Garage: validarea anti-bot (Cloudflare Turnstile, `/validare-acces/`) NU se completează și NU se ocolește → sursa e raportată „blocată”; structura paginilor neanalizată (doar date structurate JSON-LD/microdata); reîncercare sau introducere manuală.
 - NEVERIFICAT: citirea HTTP simplă de pe PC pe emag.ro (eMAG poate bloca cererile fără browser → apare „blocat”; fără browser automat implementat); sintaxa PowerShell a noului panel (netestată în cloud); sursele descoperite automat.
 - Nu publică nimic pe site; aprobarea de publicare și eligibilitatea pentru afiliere sunt câmpuri separate (implicit „fals”/„necunoscut”).
+
+## 2026-11-02 – program v1.14: verificare anti-bot completata de Laur
+- Când eMAG/PC Garage cer verificare anti-bot, modulul Campanii trece pe un browser vizibil (Chrome sau Edge, profil dedicat Pretino în `.pretino-local\browser-profil`, port local 127.0.0.1), programul sună și afișează un mesaj, Laur completează verificarea în fereastra de browser, iar citirea continuă singură. Programul NU rezolvă și NU ocolește verificarea. Dacă nu e completată în 10 minute → sursa e „blocată” (date păstrate, campanie „neverificată”). Opțiune CLI: `--browser auto|da|nu` (implicit `auto` = doar la blocare).
+- Verificat: teste cu browser simulat + test manual cu Chromium real în cloud (pagină de validare care se deblochează după câteva secunde). NEVERIFICAT: Chrome/Edge de pe PC și verificarea reală Cloudflare Turnstile de la PC Garage; sintaxa PowerShell a mesajului de notificare.

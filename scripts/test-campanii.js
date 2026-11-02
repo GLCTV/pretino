@@ -79,5 +79,24 @@ export async function testeCampanii(ok) {
   ok(o1.oprit && !o1.complet && JSON.parse(rf(join(dir2, ".pretino-local", "campanii-rulare.json"))).terminat === false, "oprire: progres salvat, rulare marcata neterminata");
   const o2 = await camp.ruleaza({ dir: dir2, mod: "complet", magazin: "emag", reia: true, fetchFn: fetchSim, pauzaMs: 0, log: tacut });
   ok(!o2.oprit && o2.complet && Object.keys(JSON.parse(rf(join(dir2, "data", "produse-campanii.json")))).length === 3, "reluare: continua si termina");
+  // anti-bot: trece in browser, notifica utilizatorul, asteapta verificarea manuala, apoi continua
+  const dir3 = mkdtempSync(join(tmpdir(), "pretino-camp3-")); mk(join(dir3, "data"), { recursive: true });
+  wf(join(dir3, "data", "campanii-surse.json"), JSON.stringify({ limite: { adancimeDescoperire: 0, pauzaVerificareMs: 5, timeoutVerificareMs: 3000 }, magazine: { emag: { activ: true } }, surse: [{ id: "e1", magazin: "emag", url: "https://www.emag.ro/nav/deals", activ: true }] }));
+  let polls = 0, notificat = 0, inchis = false;
+  const browserFals = async () => ({
+    navigheaza: async () => { polls = 0; },
+    stare: async () => (++polls < 4 ? { url: "https://www.emag.ro/validare-acces/", html: fx("pcgarage-validare.html"), status: 200 } : { url: "https://www.emag.ro/nav/deals", html: pagini["https://www.emag.ro/nav/deals"], status: 200 }),
+    adaInFata: async () => { notificat++; }, inchide: async () => { inchis = true; },
+  });
+  const b1 = await camp.ruleaza({ dir: dir3, mod: "campanii", magazin: "emag", fetchFn: async (u) => raspuns("https://www.emag.ro/validare-acces/", fx("pcgarage-validare.html")), fabricaBrowser: browserFals, pauzaMs: 0, log: tacut });
+  ok(b1.complet && notificat === 1 && inchis && Object.keys(JSON.parse(rf(join(dir3, "data", "campanii.json")))).length === 1, "anti-bot: browser vizibil, utilizatorul anuntat, asteptare verificare manuala, apoi continuare");
+  const rulari = rf(join(dir3, "logs", "campanii-progres.json"));
+  ok(!/asteapta_utilizator/.test(rulari), "anti-bot: dupa verificare starea revine la normal");
+  // verificare necompletata la timp => blocat, fara stergere de date
+  let p2 = 0;
+  const browserBlocat = async () => ({ navigheaza: async () => {}, stare: async () => ({ url: "https://www.emag.ro/validare-acces/", html: fx("pcgarage-validare.html"), status: 200 }), adaInFata: async () => {}, inchide: async () => {} });
+  const b2 = await camp.ruleaza({ dir: dir3, mod: "campanii", magazin: "emag", fetchFn: async (u) => raspuns("https://www.emag.ro/validare-acces/", fx("pcgarage-validare.html")), fabricaBrowser: browserBlocat, pauzaMs: 0, log: tacut });
+  ok(!b2.complet && b2.st.erori[0].blocat && Object.values(JSON.parse(rf(join(dir3, "data", "campanii.json"))))[0].neverificata === true, "anti-bot necompletat: raportat blocat, campania ramane neverificata");
+  rmSync(dir3, { recursive: true, force: true });
   rmSync(dir, { recursive: true, force: true }); rmSync(dir2, { recursive: true, force: true });
 }

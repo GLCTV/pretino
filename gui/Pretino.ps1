@@ -155,9 +155,19 @@ function Load-Campanii {
     [void]$c.CCampanii.Items.Add($it)
   }
 }
+$script:UltimaAsteptare = 0
+$script:InNotificare = $false
 function Show-Progres {
   $p = Read-Json (Join-Path $Root 'logs\campanii-progres.json')
   if (-not $p) { return }
+  if ($p.stare -eq 'asteapta_utilizator' -and $p.asteapta -and $p.asteapta.id -ne $script:UltimaAsteptare -and -not $script:InNotificare -and $script:ProcC -and -not $script:ProcC.HasExited) {
+    $script:UltimaAsteptare = $p.asteapta.id
+    $script:InNotificare = $true
+    [System.Media.SystemSounds]::Exclamation.Play()
+    $c.Stare.Text = 'Campanii: ASTEPT VERIFICAREA ANTI-BOT - completeaz-o in fereastra de browser deschisa.'
+    [void][System.Windows.MessageBox]::Show($win, "Magazinul cere verificare anti-bot ($($p.asteapta.url)).`n`nS-a deschis o fereastra de browser: bifeaza verificarea (si apasa Trimite daca exista).`nDupa aceea programul continua singur. Apasa OK ca sa inchizi acest mesaj.", 'Verificare anti-bot necesara', 'OK', 'Information')
+    $script:InNotificare = $false
+  }
   $k = $p.contoare
   $m = ''
   foreach ($q in $p.magazine.PSObject.Properties) { $m += "$($q.Name): $($q.Value.stare), $($q.Value.pagini) pagini | " }

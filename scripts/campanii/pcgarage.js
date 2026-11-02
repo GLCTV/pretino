@@ -35,7 +35,7 @@ const stoc = (card) => {
 export function parseListare(root, baza) {
   const produse = [];
   for (const card of qsa(root, ".product_box")) {
-    const a = qs(card, ".bf_ptitle_link") ?? qs(card, ".product_box_name a") ?? qs(card, "a[href]");
+    const a = qs(card, ".bf_ptitle_link") ?? qs(card, ".bf_ptitle a") ?? qs(card, ".product_box_name a") ?? qs(card, "a[href]");
     const titlu = text(a) || text(qs(card, ".product_box_name"));
     const url = absolut(attr(a, "href") ?? "", baza)?.split("?")[0];
     const pret = parsePret(text(qs(card, ".bfp_new")) || text(qs(card, ".pb-price .price")) || text(qs(card, ".price")));
@@ -46,7 +46,9 @@ export function parseListare(root, baza) {
     const slug = new URL(url).pathname.replace(/\/$/, "").split("/").pop();
     produse.push({
       idMagazin: slug, idOferta: null, titlu, url, imagine: src ? absolut(src, baza) : null, pret, pretReferinta: vechi && vechi > pret ? vechi : null,
-      reducereAfisata: text(qs(card, ".bf_pdiscount")) || null, disponibilitate: stoc(card), vandut: "PC Garage", categorie: null,
+      reducereAfisata: text(qs(card, ".bf_pdiscount")) || text(qs(card, ".bf_bonus_text")) || null,
+      etichete: [...new Set(qsa(card, ".ls_labels *, .bf_bonus_text").map((e) => text(e)).filter((t) => t && t.length < 80))],
+      conditie: /desigilat/i.test(baza) || /desigilat/i.test(url) ? "desigilat" : null, disponibilitate: stoc(card), vandut: "PC Garage", categorie: null,
     });
   }
   const vazut = new Set();

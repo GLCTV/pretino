@@ -43,3 +43,6 @@
 
 ## 2026-11-02 – program v1.16
 - eMAG răspunde la cereri HTTP simple cu 511 (verificare anti-bot) → acum e tratat ca blocare și modulul trece pe browserul vizibil (ca la PC Garage), în loc de eroare simplă.
+
+## 2026-11-02 – program v1.17: PC Garage – prețuri vechi, reduceri, pagini „desigilate”
+- Verificat în Chrome: pe paginile „desigilate” titlul e în `.bf_ptitle a` (înainte nu se recunoșteau), cu preț vechi `.bfp_old` și reducere în RON `.bf_pdiscount`; pe `/extra-reduceri-*/` reducerea e „X% reducere în cos” (`.bf_bonus_text`, păstrată exact, fără preț vechi); paginile de categorie (ex. `/notebook-laptop/`) nu afișează preț vechi, doar etichete (ex. „Cumpără acum la preț de Black Friday”), salvate în `etichete`. Câmp nou `conditie: "desigilat"`.

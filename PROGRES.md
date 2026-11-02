@@ -52,3 +52,6 @@
 
 ## 2026-11-02 – program v1.19: pornirea browserului (fereastra goală `about:blank`)
 - Cauză probabilă: o instanță Chrome rămasă din rularea anterioară (același profil Pretino) „fuzionează” cu cea nouă, care nu mai pornește cu depanare → fereastră goală și „browserul nu a pornit”. Acum: înainte de pornire se închid instanțele rămase pe profilul `.pretino-local\\browser-profil` și se șterg fișierele de blocare; port de depanare ales automat (fișierul `DevToolsActivePort`); se încearcă pe rând Chrome apoi Edge; la eșec, mesajul spune motivul (cod de ieșire / nu răspunde). La final browserul și procesele lui se închid.
+
+## 2026-11-02 – program v1.20: eMAG prin browser
+- Prima rulare eMAG reușită prin browserul vizibil: 8 campanii, 899 produse (din /resigilate; limita de 15 pagini/sursă a rămas „neverificat”). Paginile /nav/deals, /genius-deals, /guide/black-friday, /genius, /lps/* au apărut fără listă de produse (conținut încărcat cu JavaScript după încărcarea paginii) → acum browserul derulează pagina și așteaptă stabilizarea conținutului înainte de citire.

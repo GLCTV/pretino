@@ -82,6 +82,14 @@ async function lanseazaCu(exe, { profil, headless }) {
       const t0 = Date.now();
       while (Date.now() - t0 < timeoutMs) { if ((await ev("document.readyState").catch(() => null)) === "complete") break; await sleep(400); }
       await sleep(900);
+      // continut incarcat cu JavaScript / lazy-load: deruleaza pagina si asteapta pana se stabilizeaza (max ~10 s)
+      let ultim = -1, stabil = 0;
+      for (let i = 0; i < 12 && stabil < 2; i++) {
+        const n = await ev("window.scrollTo(0, document.body.scrollHeight); document.getElementsByTagName('*').length").catch(() => -1);
+        stabil = n === ultim ? stabil + 1 : 0; ultim = n;
+        await sleep(800);
+      }
+      await ev("window.scrollTo(0, 0)").catch(() => {});
     },
     stare: async () => ({ url: await ev("location.href"), html: await ev("document.documentElement.outerHTML"), status }),
     adaInFata: () => cdp.trimite("Page.bringToFront").catch(() => {}),

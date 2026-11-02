@@ -19,11 +19,7 @@ export function descopera(root, baza) {
     if (!curat) continue;
     try { const u = new URL(curat); if (/(^|\.)pcgarage\.ro$/.test(u.hostname) && /^\/[a-z0-9-]+\/$/.test(u.pathname) && !NU_CATEGORIE.test(u.pathname)) { const filtrat = `${u.origin}${u.pathname}filtre/discount/`; out.set(filtrat, { url: filtrat, titlu: text(a).slice(0, 80) || u.pathname.replace(/\//g, ""), categorie: true }); } } catch { /* ignora */ }
   }
-  for (const a of qsa(root, "a[href]")) {
-    const u = absolut(attr(a, "href"), baza);
-    const curat = u?.split("?")[0];
-    if (curat && esteLinkCampanie(curat) && !out.has(curat)) out.set(curat, { url: curat, titlu: text(a).slice(0, 80) || null });
-  }
+  // doar categoriile din meniu (cu filtrul „Cu discount”); paginile de campanie/oferte nu se mai descopera
   return [...out.values()];
 }
 // Structura verificata (nov. 2026) in Chrome pe /extra-reduceri-*/ si /notebook-laptop/:

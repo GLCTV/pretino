@@ -165,5 +165,5 @@
 - STATUS: local, asteptam OK de la Laur inainte de main. Neverificat: imagini produse (in cloud nu exista), tema luminoasa pe toate paginile.
 
 ## v1.53 – numarul live PC Garage
-- Pagina „Cumpara acum la pret de Black Friday” adaugata ca sursa fixa (se adauga o singura data in configuratia locala).
+- Doar categoriile PC Garage (meniu + „Cu discount”): linkurile de campanie nu se mai descopera, iar sursele de campanie descoperite anterior se scot la incarcare. Black Friday ca sursa fixa: renuntat.
 - La listele de categorie PC Garage se citeste numarul afisat de magazin (`.products-count`, ex. „18 produse”). Se iau exact atatea produse de sus in jos; cand totalul e atins nu se mai deschide pagina urmatoare (nici pagina goala de la final). Limita de 10 pagini ramane. Test adaugat.

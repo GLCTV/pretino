@@ -44,6 +44,8 @@ export function incarcaCfg(P) {
   } catch {}
   // produsele resigilate / desigilate / refurbished nu intereseaza: sursele lor se scot
   cfg.surse = (cfg.surse ?? []).filter((x) => !esteExclus(x.url, x.titlu) && ADAPTORI[x.magazin]);
+  // PC Garage: doar categoriile; sursele de campanie descoperite anterior (fara categorie) se scot; sursele puse manual raman
+  cfg.surse = cfg.surse.filter((x) => x.magazin !== "pcgarage" || !x.descoperita || x.categorie);
   return cfg;
 }
 export const esteExclus = (...t) => /resigilat|desigilat|refurbished|renewed/i.test(t.filter(Boolean).join(" "));

@@ -25,7 +25,7 @@ export async function testeCampanii(ok) {
   ok(l.produse[1].pretReferinta === null && l.produse[1].disponibilitate === "in_stoc", "pcgarage: fara pret de referinta inventat");
   ok(l.urmatoarea === "https://www.pcgarage.ro/oferte/laptopuri/pagina2/", "pcgarage: pagina urmatoare");
   const dsc = pg.descopera(root, URL_C).map((x) => x.url);
-  ok(dsc.length === 3 && dsc.every((u) => /pcgarage\.ro\/(oferte|campanii)/.test(u)), "pcgarage: descoperire doar pagini de campanie de pe domeniul PC Garage (fara cos, produse, domenii externe)");
+  ok(dsc.length === 0, "pcgarage: linkurile de campanie nu se mai descopera (doar categoriile din meniu)");
   { const m = parseHtml('<ul id="top_menu"><li><a href="https://www.pcgarage.ro/placi-video/">Placi video</a></li><li><a href="/placi-video/">dup</a></li><li><a href="https://www.pcgarage.ro/laptop-mini-laptop/">Laptop</a></li><li><a href="/pc-gaming-fortnite-gameplay-fps/">x</a></li><li><a href="/cos/">cos</a></li><li><a href="/a/b/">adanc</a></li><li><a href="https://alt.ro/x/">alt</a></li></ul><a href="/placi-de-baza/">in afara meniului</a>');
     const d = pg.descopera(m, URL_C);
     ok(d.length === 2 && d.every((x) => x.categorie) && d.map((x) => x.url).join() === "https://www.pcgarage.ro/placi-video/filtre/discount/,https://www.pcgarage.ro/laptop-mini-laptop/filtre/discount/", "pcgarage: categorii din meniu (fara duplicate, cont, gameplay, nivel 2, domenii externe)"); }

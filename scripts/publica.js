@@ -10,7 +10,17 @@ const stop = (m) => { console.error("OPRIT: " + m); process.exit(1); };
 if (!process.argv.includes("--live")) stop("lipsește --live (publicarea se pornește doar manual din program).");
 
 if (sh("git rev-parse --abbrev-ref HEAD") !== "main") stop("nu ești pe ramura main.");
-if (sh("git status --porcelain --untracked-files=no")) stop("există modificări necomise.");
+// Catalogul generat de „Actualizează oferte” (data/oferte.json, istoric-preturi.json) e urmarit de git: daca e SINGURA modificare, se comite aici
+// (pornirea manuala a publicarii = aprobarea ta) si se urca pe main, ca publicarea sa ruleze pe cod curat.
+const CATALOG = ["data/oferte.json", "data/istoric-preturi.json"];
+const modificate = sh("git status --porcelain --untracked-files=no").split("\n").map((l) => l.trim()).filter(Boolean);
+if (modificate.length && modificate.every((l) => /^M\s/.test(l) && CATALOG.includes(l.slice(2).trim()))) {
+  sh(`git add ${CATALOG.join(" ")}`);
+  sh(`git commit -m "Catalog oferte ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC"`);
+  sh("git push origin HEAD:refs/heads/main");
+  console.log("Catalogul actualizat a fost comis si urcat pe main.");
+}
+if (sh("git status --porcelain --untracked-files=no")) stop("există modificări necomise: " + sh("git status --porcelain --untracked-files=no").split("\n").slice(0, 5).join("; "));
 sh("git fetch origin main");
 if (sh("git rev-parse HEAD") !== sh("git rev-parse origin/main")) stop("main local diferă de origin/main (fă push/pull întâi).");
 

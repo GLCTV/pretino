@@ -82,3 +82,6 @@
 
 ## v1.28
 - Catalog real (3867 oferte) comis pe main; testul de independenta nu mai scaneaza catalogul generat dupa codul de afiliat (apare legitim in linkurile evoMAG), dar verifica ca nu contine nimic ConfiguratiePC.
+
+## v1.29
+- PUBLICA LIVE: daca singurele modificari necomise sunt catalogul generat (data/oferte.json, istoric-preturi.json), le comite si le urca pe main inainte de publicare.

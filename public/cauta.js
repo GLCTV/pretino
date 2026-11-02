@@ -49,10 +49,10 @@
   function card(o) {
     var r = o.v > o.p ? Math.round((1 - o.p / o.v) * 100) : 0;
     var poza = o.i ? '<a class="poza" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true"><img src="' + esc(o.i) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="300" height="225" onerror="this.parentNode.classList.add(\'fara\')"></a>' : "";
-    return '<article class="card">' + poza + (r ? '<span class="badge">-' + r + '%</span>' : "") + "<strong>" + esc(o.t) + "</strong>" +
+    return '<article class="card">' + poza + (r ? '<span class="badge">-' + r + "%" + (o.r === 2 ? " față de PRP" : "") + "</span>" : "") + "<strong>" + esc(o.t) + "</strong>" +
       '<span class="mut">' + esc(data.m[o.m] || o.m) + " · " + esc(data.c[o.c] || o.c) + "</span>" +
-      '<div><span class="pret">' + lei(o.p) + "</span>" + (r ? '<span class="vechi"' + (o.r ? ' title="Preț de referință afișat de magazin"' : "") + ">" + lei(o.v) + "</span>" : "") + "</div>" +
-      (o.r && r ? '<span class="mut">reducere afișată de magazin</span>' : "") +
+      '<div><span class="pret">' + lei(o.p) + "</span>" + (r ? '<span class="vechi"' + (o.r === 1 ? ' title="Preț de referință afișat de magazin"' : o.r === 2 ? ' title="PRP – preț recomandat de producător"' : "") + ">" + lei(o.v) + "</span>" : "") + "</div>" +
+      (o.r === 1 && r ? '<span class="mut">reducere afișată de magazin</span>' : o.r === 2 && r ? '<span class="mut">PRP = preț recomandat de producător</span>' : "") +
       '<a class="btn" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank">Vezi oferta</a></article>';
   }
   function mai_multe() {

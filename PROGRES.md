@@ -127,3 +127,6 @@
 
 ## v1.41 – cache
 - stil.css si cauta.js au ?v=<hash> in URL: dupa publicare, browserele nu mai folosesc stilul vechi din cache (se vedea pagina ingusta / poze scapate din card dupa v1.40).
+
+## v1.42 – PRP evoMAG
+- Pretul taiat din feed-ul 2Performant (evoMAG) e etichetat PRP (pret recomandat de producator), badge „-X% fata de PRP”, nu „reducere”. Aplicat pe carduri si in cautare. Raman neetichetate: ITGalaxy/Vexio/etc. (Profitshare) – de verificat ce reprezinta pretul lor vechi.

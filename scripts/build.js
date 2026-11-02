@@ -45,11 +45,13 @@ ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și 
 
 // poza produsului: URL-ul din feed-ul magazinului (hotlink), incarcata lenes; daca nu se incarca, locul ramane gol
 const poza = (o) => /^https:\/\//.test(o.imagine ?? "") ? `<a class="poza" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true"><img src="${esc(o.imagine)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="300" height="225" onerror="this.parentNode.classList.add('fara')"></a>` : "";
+// tipul pretului tăiat: 1 = referinta afisata de magazin; 2 = PRP (pret recomandat de producator), cum vine in feed-ul 2Performant (evoMAG) – nu e dovada unei reduceri reale
+const tipRef = (o) => (o.referintaMagazin ? 1 : o.sursa === "2performant" ? 2 : 0);
 const card = (o) => {
-  const r = reducere(o);
-  return `<article class="card">${poza(o)}${r ? `<span class="badge">-${r}%</span>` : ""}<strong>${esc(o.titlu)}</strong>
+  const r = reducere(o), t = tipRef(o);
+  return `<article class="card">${poza(o)}${r ? `<span class="badge">-${r}%${t === 2 ? " față de PRP" : ""}</span>` : ""}<strong>${esc(o.titlu)}</strong>
 <span class="mut">${esc(mag[o.magazin]?.nume ?? o.magazin)} · ${esc(cat[o.categorie]?.nume ?? o.categorie)}</span>
-<div><span class="pret">${lei(o.pret)}</span>${r ? `<span class="vechi"${o.referintaMagazin ? ' title="Preț de referință afișat de magazin"' : ""}>${lei(o.pretVechi)}</span>` : ""}</div>${o.referintaMagazin && r ? '<span class="mut">reducere afișată de magazin</span>' : ""}
+<div><span class="pret">${lei(o.pret)}</span>${r ? `<span class="vechi"${t === 1 ? ' title="Preț de referință afișat de magazin"' : t === 2 ? ' title="PRP – preț recomandat de producător"' : ""}>${lei(o.pretVechi)}</span>` : ""}</div>${t === 1 && r ? '<span class="mut">reducere afișată de magazin</span>' : t === 2 && r ? '<span class="mut">PRP = preț recomandat de producător</span>' : ""}
 <a class="btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">Vezi oferta</a></article>`;
 };
 const grila = (l) => `<div class="grid">${l.map(card).join("")}</div>`;
@@ -87,7 +89,7 @@ mkdirSync("dist", { recursive: true });
 if (existsSync("public")) cpSync("public", "dist", { recursive: true });
 writeFileSync("dist/stil.css", CSS);
 // index de cautare (citit de /cauta.js): campuri scurte, ordinea = cele mai mari reduceri primele
-writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), o: sortate.map((o) => ({ t: o.titlu, m: o.magazin, c: o.categorie, p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "" })) }));
+writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), o: sortate.map((o) => ({ t: o.titlu, m: o.magazin, c: o.categorie, p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: tipRef(o), u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "" })) }));
 for (const p of pagini) {
   const dir = "dist" + p.cale;
   mkdirSync(dir, { recursive: true });

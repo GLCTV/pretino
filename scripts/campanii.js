@@ -155,6 +155,16 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
           if (mod === "complet") {
             const { produse, urmatoarea } = ad.parseListare(root, r.url);
             if (!produse.length && pagina === 1) {
+              try {
+                const dir2 = join(dir, "rapoarte", "esantioane-pagini"); mkdirSync(dir2, { recursive: true });
+                const h = r.corp || "";
+                const cnt = (re) => (h.match(re) || []).length;
+                const clase = {}; for (const mm of h.matchAll(/class="([^"]+)"/g)) for (const c of mm[1].split(/\s+/)) if (/card|prod|offer|price|pret|item|deal/i.test(c)) clase[c] = (clase[c] || 0) + 1;
+                const top = Object.entries(clase).sort((a, b) => b[1] - a[1]).slice(0, 40).map(([c, n]) => `${c}=${n}`).join(" ");
+                const nume = `${m}-${hash(s.url)}`;
+                writeFileSync(join(dir2, nume + ".txt"), `URL: ${s.url}\nURL final: ${r.url}\nBytes: ${h.length}\ncard-item: ${cnt(/card-item/g)}; data-offer-id: ${cnt(/data-offer-id/g)}; product-new-price: ${cnt(/product-new-price/g)}; ld+json: ${cnt(/application\/ld\+json/g)}; __NEXT_DATA__/__INITIAL: ${cnt(/__NEXT_DATA__|__INITIAL_STATE__|window\.__/g)}; scripturi: ${cnt(/<script/g)}\nClase relevante: ${top}\n`);
+                writeFileSync(join(dir2, nume + ".html"), h.slice(0, 400000));
+              } catch {}
               if (st.campanii[cid]?.titluPagina) st.informativ.push({ magazin: m, sursa: s.url, motiv: "pagina citita, fara lista de produse (pagina informativa sau lista neinteleasa)" });
               else erori(m, s.url, "pagina goala sau neinteleasa: nici titlu, nici produse (posibil continut incarcat prin JavaScript)");
             }

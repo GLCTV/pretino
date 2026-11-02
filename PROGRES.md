@@ -55,3 +55,6 @@
 
 ## 2026-11-02 – program v1.20: eMAG prin browser
 - Prima rulare eMAG reușită prin browserul vizibil: 8 campanii, 899 produse (din /resigilate; limita de 15 pagini/sursă a rămas „neverificat”). Paginile /nav/deals, /genius-deals, /guide/black-friday, /genius, /lps/* au apărut fără listă de produse (conținut încărcat cu JavaScript după încărcarea paginii) → acum browserul derulează pagina și așteaptă stabilizarea conținutului înainte de citire.
+
+## v1.21
+- Paginile eMAG fara lista de produse: se salveaza un esantion (rapoarte/esantioane-pagini/) pentru diagnostic; dupa derulare tot nu apar produse.

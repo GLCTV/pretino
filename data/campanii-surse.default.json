@@ -1,13 +1,191 @@
 {
-  "limite": { "concurentaPerMagazin": 2, "pauzaMs": 700, "maxPaginiListaPerSursa": 15, "maxSurseDescoperite": 25, "adancimeDescoperire": 1, "timeoutMs": 25000, "reincercari": 3 },
+  "limite": {
+    "concurentaPerMagazin": 2,
+    "pauzaMs": 700,
+    "maxPaginiListaPerSursa": 15,
+    "maxSurseDescoperite": 25,
+    "adancimeDescoperire": 1,
+    "timeoutMs": 25000,
+    "reincercari": 3
+  },
   "magazine": {
-    "emag": { "nume": "eMAG", "domenii": ["emag.ro"], "activ": true },
-    "pcgarage": { "nume": "PC Garage", "domenii": ["pcgarage.ro"], "activ": true }
+    "emag": {
+      "nume": "eMAG",
+      "domenii": [
+        "emag.ro"
+      ],
+      "activ": true
+    },
+    "pcgarage": {
+      "nume": "PC Garage",
+      "domenii": [
+        "pcgarage.ro"
+      ],
+      "activ": true
+    }
   },
   "surse": [
-    { "id": "emag-deals", "magazin": "emag", "url": "https://www.emag.ro/nav/deals", "titlu": "Ofertele eMAG", "activ": true, "origine": "manual" },
-    { "id": "emag-genius-deals", "magazin": "emag", "url": "https://www.emag.ro/genius-deals", "titlu": "Genius Deals", "activ": true, "origine": "manual" },
-    { "id": "emag-black-friday", "magazin": "emag", "url": "https://www.emag.ro/guide/black-friday", "titlu": "Black Friday eMAG", "activ": true, "origine": "manual" },
-    { "id": "pcgarage-home", "magazin": "pcgarage", "url": "https://www.pcgarage.ro/", "titlu": "PC Garage - pagina principala (pentru descoperirea paginilor de oferte)", "activ": true, "origine": "manual" }
+    {
+      "id": "emag-deals",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/nav/deals",
+      "titlu": "Ofertele eMAG",
+      "activ": true,
+      "origine": "manual"
+    },
+    {
+      "id": "emag-genius-deals",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/genius-deals",
+      "titlu": "Genius Deals",
+      "activ": true,
+      "origine": "manual"
+    },
+    {
+      "id": "emag-black-friday",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/guide/black-friday",
+      "titlu": "Black Friday eMAG",
+      "activ": true,
+      "origine": "manual"
+    },
+    {
+      "id": "pcgarage-home",
+      "magazin": "pcgarage",
+      "url": "https://www.pcgarage.ro/",
+      "titlu": "PC Garage - pagina principala (pentru descoperirea paginilor de oferte)",
+      "activ": true,
+      "origine": "manual"
+    },
+    {
+      "id": "emag-red-laptopuri",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/laptopuri/sort-discountdesc/c",
+      "titlu": "Laptopuri - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-telefoane-mobile",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/telefoane-mobile/sort-discountdesc/c",
+      "titlu": "Telefoane mobile - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-monitoare-lcd-led",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/monitoare-lcd-led/sort-discountdesc/c",
+      "titlu": "Monitoare - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-placi_video",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/placi_video/sort-discountdesc/c",
+      "titlu": "Placi video - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-procesoare",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/procesoare/sort-discountdesc/c",
+      "titlu": "Procesoare - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-memorii",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/memorii/sort-discountdesc/c",
+      "titlu": "Memorii - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-tablete",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/tablete/sort-discountdesc/c",
+      "titlu": "Tablete - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-televizoare",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/televizoare/sort-discountdesc/c",
+      "titlu": "Televizoare - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-desktop-pc",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/desktop-pc/sort-discountdesc/c",
+      "titlu": "Desktop PC - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-tastaturi",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/tastaturi/sort-discountdesc/c",
+      "titlu": "Tastaturi - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-mouse",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/mouse/sort-discountdesc/c",
+      "titlu": "Mouse - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-casti-pc",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/casti-pc/sort-discountdesc/c",
+      "titlu": "Casti PC - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    },
+    {
+      "id": "emag-red-smartwatch",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/smartwatch/sort-discountdesc/c",
+      "titlu": "Smartwatch - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 6
+    }
   ]
 }

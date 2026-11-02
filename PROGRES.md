@@ -61,3 +61,6 @@
 
 ## v1.22
 - Resigilate/desigilate/refurbished excluse complet (eMAG + PC Garage): surse scoase, produse si campanii vechi curatate la urmatoarea actualizare.
+
+## v1.23
+- eMAG: 13 surse implicite IT sortate dupa reducere (/categorie/sort-discountdesc/c, max 6 pagini fiecare, verificate in Chrome); surse implicite noi se adauga o singura data in configul existent. Paginile de prezentare (nav/deals, genius etc.) sunt doar informative.

@@ -36,6 +36,12 @@ export function incarcaCfg(P) {
     if (existsSync(implicit)) copyFileSync(implicit, P.surse);
   }
   const cfg = citeste(P.surse, { limite: {}, magazine: {}, surse: [] });
+  // surse implicite noi (aparute intr-o versiune ulterioara) se adauga o singura data; cele sterse de utilizator nu revin
+  try {
+    const impl = citeste(join(P.surse, "..", "campanii-surse.default.json"), { surse: [] });
+    cfg.defaultVazute ??= (impl.surse ?? []).filter((x) => !x.id.startsWith("emag-red-")).map((x) => x.id);
+    for (const x of impl.surse ?? []) if (!cfg.defaultVazute.includes(x.id)) { cfg.defaultVazute.push(x.id); if (!cfg.surse.some((y) => y.url === x.url)) cfg.surse.push({ ...x }); }
+  } catch {}
   // produsele resigilate / desigilate / refurbished nu intereseaza: sursele lor se scot
   cfg.surse = (cfg.surse ?? []).filter((x) => !esteExclus(x.url, x.titlu));
   return cfg;
@@ -180,8 +186,9 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
               if (st.campanii[cid] && !st.campanii[cid].produse.includes(pid)) st.campanii[cid].produse.push(pid);
               if (!ex) k.produseCitite++;
             }
-            st.urmatoare[s.id] = urmatoarea && pagina < lim.maxPaginiListaPerSursa ? urmatoarea : undefined;
-            if (urmatoarea && pagina >= lim.maxPaginiListaPerSursa) { st.neverificate.push({ magazin: m, sursa: s.url, motiv: `oprit la limita de ${lim.maxPaginiListaPerSursa} pagini` }); }
+            const maxP = s.maxPagini ?? lim.maxPaginiListaPerSursa;
+            st.urmatoare[s.id] = urmatoarea && pagina < maxP ? urmatoarea : undefined;
+            if (urmatoarea && pagina >= maxP && !s.sortatDupaReducere) { st.neverificate.push({ magazin: m, sursa: s.url, motiv: `oprit la limita de ${maxP} pagini` }); }
             url = st.urmatoare[s.id];
           } else url = null;
           salveazaStare(); salveazaProgres();

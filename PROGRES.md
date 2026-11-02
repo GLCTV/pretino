@@ -157,3 +157,9 @@
 
 ## v1.51 – limita 10 pagini
 - Categoriile PC Garage (filtrul Cu discount): maximum 10 pagini pe categorie (era 30).
+
+## v1.52 – design nou (referinta Pretino.ro, tema inchisa + luminoasa)
+- Site regenerat dupa designul de referinta: antet cu logo/cautare/favorite/tema, categorii cu iconite, subcategorii, filtre (Magazine, Pret, Reducere, Reseteaza), sortare, grila de 4 produse, carduri cu reducere/economie/„Vezi oferta”.
+- Clasificare noua pe titlu (`scripts/lib/clasificare.js`), iconite proprii (`scripts/lib/iconite.js`), stil `src/stil.css`, font Montserrat local (OFL).
+- Doar date reale (oferte cu pret redus); linkurile de afiliere pastrate (`sponsored nofollow noopener`). Responsive: telefon 2 produse/rand, filtre in panou; fara scroll orizontal 390–1920 px.
+- STATUS: local, asteptam OK de la Laur inainte de main. Neverificat: imagini produse (in cloud nu exista), tema luminoasa pe toate paginile.

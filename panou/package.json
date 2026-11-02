@@ -1,0 +1,7 @@
+{
+  "name": "pretino-panou",
+  "private": true,
+  "type": "module",
+  "description": "Panou de control Pretino: emailuri contact@pretino.ro (primire, trimitere) si stare site. Worker Cloudflare propriu Pretino.",
+  "dependencies": { "postal-mime": "^2.4.0" }
+}

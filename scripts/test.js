@@ -86,6 +86,7 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   ok(dinProdus({ ...base, ultimaVerificare: "2026-10-20T10:00:00Z" }, mg, camp, acum).omis, "campanii->catalog: date vechi nu intra");
   ok(dinProdus({ ...base, titlu: "Laptop Resigilat" }, mg, camp, acum).omis, "campanii->catalog: resigilat nu intra");
   ok(dinProdus({ ...base, pretReferinta: 20000 }, mg, camp, acum).omis, "campanii->catalog: reducere suspecta >60% nu intra"); }
+{ const { testePanou } = await import("./test-panou.js"); await testePanou(ok); }
 { const { testeCampanii } = await import("./test-campanii.js"); await testeCampanii(ok); }
 console.log(esecuri ? `\n${esecuri} teste eșuate` : "\nToate testele au trecut");
 process.exit(esecuri ? 1 : 0);

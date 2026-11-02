@@ -10,3 +10,8 @@ data/campanii.json
 data/produse-campanii.json
 data/istoric-campanii.json
 data/campanii-surse.json
+panou/node_modules
+panou/wrangler.local.jsonc
+panou/.wrangler
+panou/package-lock.json
+panou/bun.lock

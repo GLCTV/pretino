@@ -85,6 +85,9 @@ writeFileSync("dist/404.html", pagina({ titlu: `Pagină negăsită – ${SITE_NA
 const indexabile = pagini.filter((p) => p.index);
 writeFileSync("dist/sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexabile.map((p) => `<url><loc>${SITE_URL}${p.cale}</loc></url>`).join("\n")}\n</urlset>\n`);
 writeFileSync("dist/robots.txt", DEMO ? "User-agent: *\nDisallow: /\n" : `User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+// stare publica a catalogului (citita de panoul de control; fara date sensibile)
+{ const num = (k, nume) => Object.fromEntries(Object.entries(oferte.reduce((a, o) => ((a[nume(o)] = (a[nume(o)] ?? 0) + 1), a), {})).sort((p, q) => q[1] - p[1]));
+  writeFileSync("dist/status.json", JSON.stringify({ generat: new Date().toISOString(), total: oferte.length, magazine: num("m", (o) => mag[o.magazin]?.nume ?? o.magazin), categorii: num("c", (o) => cat[o.categorie]?.nume ?? o.categorie), demo: DEMO }) + "\n"); }
 let sha = "";
 try { sha = execSync("git rev-parse HEAD", { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); } catch {}
 writeFileSync("dist/version.json", JSON.stringify({ sha, built: new Date().toISOString(), demo: DEMO }) + "\n");

@@ -1,0 +1,17 @@
+// Sablon: scripts/panou-deploy.js il completeaza (database_id) si scrie panou/wrangler.local.jsonc (ignorat de git). Nu contine secrete.
+{
+  "name": "pretino-panou",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "routes": [{ "pattern": "panou.pretino.ro", "custom_domain": true }],
+  "d1_databases": [{ "binding": "DB", "database_name": "pretino-mail", "database_id": "__DATABASE_ID__" }],
+  "vars": {
+    "FROM": "Pretino <contact@pretino.ro>",
+    "FORWARD_TO": "laur.games24@gmail.com",
+    "ALLOWED_EMAIL": "laur.games24@gmail.com",
+    "ACCESS_TEAM_DOMAIN": "__ACCESS_TEAM_DOMAIN__",
+    "ACCESS_AUD": "__ACCESS_AUD__",
+    "SITE_URL": "https://pretino.ro"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "pretino",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Pretino.ro - oferte actuale din magazinele din Romania (proiect independent)",
+  "scripts": {
+    "build": "bun scripts/build.js",
+    "build:demo": "bun scripts/build.js --demo",
+    "preview": "bun scripts/serve.js",
+    "preview:demo": "bun scripts/build.js --demo && bun scripts/serve.js",
+    "actualizare": "bun scripts/actualizare.js",
+    "test": "bun scripts/test.js",
+    "publica": "bun scripts/publica.js"
+  }
+}

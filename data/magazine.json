@@ -1,0 +1,5 @@
+[
+  { "id": "emag", "nume": "eMAG", "domeniu": "emag.ro", "activ": false, "sursa": null, "afiliere": { "retea": null } },
+  { "id": "altex", "nume": "Altex", "domeniu": "altex.ro", "activ": false, "sursa": null, "afiliere": { "retea": null } },
+  { "id": "pcgarage", "nume": "PC Garage", "domeniu": "pcgarage.ro", "activ": false, "sursa": null, "afiliere": { "retea": null } }
+]

@@ -1,0 +1,10 @@
+[
+  { "slug": "electronice", "nume": "Electronice și IT" },
+  { "slug": "electrocasnice", "nume": "Electrocasnice" },
+  { "slug": "casa-si-gradina", "nume": "Casă și grădină" },
+  { "slug": "moda", "nume": "Modă" },
+  { "slug": "auto", "nume": "Auto" },
+  { "slug": "sport", "nume": "Sport și timp liber" },
+  { "slug": "copii", "nume": "Copii și jucării" },
+  { "slug": "supermarket", "nume": "Supermarket" }
+]

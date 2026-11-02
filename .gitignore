@@ -1,0 +1,7 @@
+node_modules
+dist
+.pretino-local
+logs
+rapoarte
+*.env
+secrete.env

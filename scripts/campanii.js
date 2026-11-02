@@ -35,8 +35,12 @@ export function incarcaCfg(P) {
     const implicit = join(P.surse, "..", "campanii-surse.default.json");
     if (existsSync(implicit)) copyFileSync(implicit, P.surse);
   }
-  return citeste(P.surse, { limite: {}, magazine: {}, surse: [] });
+  const cfg = citeste(P.surse, { limite: {}, magazine: {}, surse: [] });
+  // produsele resigilate / desigilate / refurbished nu intereseaza: sursele lor se scot
+  cfg.surse = (cfg.surse ?? []).filter((x) => !esteExclus(x.url, x.titlu));
+  return cfg;
 }
+export const esteExclus = (...t) => /resigilat|desigilat|refurbished|renewed/i.test(t.filter(Boolean).join(" "));
 const LIMITE_IMPLICITE = { concurentaPerMagazin: 2, pauzaMs: 700, maxPaginiListaPerSursa: 15, maxSurseDescoperite: 25, adancimeDescoperire: 1, timeoutMs: 25000, reincercari: 3 };
 
 // ---------- surse (adaugare / editare / dezactivare) ----------
@@ -146,7 +150,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
             // descoperire (doar din sursele configurate, adancime 1, cu limite)
             if (!s.descoperita && lim.adancimeDescoperire >= 1) {
               for (const d of ad.descopera(root, r.url)) {
-                if (cfg.surse.some((x) => x.url === d.url) || cfg.surse.filter((x) => x.magazin === m && x.descoperita).length >= lim.maxSurseDescoperite) continue;
+                if (esteExclus(d.url, d.titlu) || cfg.surse.some((x) => x.url === d.url) || cfg.surse.filter((x) => x.magazin === m && x.descoperita).length >= lim.maxSurseDescoperite) continue;
                 const nou = { id: `${m}-${hash(d.url)}`, magazin: m, url: d.url, titlu: d.titlu, activ: true, descoperita: true, origine: s.url, adaugata: new Date().toISOString() };
                 cfg.surse.push(nou); coada.push(nou); k.surseNoi++;
               }
@@ -169,6 +173,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
               else erori(m, s.url, "pagina goala sau neinteleasa: nici titlu, nici produse (posibil continut incarcat prin JavaScript)");
             }
             for (const p of produse) {
+              if (p.conditie === "desigilat" || esteExclus(p.url, p.titlu)) continue;
               const pid = `${m}-${p.idMagazin ?? hash(p.url)}`;
               const ex = st.produse[pid];
               st.produse[pid] = { ...(ex ?? {}), ...p, id: pid, magazin: m, campanii: [...new Set([...(ex?.campanii ?? []), cid])] };
@@ -227,6 +232,10 @@ function faBackup(P) {
 
 function aplica(P, st, azi, k, mod) {
   const campanii = citeste(P.campanii, {}), produse = citeste(P.produse, {}), istoric = citeste(P.istoric, {});
+  // curatare date vechi: campanii si produse resigilate / desigilate
+  for (const [id, c] of Object.entries(campanii)) if (esteExclus(c.url, c.titlu)) delete campanii[id];
+  for (const [id, p] of Object.entries(produse)) if (p.conditie === "desigilat" || esteExclus(p.url, p.titlu)) delete produse[id];
+  for (const c of Object.values(campanii)) if (Array.isArray(c.produse)) c.produse = c.produse.filter((id) => produse[id]);
   const acum = new Date().toISOString();
   const esuate = new Set(st.erori.map((e) => e.sursa));
   for (const [id, c] of Object.entries(st.campanii)) {

@@ -7,7 +7,7 @@ import { absolut, fara, paginaUrmatoare, produseStructurate } from "./generic.js
 
 export const DOMENII = ["emag.ro"];
 // Pagini relevante pentru descoperire (doar pe domeniul eMAG; pagini de produs si cont excluse)
-const PERMISE = /^\/(lps|guide|campanii|genius-deals|genius|nav\/deals|resigilate|brands|black-friday|promo|cupoane)(\/|$)/i;
+const PERMISE = /^\/(lps|guide|campanii|genius-deals|genius|nav\/deals|brands|black-friday|promo|cupoane)(\/|$)/i;
 const EXCLUSE = /\/(pd|cart|favorites|history|user|checkout|login)(\/|$)/i;
 export function esteLinkCampanie(url) {
   try { const u = new URL(url); return /(^|\.)emag\.ro$/.test(u.hostname) && PERMISE.test(u.pathname) && !EXCLUSE.test(u.pathname); } catch { return false; }

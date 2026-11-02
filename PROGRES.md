@@ -58,3 +58,6 @@
 
 ## v1.21
 - Paginile eMAG fara lista de produse: se salveaza un esantion (rapoarte/esantioane-pagini/) pentru diagnostic; dupa derulare tot nu apar produse.
+
+## v1.22
+- Resigilate/desigilate/refurbished excluse complet (eMAG + PC Garage): surse scoase, produse si campanii vechi curatate la urmatoarea actualizare.

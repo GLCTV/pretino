@@ -18,7 +18,7 @@ Site static de oferte actuale din magazinele din România. Proiect independent (
 ## Instalare (o dată)
 1. Pune folderul proiectului pe PC (clonează `https://github.com/glctv/pretino`).
 2. Rulează `Pretino.bat` – instalează Git și Bun dacă lipsesc și deschide programul.
-3. Secretele pentru publicare, în `%LOCALAPPDATA%\Pretino\secrete.env` (nu în repo):
+3. Secretele pentru publicare, în `%LOCALAPPDATA%\Pretino\` (`secrete.env` pentru Cloudflare, `feeduri.env` pentru feed-uri/coduri de afiliat) (nu în repo):
    ```
    CLOUDFLARE_API_TOKEN=...
    CLOUDFLARE_ACCOUNT_ID=...

@@ -23,7 +23,8 @@ export function dinProdus(p, magazine, campanii = {}, acum = Date.now()) {
   const red = (1 - p.pret / ref) * 100;
   if (red > REDUCERE_MAX) return { omis: "reducere suspecta (>60%)" };
   const dinListaIT = (p.campanii ?? []).some((c) => String(campanii[c]?.sursaId ?? "").startsWith("emag-red-"));
-  const categorie = mapCategorie([p.categorie, p.titlu].filter(Boolean).join(" ")) ?? (dinListaIT ? "electronice" : null);
+  const dinSursa = (p.campanii ?? []).map((c) => campanii[c]?.categoriePretino).find(Boolean); // categoria Pretino a listei din care vine produsul
+  const categorie = dinSursa ?? mapCategorie([p.categorie, p.titlu].filter(Boolean).join(" ")) ?? (dinListaIT ? "electronice" : null);
   return { oferta: { id: idOferta("camp", p.url), sursa: "campanii", titlu: p.titlu, categorie, magazin: m.id, pret: p.pret, pretVechi: ref, referintaMagazin: true, url: p.url, afiliat: false, ...(p.vandut && p.vandut !== "Necunoscut" ? { vandut: p.vandut } : {}), ...(p.imagine ? { imagine: p.imagine } : {}) } };
 }
 

@@ -72,6 +72,7 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   const camp = { c1: { sursaId: "emag-red-laptopuri" } };
   const o = dinProdus(base, mg, camp, acum).oferta;
   ok(o && o.pretVechi === 1500 && o.referintaMagazin === true && o.afiliat === false && o.categorie === "electronice", "campanii->catalog: oferta cu reducere afisata de magazin, fara afiliere");
+  ok(dinProdus(base, mg, { c1: { sursaId: "emag-red-frigidere", categoriePretino: "electrocasnice" } }, acum).oferta?.categorie === "electrocasnice", "campanii->catalog: categoria vine din lista sursa");
   ok(dinProdus({ ...base, pretReferinta: null }, mg, camp, acum).omis, "campanii->catalog: fara pret de referinta nu intra");
   ok(dinProdus({ ...base, disponibilitate: "out_of_stock" }, mg, camp, acum).omis, "campanii->catalog: fara stoc nu intra");
   ok(dinProdus({ ...base, ultimaVerificare: "2026-10-20T10:00:00Z" }, mg, camp, acum).omis, "campanii->catalog: date vechi nu intra");

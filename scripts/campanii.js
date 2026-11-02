@@ -40,6 +40,7 @@ export function incarcaCfg(P) {
   try {
     const impl = citeste(join(P.surse, "..", "campanii-surse.default.json"), { surse: [] });
     cfg.defaultVazute ??= (impl.surse ?? []).filter((x) => !x.id.startsWith("emag-red-")).map((x) => x.id);
+    for (const x of impl.surse ?? []) { const e = cfg.surse.find((y) => y.id === x.id); if (e && x.categoriePretino && !e.categoriePretino) e.categoriePretino = x.categoriePretino; }
     for (const x of impl.surse ?? []) if (!cfg.defaultVazute.includes(x.id)) { cfg.defaultVazute.push(x.id); if (!cfg.surse.some((y) => y.url === x.url)) cfg.surse.push({ ...x }); }
   } catch {}
   // produsele resigilate / desigilate / refurbished nu intereseaza: sursele lor se scot
@@ -152,7 +153,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
           const cid = `c-${hash(s.url)}`;
           if (pagina === 1 && !st.urmatoare[s.id]) {
             const meta = metaCampanie(root, s.url, r.url);
-            st.campanii[cid] = { id: cid, magazin: m, sursaId: s.id, ...meta, titluPagina: meta.titlu, titlu: s.descoperita ? (meta.titlu ?? s.titlu) : (s.titlu ?? meta.titlu), urlOrigine: s.origine && s.origine !== "manual" ? s.origine : null, produse: [], verificat: true };
+            st.campanii[cid] = { id: cid, magazin: m, sursaId: s.id, ...meta, titluPagina: meta.titlu, categoriePretino: s.categoriePretino ?? null, titlu: s.descoperita ? (meta.titlu ?? s.titlu) : (s.titlu ?? meta.titlu), urlOrigine: s.origine && s.origine !== "manual" ? s.origine : null, produse: [], verificat: true };
             // descoperire (doar din sursele configurate, adancime 1, cu limite)
             if (!s.descoperita && lim.adancimeDescoperire >= 1) {
               for (const d of ad.descopera(root, r.url)) {

@@ -65,7 +65,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-telefoane-mobile",
@@ -75,7 +76,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-monitoare-lcd-led",
@@ -85,7 +87,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-placi_video",
@@ -95,7 +98,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-procesoare",
@@ -105,7 +109,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-memorii",
@@ -115,7 +120,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-tablete",
@@ -125,7 +131,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-televizoare",
@@ -135,7 +142,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-desktop-pc",
@@ -145,7 +153,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-tastaturi",
@@ -155,7 +164,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-mouse",
@@ -165,7 +175,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-casti-pc",
@@ -175,7 +186,8 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
     },
     {
       "id": "emag-red-smartwatch",
@@ -185,7 +197,404 @@
       "activ": true,
       "origine": "manual",
       "sortatDupaReducere": true,
-      "maxPagini": 6
+      "maxPagini": 6,
+      "categoriePretino": "electronice"
+    },
+    {
+      "id": "emag-red-combine-frigorifice",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/combine-frigorifice/sort-discountdesc/c",
+      "titlu": "Combine frigorifice - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-frigidere",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/frigidere/sort-discountdesc/c",
+      "titlu": "Frigidere - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-congelatoare",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/congelatoare/sort-discountdesc/c",
+      "titlu": "Congelatoare - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-aspiratoare",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/aspiratoare/sort-discountdesc/c",
+      "titlu": "Aspiratoare - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-cuptoare-microunde",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/cuptoare-microunde/sort-discountdesc/c",
+      "titlu": "Cuptoare cu microunde - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-espressoare",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/espressoare/sort-discountdesc/c",
+      "titlu": "Espressoare - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-cuptoare-incorporabile",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/cuptoare-incorporabile/sort-discountdesc/c",
+      "titlu": "Cuptoare incorporabile - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-hote",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/hote/sort-discountdesc/c",
+      "titlu": "Hote - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-uscatoare-rufe",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/uscatoare-rufe/sort-discountdesc/c",
+      "titlu": "Uscatoare de rufe - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-blendere----tocatoare",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/blendere----tocatoare/sort-discountdesc/c",
+      "titlu": "Blendere si tocatoare - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-friteuze",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/friteuze/sort-discountdesc/c",
+      "titlu": "Friteuze - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-mixere",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/mixere/sort-discountdesc/c",
+      "titlu": "Mixere - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-plite-electrice",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/plite-electrice/sort-discountdesc/c",
+      "titlu": "Plite electrice - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-ventilatoare-racitoare-aer",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/ventilatoare-racitoare-aer/sort-discountdesc/c",
+      "titlu": "Ventilatoare - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-aeroterme",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/aeroterme/sort-discountdesc/c",
+      "titlu": "Aeroterme - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "electrocasnice"
+    },
+    {
+      "id": "emag-red-saltele",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/saltele/sort-discountdesc/c",
+      "titlu": "Saltele - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "casa-si-gradina"
+    },
+    {
+      "id": "emag-red-canapele",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/canapele/sort-discountdesc/c",
+      "titlu": "Canapele - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "casa-si-gradina"
+    },
+    {
+      "id": "emag-red-birouri",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/birouri/sort-discountdesc/c",
+      "titlu": "Birouri - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "casa-si-gradina"
+    },
+    {
+      "id": "emag-red-scaune-birou",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/scaune-birou/sort-discountdesc/c",
+      "titlu": "Scaune de birou - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "casa-si-gradina"
+    },
+    {
+      "id": "emag-red-becuri",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/becuri/sort-discountdesc/c",
+      "titlu": "Becuri - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "casa-si-gradina"
+    },
+    {
+      "id": "emag-red-trotinete-electrice",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/trotinete-electrice/sort-discountdesc/c",
+      "titlu": "Trotinete electrice - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "sport"
+    },
+    {
+      "id": "emag-red-biciclete",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/biciclete/sort-discountdesc/c",
+      "titlu": "Biciclete - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "sport"
+    },
+    {
+      "id": "emag-red-fitness",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/fitness/sort-discountdesc/c",
+      "titlu": "Fitness - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "sport"
+    },
+    {
+      "id": "emag-red-carucioare-copii",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/carucioare-copii/sort-discountdesc/c",
+      "titlu": "Carucioare copii - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "copii"
+    },
+    {
+      "id": "emag-red-scaune-auto-copii",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/scaune-auto-copii/sort-discountdesc/c",
+      "titlu": "Scaune auto copii - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "copii"
+    },
+    {
+      "id": "emag-red-scutece-chilotei",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/scutece-chilotei/sort-discountdesc/c",
+      "titlu": "Scutece - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "copii"
+    },
+    {
+      "id": "emag-red-anvelope-auto",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/anvelope-auto/sort-discountdesc/c",
+      "titlu": "Anvelope auto - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "auto"
+    },
+    {
+      "id": "emag-red-navigatii-gps",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/navigatii-gps/sort-discountdesc/c",
+      "titlu": "Navigatii GPS - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "auto"
+    },
+    {
+      "id": "emag-red-ghete-barbati",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/ghete-barbati/sort-discountdesc/c",
+      "titlu": "Ghete barbati - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "moda"
+    },
+    {
+      "id": "emag-red-ghete-dama",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/ghete-dama/sort-discountdesc/c",
+      "titlu": "Ghete dama - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "moda"
+    },
+    {
+      "id": "emag-red-ceasuri-dama",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/ceasuri-dama/sort-discountdesc/c",
+      "titlu": "Ceasuri dama - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "moda"
+    },
+    {
+      "id": "emag-red-genti-dama",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/genti-dama/sort-discountdesc/c",
+      "titlu": "Genti dama - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "moda"
+    },
+    {
+      "id": "emag-red-rucsacuri",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/rucsacuri/sort-discountdesc/c",
+      "titlu": "Rucsacuri - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "moda"
+    },
+    {
+      "id": "emag-red-hanorace-barbati",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/hanorace-barbati/sort-discountdesc/c",
+      "titlu": "Hanorace barbati - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "moda"
+    },
+    {
+      "id": "emag-red-cafea",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/cafea/sort-discountdesc/c",
+      "titlu": "Cafea - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "supermarket"
+    },
+    {
+      "id": "emag-red-detergenti-rufe",
+      "magazin": "emag",
+      "url": "https://www.emag.ro/detergenti-rufe/sort-discountdesc/c",
+      "titlu": "Detergenti de rufe - cele mai mari reduceri (eMAG)",
+      "activ": true,
+      "origine": "manual",
+      "sortatDupaReducere": true,
+      "maxPagini": 4,
+      "categoriePretino": "supermarket"
     }
   ]
 }

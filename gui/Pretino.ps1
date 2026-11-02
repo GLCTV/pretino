@@ -45,7 +45,7 @@ $timer = New-Object System.Windows.Threading.DispatcherTimer
 $timer.Interval = [TimeSpan]::FromMilliseconds(700)
 $timer.Add_Tick({
   if ($script:LogFile -and (Test-Path $script:LogFile)) {
-    try { $c.Jurnal.Text = (Get-Content $script:LogFile -Raw -ErrorAction Stop); $c.Jurnal.ScrollToEnd() } catch {}
+    try { $c.Jurnal.Text = (Get-Content $script:LogFile -Raw -Encoding UTF8 -ErrorAction Stop); $c.Jurnal.ScrollToEnd() } catch {}
   }
   if ($script:Proc -and $script:Proc.HasExited) {
     $c.Stare.Text = if ($script:Proc.ExitCode -eq 0) { 'Terminat cu succes.' } else { "Terminat cu eroare (cod $($script:Proc.ExitCode))." }

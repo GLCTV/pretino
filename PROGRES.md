@@ -92,3 +92,6 @@
 - De facut: cand se adauga scriptul Profitshare (dupa aprobare), verificat daca seteaza cookie-uri la incarcare -> bannerul de consimtamant + actualizat /cookies/.
 
 - Email contact: contact@pretino.ro (Cloudflare Email Routing -> Gmail), pus in src/config.js. Mai lipseste OPERATOR.nume. Etapa 2 (trimitere din contact@) neinceputa.
+
+## v1.31
+- OPERATOR completat (Laur Cristian, contact@pretino.ro): paginile legale nu mai au marcaje, publicarea nu mai e blocata.

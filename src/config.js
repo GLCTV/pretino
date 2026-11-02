@@ -7,7 +7,7 @@ export const GITHUB_REPO = "glctv/pretino";
 export const PREVIEW_PORT = 3100;
 // Date despre operatorul site-ului, afisate in paginile legale. COMPLETEAZA-LE inainte de publicare (publicarea LIVE se opreste cat timp raman marcaje „[COMPLETEAZĂ”).
 export const OPERATOR = {
-  nume: "",    // ex. numele tau complet sau denumirea firmei (PFA / SRL)
+  nume: "Laur Cristian",    // numele operatorului; se schimba cand exista PFA / firma
   email: "contact@pretino.ro",   // adresa de contact publica (redirectionata prin Cloudflare Email Routing)
   cui: "",     // optional: CUI / CIF, daca ai firma sau PFA
 };

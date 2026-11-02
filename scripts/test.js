@@ -44,6 +44,27 @@ i = actualizeazaIstoric(i, [{ id: "x", pret: 10 }], "2026-11-03");
 ok(i.x.length === 1, "istoric: preț neschimbat nu adaugă intrare");
 i = actualizeazaIstoric(i, [{ id: "x", pret: 8 }], "2026-11-04");
 ok(i.x.length === 2 && i.x[1].p === 8, "istoric: preț schimbat adaugă intrare");
+
+// 7. Adaptori de surse (cu fișiere de probă, fără rețea)
+{
+  const { parseCsv } = await import("./lib/csv.js");
+  const { parsePret, areReducereReala } = await import("./lib/oferta.js");
+  const ps = await import("./surse/profitshare.js");
+  const tp = await import("./surse/2performant.js");
+  const magazine = JSON.parse(readFileSync("data/magazine.json", "utf8"));
+  ok(parsePret("1.299,99") === 1299.99 && parsePret("799.99") === 799.99 && parsePret("1,299.50") === 1299.5, "pret: formate RO si EN");
+  const rows = parseCsv(readFileSync("tests/fixtures/profitshare.csv", "utf8"));
+  const r = rows.map((x) => ps.dinRand(x, magazine));
+  ok(r[0].oferta && r[0].oferta.pret === 3999 && r[0].oferta.pretVechi === 4999 && r[0].oferta.magazin === "emag" && r[0].oferta.categorie === "electronice", "profitshare: oferta cu reducere citita corect");
+  ok(r[0].oferta.url === "https://l.profitshare.ro/l/1", "profitshare: foloseste linkul de afiliere");
+  ok(r[1].oferta && !areReducereReala(r[1].oferta), "profitshare: fara pret redus nu e reducere reala");
+  ok(r[2].omis === "fara stoc", "profitshare: produs epuizat omis");
+  ok(/magazin necunoscut/.test(r[3].omis), "profitshare: magazin necunoscut omis");
+  const t = parseCsv(readFileSync("tests/fixtures/2performant.csv", "utf8")).map((x) => tp.dinRand(x, magazine, "AFF"));
+  ok(t[0].oferta && t[0].oferta.pretVechi === 999.99 && t[0].oferta.magazin === "evomag", "2performant: oferta citita corect");
+  let eroare = false; try { await ps.citeste(magazine, {}); } catch { eroare = true; }
+  ok(eroare, "profitshare: fara feed in secrete.env da eroare clara");
+}
 ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"), "CLAUDE.md, README.md, PROGRES.md există");
 console.log(esecuri ? `\n${esecuri} teste eșuate` : "\nToate testele au trecut");
 process.exit(esecuri ? 1 : 0);

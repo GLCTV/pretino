@@ -1,5 +1,12 @@
 [
-  { "id": "emag", "nume": "eMAG", "domeniu": "emag.ro", "activ": false, "sursa": null, "afiliere": { "retea": null } },
-  { "id": "altex", "nume": "Altex", "domeniu": "altex.ro", "activ": false, "sursa": null, "afiliere": { "retea": null } },
-  { "id": "pcgarage", "nume": "PC Garage", "domeniu": "pcgarage.ro", "activ": false, "sursa": null, "afiliere": { "retea": null } }
+  { "id": "emag", "nume": "eMAG", "domeniu": "emag.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
+  { "id": "evomag", "nume": "evoMAG", "domeniu": "evomag.ro", "activ": true, "sursa": "2performant", "afiliere": { "retea": "2performant", "unique": null } },
+  { "id": "itgalaxy", "nume": "ITGalaxy", "domeniu": "itgalaxy.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
+  { "id": "vexio", "nume": "Vexio", "domeniu": "vexio.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
+  { "id": "pcmadd", "nume": "PCMadd", "domeniu": "pcmadd.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
+  { "id": "citgrup", "nume": "CITGrup", "domeniu": "citgrup.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
+  { "id": "dwyn", "nume": "Dwyn", "domeniu": "dwyn.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
+  { "id": "techstar", "nume": "Techstar", "domeniu": "techstar.ro", "activ": true, "sursa": "profitshare", "afiliere": { "retea": "profitshare" } },
+  { "id": "pcgarage", "nume": "PC Garage", "domeniu": "pcgarage.ro", "activ": false, "sursa": "pcgarage", "afiliere": { "retea": null } },
+  { "id": "altex", "nume": "Altex", "domeniu": "altex.ro", "activ": false, "sursa": null, "afiliere": { "retea": null } }
 ]

@@ -13,10 +13,10 @@ export function dinRand(x, magazine, affCode) {
   if (!m) return { omis: "magazin necunoscut: " + link };
   if (!inStoc(pick(x, "availability", "stock", "in_stock", "stoc", "disponibilitate")) || /^(0|false|no|nu)$/i.test(pick(x, "product_active", "active", "is_active"))) return { omis: "fara stoc" };
   const pret = parsePret(pick(x, "sale_price", "price", "price_vat", "pret")), vechi = parsePret(pick(x, "old_price", "full_price", "price_old"));
-  let aff = pick(x, "marketer_link", "aff_link", "affiliate_link", "affiliate_url", "aff_url", "tracking_link")
+  let aff = pick(x, "marketer_link", "aff_link", "affiliate_link", "affiliate_url", "aff_url", "tracking_link") || (/^https?:/.test(x.aff_code ?? "") ? x.aff_code : "")
     || (affCode && m.afiliere?.unique ? `https://event.2performant.com/events/click?ad_type=quicklink&aff_code=${affCode}&unique=${m.afiliere.unique}&redirect_to=${encodeURIComponent(link)}` : "");
   if (aff && link && /redirect_to=$/.test(aff)) aff += encodeURIComponent(link);
-  if (/redirect_to=$/.test(aff)) return { omis: "fara link produs" };
+  if (!aff || /redirect_to=$/.test(aff)) return { omis: "fara link produs" };
   const titlu = pick(x, "product_title", "title", "name", "product_name");
   const url = aff || link;
   if (!pret || !url || !titlu) return { omis: "date incomplete" };

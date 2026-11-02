@@ -197,7 +197,7 @@
     var cbs = document.querySelectorAll('#f-mag input');
     for (var j = 0; j < cbs.length; j++) cbs[j].checked = state.mags.indexOf(cbs[j].value) >= 0;
     var chips = document.querySelectorAll(".subcats .chip[data-sub]");
-    for (var k = 0; k < chips.length; k++) chips[k].setAttribute("aria-pressed", chips[k].getAttribute("data-sub") === state.sub ? "true" : "false");
+    for (var k = 0; k < chips.length; k++) { if (chips[k].getAttribute("data-sub") === state.sub) chips[k].setAttribute("aria-current", "page"); else chips[k].removeAttribute("aria-current"); }
     sortSel.value = state.sort;
   }
   function construiesteMagazine() {

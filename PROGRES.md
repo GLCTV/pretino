@@ -193,3 +193,7 @@
 - `panou/src/stat.js`, `panou/schema.sql` (tabele `vizite`, `clickuri`), `panou/wrangler.sablon.jsonc` (rute), pagini legale (confidentialitate, cookies) actualizate. Teste cu SQLite real in `scripts/test-panou.js`.
 - DE FACUT de Laur dupa OK + main: `bun scripts/panou-deploy.js --deploy` (creeaza tabelele si rutele), apoi PUBLICA LIVE. Pana la ambele, statisticile raman goale. Vizitele tale: deschide o data pretino.ro/?fara-statistici=1 pe fiecare dispozitiv.
 - STATUS: pe ramura `statistici-panou`, asteptam OK de la Laur inainte de main.
+
+## v1.59 – accesibilitate
+- Select-ul „Sortează” are nume accesibil (aria-label; eticheta e ascunsa pe telefon). Chip-urile de subcategorie sunt linkuri: aria-pressed scos (nepermis pe <a>), ramane aria-current. Raportat de PageSpeed (Accesibilitate 86–91).
+- STATUS: pe ramura `accesibilitate-v1`, asteptam OK de la Laur inainte de main.

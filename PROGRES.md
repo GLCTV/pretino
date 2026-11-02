@@ -76,3 +76,6 @@
 ## v1.26 – categorii eMAG non-IT
 - +33 surse eMAG (electrocasnice, casa si gradina, sport, copii, auto, moda, supermarket), sortate dupa reducere, max 4 pagini; fiecare sursa are categoriePretino, copiata pe campanie si folosita la catalog.
 - Afiliere eMAG: contul Profitshare are doar website-ul „Configuratie PC"; pretino.ro trebuie adaugat de Laur ca website (si aprobat la programul eMAG), apoi „Genereaza script link automat" (app.profitshare.ro/automate-links) -> fragmentul se pune in site. De facut dupa ce exista.
+
+## v1.27
+- Validare website pretino.ro la Profitshare: tag meta profitshareid in antetul tuturor paginilor (scripts/build.js). Dupa PUBLICA LIVE: „valideaza website” in Profitshare; apoi script link automat pentru eMAG.

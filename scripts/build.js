@@ -27,7 +27,7 @@ nav{display:flex;gap:12px;flex-wrap:wrap}.grid{display:grid;grid-template-column
 function pagina({ titlu, descriere, cale, corp, noindex = false }) {
   const robots = noindex || DEMO ? '<meta name="robots" content="noindex">' : "";
   return `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(titlu)}</title><meta name="description" content="${esc(descriere)}">${robots}
+<meta name="profitshareid" content="7dd842fc7074c28872c609438ead55e6"><title>${esc(titlu)}</title><meta name="description" content="${esc(descriere)}">${robots}
 <link rel="canonical" href="${SITE_URL}${cale}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/stil.css"></head><body>
 ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și nu se publică</div>' : ""}
 <header><a class="logo" href="/">${esc(SITE_NAME)}</a><nav>${categorii.map((c) => `<a href="/categorie/${c.slug}/">${esc(c.nume)}</a>`).join("")}</nav></header>

@@ -29,3 +29,6 @@ Pretino.ro = site de oferte actuale din magazinele din România. Proiect **compl
 ## Continuitate
 - Progres: `PROGRES.md` (ce e făcut, verificat, ce lipsește). Pe PC: `E:\Claude\proiecte\pretino\NOTITE.md` + `PROGRES.md`.
 - La sarcini lungi, salvează progresul înainte de a rămâne fără context.
+
+## Livrarea modificarilor pe PC
+- Modificarile de program/site ajung pe PC DOAR prin GitHub: push pe branch/main, apoi Laur apasa butonul "Actualizeaza programul" (git pull --rebase --autostash). NU scrie fisierele proiectului direct pe PC cu device_commit_files (creeaza modificari necomise si blocheaza actualizarea/publicarea). Fisierele de documentatie din E:\Claude\proiecte\pretino sunt exceptia.

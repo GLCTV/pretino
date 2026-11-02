@@ -69,7 +69,7 @@ $timer.Start()
 
 # La pornire: aduce ultimele modificari ale proiectului Pretino (doar fast-forward, nu atinge alt proiect)
 if (Test-Path (Join-Path $Root '.git')) {
-  try { Push-Location $Root; git pull --ff-only -q 2>$null; Pop-Location } catch { Pop-Location }
+  try { Push-Location $Root; git pull --rebase --autostash -q 2>$null; Pop-Location } catch { Pop-Location }
 }
 
 $c.BPreview.Add_Click({
@@ -86,7 +86,7 @@ $c.BOprestePreview.Add_Click({
   if ($script:Preview -and -not $script:Preview.HasExited) { & taskkill /PID $script:Preview.Id /T /F | Out-Null }
   $script:Preview = $null; $c.Stare.Text = 'Previzualizare oprita.'
 })
-$c.BProgram.Add_Click({ $script:DupaProgram = $true; Start-Task 'actualizare-program' 'git pull --ff-only' })
+$c.BProgram.Add_Click({ $script:DupaProgram = $true; Start-Task 'actualizare-program' 'git pull --rebase --autostash' })
 $c.BActualizare.Add_Click({ Start-Task 'actualizare' 'bun scripts/actualizare.js' })
 $c.BTeste.Add_Click({ Start-Task 'teste' 'bun scripts/test.js' })
 $c.BLive.Add_Click({

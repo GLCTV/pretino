@@ -102,3 +102,6 @@
 
 ## v1.33 – panou cu parola
 - Panoul se deschide cu parola (PANOU_KEY, secret Cloudflare setat de Laur cu `--parola`), fara Zero Trust. Limitare incercari per IP, Cc/Bcc, retentie 6 luni, Reincarca/Iesi. Cloudflare Access ramane optional. Teste actualizate.
+
+## v1.34
+- panou-deploy: optiunea --login (ignora tokenul din secrete.env, foloseste wrangler login).

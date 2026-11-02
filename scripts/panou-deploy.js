@@ -1,6 +1,7 @@
 // Instaleaza / actualizeaza panoul de control Pretino (Worker Cloudflare „pretino-panou", baza D1 „pretino-mail"). Pornit DOAR manual de Laur:
 //   bun scripts/panou-deploy.js --deploy            (instaleaza / actualizeaza)
 //   bun scripts/panou-deploy.js --deploy --resend   (+ iti cere cheia Resend si o salveaza ca secret in Cloudflare)
+//   (adauga --login ca sa folosesti `wrangler login` in loc de token-ul din secrete.env)
 //   bun scripts/panou-deploy.js --deploy --parola   (+ iti cere parola panoului, minim 12 caractere, salvata ca secret PANOU_KEY)
 // Autentificare Cloudflare: CLOUDFLARE_API_TOKEN din %LOCALAPPDATA%\Pretino\secrete.env (daca are drepturi pentru Workers/D1/DNS) sau `wrangler login`.
 // Setari neSecrete din secrete.env: ACCESS_TEAM_DOMAIN (ex. nume.cloudflareaccess.com) si ACCESS_AUD (din aplicatia Access). Fara ele panoul refuza orice acces.
@@ -11,7 +12,9 @@ import { incarcaSecrete } from "./lib/secrete.js";
 const stop = (m) => { console.error("OPRIT: " + m); process.exit(1); };
 if (!process.argv.includes("--deploy")) stop("lipseste --deploy (se porneste doar manual).");
 const secrete = incarcaSecrete();
-const env = { ...process.env, ...(secrete.CLOUDFLARE_API_TOKEN ? { CLOUDFLARE_API_TOKEN: secrete.CLOUDFLARE_API_TOKEN } : {}), ...(secrete.CLOUDFLARE_ACCOUNT_ID ? { CLOUDFLARE_ACCOUNT_ID: secrete.CLOUDFLARE_ACCOUNT_ID } : {}) };
+const folosesteLogin = process.argv.includes("--login");
+if (folosesteLogin) { delete process.env.CLOUDFLARE_API_TOKEN; delete process.env.CLOUDFLARE_ACCOUNT_ID; console.log("Folosesc autentificarea `wrangler login` (token-ul din secrete.env e ignorat)."); }
+const env = { ...process.env, ...(!folosesteLogin && secrete.CLOUDFLARE_API_TOKEN ? { CLOUDFLARE_API_TOKEN: secrete.CLOUDFLARE_API_TOKEN } : {}), ...(!folosesteLogin && secrete.CLOUDFLARE_ACCOUNT_ID ? { CLOUDFLARE_ACCOUNT_ID: secrete.CLOUDFLARE_ACCOUNT_ID } : {}) };
 const run = (cmd, args, { cwd = "panou", capture = false, input } = {}) => {
   const r = spawnSync(cmd, args, { cwd, env, shell: true, encoding: "utf8", stdio: capture ? ["ignore", "pipe", "inherit"] : "inherit", input });
   if (r.status !== 0) stop(`${cmd} ${args.join(" ")} a esuat.`);

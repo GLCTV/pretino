@@ -3,7 +3,7 @@
 // asteapta ca TU sa o completezi si apoi continua citirea. Profil dedicat Pretino (fara conturile tale), local, pe 127.0.0.1.
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { esteBlocare, BlocatError } from "./http.js";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -48,7 +48,8 @@ class Cdp {
   }
 }
 
-async function lanseazaCu(exe, { profil, headless }) {
+async function lanseazaCu(exe, { profil: profilRel, headless }) {
+  const profil = resolve(profilRel); // cale absoluta: Edge/Chrome rezolva caile relative fata de folderul lor, nu al programului
   curataProfil(profil);
   mkdirSync(profil, { recursive: true });
   const args = ["--remote-debugging-port=0", "--remote-debugging-address=127.0.0.1", `--user-data-dir=${profil}`, "--no-first-run", "--no-default-browser-check", "--start-maximized", "--disable-popup-blocking", ...(headless ? ["--headless=new", "--no-sandbox"] : []), "about:blank"];

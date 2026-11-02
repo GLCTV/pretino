@@ -52,7 +52,7 @@ async function lanseazaCu(exe, { profil: profilRel, headless }) {
   const profil = resolve(profilRel); // cale absoluta: Edge/Chrome rezolva caile relative fata de folderul lor, nu al programului
   curataProfil(profil);
   mkdirSync(profil, { recursive: true });
-  const args = ["--remote-debugging-port=0", "--remote-debugging-address=127.0.0.1", `--user-data-dir=${profil}`, "--no-first-run", "--no-default-browser-check", "--start-maximized", "--disable-popup-blocking", ...(headless ? ["--headless=new", "--no-sandbox"] : []), "about:blank"];
+  const args = ["--remote-debugging-port=0", "--remote-debugging-address=127.0.0.1", `--user-data-dir=${profil}`, "--no-first-run", "--no-default-browser-check", "--start-maximized", "--disable-popup-blocking", "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows", ...(headless ? ["--headless=new", "--no-sandbox"] : []), "about:blank"];
   const proc = spawn(exe, args, { stdio: ["ignore", "ignore", "pipe"] });
   let iesit = null, err = "";
   proc.on("exit", (cod) => { iesit = cod ?? -1; });

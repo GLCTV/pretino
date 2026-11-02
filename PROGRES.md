@@ -145,3 +145,6 @@
 
 ## v1.47 – fix profil browser
 - Edge nu putea crea .pretino-local\browser-profil (cale relativa); acum calea e absoluta (resolve) in lib/browser.js.
+
+## v1.48 – ritm browser PC Garage
+- In modul browser: pauza minima 3 s intre pagini (daca nu e fortata din test), flaguri contra incetinirii filelor in fundal. Profil propriu .pretino-local/browser-profil (nu se foloseste nimic din alt proiect). Cloudflare: verificarea nu se ocoleste; programul asteapta rezolvarea manuala.

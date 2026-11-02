@@ -102,7 +102,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
 
   const clienti = {}, inBrowser = {};
   let browser = null, fetchBrowser = null;
-  const clientNou = (m, f) => creeazaClient({ concurenta: inBrowser[m] ? 1 : lim.concurentaPerMagazin, pauzaMs: lim.pauzaMs, timeoutMs: lim.timeoutMs, reincercari: inBrowser[m] ? 0 : lim.reincercari, fetchFn: f, oprit });
+  const clientNou = (m, f) => creeazaClient({ concurenta: inBrowser[m] ? 1 : lim.concurentaPerMagazin, pauzaMs: inBrowser[m] && pauzaMs === undefined ? Math.max(lim.pauzaMs, 3000) : lim.pauzaMs, timeoutMs: lim.timeoutMs, reincercari: inBrowser[m] ? 0 : lim.reincercari, fetchFn: f, oprit });
   const client = (m) => (clienti[m] ??= clientNou(m, inBrowser[m] ? fetchBrowser : fetchFn));
   // trecere la browserul vizibil (utilizatorul completeaza verificarea anti-bot; programul nu o completeaza)
   const treciInBrowser = async (m) => {

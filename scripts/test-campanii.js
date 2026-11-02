@@ -28,7 +28,10 @@ export async function testeCampanii(ok) {
   ok(dsc.length === 3 && dsc.every((u) => /pcgarage\.ro\/(oferte|campanii)/.test(u)), "pcgarage: descoperire doar pagini de campanie de pe domeniul PC Garage (fara cos, produse, domenii externe)");
   { const m = parseHtml('<ul id="top_menu"><li><a href="https://www.pcgarage.ro/placi-video/">Placi video</a></li><li><a href="/placi-video/">dup</a></li><li><a href="https://www.pcgarage.ro/laptop-mini-laptop/">Laptop</a></li><li><a href="/pc-gaming-fortnite-gameplay-fps/">x</a></li><li><a href="/cos/">cos</a></li><li><a href="/a/b/">adanc</a></li><li><a href="https://alt.ro/x/">alt</a></li></ul><a href="/placi-de-baza/">in afara meniului</a>');
     const d = pg.descopera(m, URL_C);
-    ok(d.length === 2 && d.every((x) => x.categorie) && d.map((x) => x.url).join() === "https://www.pcgarage.ro/placi-video/,https://www.pcgarage.ro/laptop-mini-laptop/", "pcgarage: categorii din meniu (fara duplicate, cont, gameplay, nivel 2, domenii externe)"); }
+    ok(d.length === 2 && d.every((x) => x.categorie) && d.map((x) => x.url).join() === "https://www.pcgarage.ro/placi-video/filtre/discount/,https://www.pcgarage.ro/laptop-mini-laptop/filtre/discount/", "pcgarage: categorii din meniu (fara duplicate, cont, gameplay, nivel 2, domenii externe)"); }
+  { const k = parseHtml('<div class="product_box_container"><div class="product_box"><div class="product_box_name"><a href="/laptop-x/">Laptop X</a></div><div class="pb-price"><p class="price">2.598,99 RON</p></div></div><div class="pb-extra"><p class="pbe-price-old">2.648,99 RON</p><p class="pbe-name">Discount 50,00 RON</p></div></div>');
+    const lp = pg.parseListare(k, URL_C).produse[0];
+    ok(lp && lp.pret === 2598.99 && lp.pretReferinta === 2648.99 && lp.reducereAfisata === "Discount 50,00 RON", "pcgarage: pret vechi din blocul .pb-extra de langa cardul de categorie"); }
   const mc = gen.metaCampanie(root, URL_C);
   ok(mc.reducereAnuntata === "pana la 30%" && mc.codPromotional === "TOAMNA25" && mc.sfarsit === "2026-11-10" && mc.conditii.length >= 2, "campanie: reducere exacta, cod explicit, data sfarsit, conditii");
   ok(gen.extrageCod("Reducere mare pentru tine, comanda acum") === null && gen.extrageDate("fara date").sfarsit === null, "campanie: nu inventeaza cod sau date");

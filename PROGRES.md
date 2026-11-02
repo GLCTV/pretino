@@ -139,3 +139,6 @@
 
 ## v1.45 – fix descoperire categorii
 - In HTML-ul brut meniul PC Garage e ul id="top_menu" (clasa se adauga din JS); selectorul foloseste acum [id=top_menu] (parserul propriu nu suporta #id). Verificat in Chrome: HTML brut are top_menu, linkuri absolute.
+
+## v1.46 – doar produse cu discount din categorii PC Garage
+- Categoriile din meniu se citesc prin filtrul /<cat>/filtre/discount/ (verificat in Chrome: toate cardurile au pret vechi), max 30 pagini/categorie. Pretul vechi (.pbe-price-old) e in .pb-extra, frate al .product_box in .product_box_container: parseListare citeste acum containerul. Nu s-a rulat inca pe PC. De verificat: paginarea /pagina2/ pe filtre/discount si categoriile fara discount (pot da 404/gol).

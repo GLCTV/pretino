@@ -16,8 +16,8 @@ export function descopera(root, baza) {
   const out = new Map();
   for (const a of qsa(root, "[id=top_menu] a[href], .top_menu a[href]")) {
     const curat = absolut(attr(a, "href"), baza)?.split("?")[0];
-    if (!curat || out.has(curat)) continue;
-    try { const u = new URL(curat); if (/(^|\.)pcgarage\.ro$/.test(u.hostname) && /^\/[a-z0-9-]+\/$/.test(u.pathname) && !NU_CATEGORIE.test(u.pathname)) out.set(curat, { url: curat, titlu: text(a).slice(0, 80) || u.pathname.replace(/\//g, ""), categorie: true }); } catch { /* ignora */ }
+    if (!curat) continue;
+    try { const u = new URL(curat); if (/(^|\.)pcgarage\.ro$/.test(u.hostname) && /^\/[a-z0-9-]+\/$/.test(u.pathname) && !NU_CATEGORIE.test(u.pathname)) { const filtrat = `${u.origin}${u.pathname}filtre/discount/`; out.set(filtrat, { url: filtrat, titlu: text(a).slice(0, 80) || u.pathname.replace(/\//g, ""), categorie: true }); } } catch { /* ignora */ }
   }
   for (const a of qsa(root, "a[href]")) {
     const u = absolut(attr(a, "href"), baza);
@@ -29,6 +29,7 @@ export function descopera(root, baza) {
 // Structura verificata (nov. 2026) in Chrome pe /extra-reduceri-*/ si /notebook-laptop/:
 //  - lista campanii: .product_box cu .bf_ptitle_link (titlu+URL), .bfp_new (pret), .bfp_old (pret vechi, poate fi gol), .bf_pdiscount, imagine .bf_pimage_img
 //  - lista categorie: .product_box cu .product_box_name a (titlu+URL), .pb-price .price (pret), .aq_prod_p_old / .pbe-price-old (pret vechi), .product_box_availability
+//  - filtrul „Cu discount": /<categorie>/filtre/discount/ (doar produsele cu pret vechi; verificat in Chrome)
 //  - paginare: /<categorie>/paginaN/
 const OLD = ".bfp_old,.aq_prod_p_old,.pbe-price-old,.pb-price-old,[class*=price-old]";
 const stoc = (card) => {
@@ -41,7 +42,9 @@ const stoc = (card) => {
 };
 export function parseListare(root, baza) {
   const produse = [];
-  for (const card of qsa(root, ".product_box")) {
+  // pe paginile de categorie, pretul vechi (.pbe-price-old) e in blocul .pb-extra de langa .product_box, ambele in .product_box_container
+  const cutii = qsa(root, ".product_box"), containere = qsa(root, ".product_box_container");
+  for (const card of containere.length && containere.length === cutii.length ? containere : cutii) { // containere folosite doar daca fiecare card are propriul container
     const a = qs(card, ".bf_ptitle_link") ?? qs(card, ".bf_ptitle a") ?? qs(card, ".product_box_name a") ?? qs(card, "a[href]");
     const titlu = text(a) || text(qs(card, ".product_box_name"));
     const url = absolut(attr(a, "href") ?? "", baza)?.split("?")[0];
@@ -53,7 +56,7 @@ export function parseListare(root, baza) {
     const slug = new URL(url).pathname.replace(/\/$/, "").split("/").pop();
     produse.push({
       idMagazin: slug, idOferta: null, titlu, url, imagine: src ? absolut(src, baza) : null, pret, pretReferinta: vechi && vechi > pret ? vechi : null,
-      reducereAfisata: text(qs(card, ".bf_pdiscount")) || text(qs(card, ".bf_bonus_text")) || null,
+      reducereAfisata: text(qs(card, ".bf_pdiscount")) || text(qs(card, ".pbe-name")) || text(qs(card, ".bf_bonus_text")) || null,
       etichete: [...new Set(qsa(card, ".ls_labels *, .bf_bonus_text").map((e) => text(e)).filter((t) => t && t.length < 80))],
       conditie: /desigilat/i.test(baza) || /desigilat/i.test(url) ? "desigilat" : null, disponibilitate: stoc(card), vandut: "PC Garage", categorie: null,
     });

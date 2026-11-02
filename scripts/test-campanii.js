@@ -25,13 +25,19 @@ export async function testeCampanii(ok) {
   ok(l.produse[1].pretReferinta === null && l.produse[1].disponibilitate === "in_stoc", "pcgarage: fara pret de referinta inventat");
   ok(l.urmatoarea === "https://www.pcgarage.ro/oferte/laptopuri/pagina2/", "pcgarage: pagina urmatoare");
   const dsc = pg.descopera(root, URL_C).map((x) => x.url);
-  ok(dsc.length === 3 && dsc.every((u) => /pcgarage\.ro\/(oferte|campanii)/.test(u)), "pcgarage: descoperire doar pagini de campanie de pe domeniul PC Garage (fara cos, produse, domenii externe)");
+  ok(dsc.length === 0, "pcgarage: linkurile de campanie nu se mai descopera (doar categoriile din meniu)");
   { const m = parseHtml('<ul id="top_menu"><li><a href="https://www.pcgarage.ro/placi-video/">Placi video</a></li><li><a href="/placi-video/">dup</a></li><li><a href="https://www.pcgarage.ro/laptop-mini-laptop/">Laptop</a></li><li><a href="/pc-gaming-fortnite-gameplay-fps/">x</a></li><li><a href="/cos/">cos</a></li><li><a href="/a/b/">adanc</a></li><li><a href="https://alt.ro/x/">alt</a></li></ul><a href="/placi-de-baza/">in afara meniului</a>');
     const d = pg.descopera(m, URL_C);
     ok(d.length === 2 && d.every((x) => x.categorie) && d.map((x) => x.url).join() === "https://www.pcgarage.ro/placi-video/filtre/discount/,https://www.pcgarage.ro/laptop-mini-laptop/filtre/discount/", "pcgarage: categorii din meniu (fara duplicate, cont, gameplay, nivel 2, domenii externe)"); }
   { const k = parseHtml('<div class="product_box_container"><div class="product_box"><div class="product_box_name"><a href="/laptop-x/">Laptop X</a></div><div class="pb-price"><p class="price">2.598,99 RON</p></div></div><div class="pb-extra"><p class="pbe-price-old">2.648,99 RON</p><p class="pbe-name">Discount 50,00 RON</p></div></div>');
     const lp = pg.parseListare(k, URL_C).produse[0];
     ok(lp && lp.pret === 2598.99 && lp.pretReferinta === 2648.99 && lp.reducereAfisata === "Discount 50,00 RON", "pcgarage: pret vechi din blocul .pb-extra de langa cardul de categorie"); }
+  { const k = parseHtml('<span class="products-count">1.234 produse de la 7 producatori</span><div class="product_box"><div class="product_box_name"><a href="/a/">A</a></div><div class="pb-price"><p class="price">10,00 RON</p></div></div>');
+    const r = pg.parseListare(k, URL_C); ok(r.total === 1234 && r.produse.length === 1, "pcgarage: numarul live de produse (.products-count) citit"); }
+  { const h = (n) => `<div class="pagination"><a href="https://www.pcgarage.ro/monitoare-led/pagina2/filtre/discount/">2</a><a href="https://www.pcgarage.ro/monitoare-led/pagina3/filtre/discount/">3</a></div>`;
+    const u1 = pg.parseListare(parseHtml(h()), "https://www.pcgarage.ro/monitoare-led/filtre/discount/").urmatoarea;
+    const u2 = pg.parseListare(parseHtml(h()), "https://www.pcgarage.ro/monitoare-led/pagina2/filtre/discount/").urmatoarea;
+    ok(u1?.includes("/pagina2/filtre/discount/") && u2?.includes("/pagina3/filtre/discount/"), "pcgarage: paginare pe adrese /paginaN/filtre/discount/"); }
   { const { deschide, argumenteVerificare } = await import("./deschide-browser.js"); const ap = [];
     const a = argumenteVerificare("C:\\p", "https://www.pcgarage.ro/");
     ok(a.includes("--user-data-dir=C:\\p") && a.some((x) => /remote-debugging-port=9333/.test(x)) && !a.some((x) => /headless/.test(x)), "verificare manuala: browser vizibil cu port fix local pentru atasare");

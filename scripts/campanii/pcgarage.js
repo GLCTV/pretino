@@ -19,11 +19,7 @@ export function descopera(root, baza) {
     if (!curat) continue;
     try { const u = new URL(curat); if (/(^|\.)pcgarage\.ro$/.test(u.hostname) && /^\/[a-z0-9-]+\/$/.test(u.pathname) && !NU_CATEGORIE.test(u.pathname)) { const filtrat = `${u.origin}${u.pathname}filtre/discount/`; out.set(filtrat, { url: filtrat, titlu: text(a).slice(0, 80) || u.pathname.replace(/\//g, ""), categorie: true }); } } catch { /* ignora */ }
   }
-  for (const a of qsa(root, "a[href]")) {
-    const u = absolut(attr(a, "href"), baza);
-    const curat = u?.split("?")[0];
-    if (curat && esteLinkCampanie(curat) && !out.has(curat)) out.set(curat, { url: curat, titlu: text(a).slice(0, 80) || null });
-  }
+  // doar categoriile din meniu (cu filtrul „Cu discount”); paginile de campanie/oferte nu se mai descopera
   return [...out.values()];
 }
 // Structura verificata (nov. 2026) in Chrome pe /extra-reduceri-*/ si /notebook-laptop/:
@@ -63,11 +59,15 @@ export function parseListare(root, baza) {
   }
   const vazut = new Set();
   const unice = produse.filter((p) => !vazut.has(p.url) && vazut.add(p.url));
-  return { produse: unice.length ? unice : produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: urmatoarea(root, baza) };
+  // numarul live al produselor din pagina de categorie („18 produse de la 7 producatori”, .products-count)
+  const mt = text(qs(root, ".products-count")).match(/(\d[\d.]*)\s+produs/i);
+  const total = mt ? Number(mt[1].replace(/\./g, "")) : null;
+  return { produse: unice.length ? unice : produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: urmatoarea(root, baza), total: total > 0 ? total : null };
 }
 function urmatoarea(root, baza) {
-  const m = baza.match(/\/pagina(\d+)\/?(?:\?.*)?$/);
+  // formele reale: /<cat>/paginaN/ si /<cat>/paginaN/filtre/discount/
+  const m = baza.match(/\/pagina(\d+)(?:\/|$|\?)/);
   const n = m ? Number(m[1]) + 1 : 2;
-  const a = qsa(root, ".pagination a, .lr-pagination a").find((x) => new RegExp(`/pagina${n}/?$`).test(attr(x, "href") ?? ""));
+  const a = qsa(root, ".pagination a, .lr-pagination a").find((x) => new RegExp(`/pagina${n}(/|$|\\?)`).test(attr(x, "href") ?? ""));
   return a ? absolut(attr(a, "href"), baza) : paginaUrmatoare(root, baza);
 }

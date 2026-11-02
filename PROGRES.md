@@ -36,3 +36,7 @@
 ## 2026-11-02 – program v1.14: verificare anti-bot completata de Laur
 - Când eMAG/PC Garage cer verificare anti-bot, modulul Campanii trece pe un browser vizibil (Chrome sau Edge, profil dedicat Pretino în `.pretino-local\browser-profil`, port local 127.0.0.1), programul sună și afișează un mesaj, Laur completează verificarea în fereastra de browser, iar citirea continuă singură. Programul NU rezolvă și NU ocolește verificarea. Dacă nu e completată în 10 minute → sursa e „blocată” (date păstrate, campanie „neverificată”). Opțiune CLI: `--browser auto|da|nu` (implicit `auto` = doar la blocare).
 - Verificat: teste cu browser simulat + test manual cu Chromium real în cloud (pagină de validare care se deblochează după câteva secunde). NEVERIFICAT: Chrome/Edge de pe PC și verificarea reală Cloudflare Turnstile de la PC Garage; sintaxa PowerShell a mesajului de notificare.
+
+## 2026-11-02 – program v1.15: cititor PC Garage
+- Verificat în Chrome (nov. 2026) pe `/extra-reduceri-*/` și `/notebook-laptop/`: carduri `.product_box` (două variante: listă de campanie `bf_*` și listă de categorie), preț vechi `.bfp_old`/`.aq_prod_p_old`/`.pbe-price-old`, paginare `/paginaN/`. Prima rulare pe PC: 11 pagini de campanii descoperite prin browserul vizibil.
+- Pagini citite fără listă de produse (home, regulamente) sunt raportate ca „informative”, nu ca eroare; pagina goală/neînțeleasă rămâne eroare. Entități HTML decodate în titluri; titlul paginii are prioritate pentru sursele descoperite.

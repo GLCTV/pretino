@@ -4,7 +4,8 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 
 export async function testeCampanii(ok) {
-  const { parseHtml, qsa } = await import("./lib/dom.js");
+  const { parseHtml, qsa, text } = await import("./lib/dom.js");
+  const text0 = (r) => text(r);
   const gen = await import("./campanii/generic.js");
   const em = await import("./campanii/emag.js");
   const pg = await import("./campanii/pcgarage.js");
@@ -32,6 +33,11 @@ export async function testeCampanii(ok) {
   ok(camp.stareCampanie({ sfarsit: "2026-11-01" }, "2026-11-02", true, true) === "expirata_confirmata" && camp.stareCampanie({ inceput: "2026-12-01" }, "2026-11-02", true, true) === "programata" && camp.stareCampanie({}, "2026-11-02", false, false) === "necunoscuta" && camp.stareCampanie({}, "2026-11-02", true, true) === "activa_confirmata", "campanie: stari activa/programata/expirata/necunoscuta");
   const sp = pg.parseListare(parseHtml(fx("pcgarage-produse.html")), "https://www.pcgarage.ro/oferte/");
   ok(sp.produse.length === 1 && sp.produse[0].pret === 2499.99 && sp.produse[0].idMagazin === "PG1", "pcgarage: produse din date structurate JSON-LD");
+  const pl = pg.parseListare(parseHtml(fx("pcgarage-listare.html")), "https://www.pcgarage.ro/notebook-laptop/");
+  ok(pl.produse.length === 3 && pl.produse[0].pret === 87.49 && pl.produse[0].pretReferinta === 102.93 && pl.produse[0].reducereAfisata === "-15%" && pl.produse[0].idMagazin === "everki-advance", "pcgarage: lista de campanie (bf_*) citita");
+  ok(pl.produse[1].pret === 1648.99 && pl.produse[1].pretReferinta === 1899.99 && pl.produse[1].disponibilitate === "in_stoc" && pl.produse[1].imagine === "https://img.pcgarage.ro/l1.jpg" && pl.produse[2].disponibilitate === "indisponibil", "pcgarage: lista de categorie, pret vechi, stoc, imagine din srcset");
+  ok(pl.urmatoarea === "https://www.pcgarage.ro/notebook-laptop/pagina2/" && pg.parseListare(parseHtml(fx("pcgarage-listare.html")), "https://www.pcgarage.ro/notebook-laptop/pagina2/").urmatoarea === "https://www.pcgarage.ro/notebook-laptop/pagina3/", "pcgarage: paginare /paginaN/");
+  ok(parseHtml("<p>&rsaquo; % Desigilate &amp; &#259;</p>").children[0].children[0].text.includes("&rsaquo;") && text0(parseHtml("<p>&rsaquo; % Desigilate</p>")) === "› % Desigilate", "dom: entitati HTML decodate");
   ok(http.esteBlocare("https://www.pcgarage.ro/validare-acces/", 200, fx("pcgarage-validare.html")) && !http.esteBlocare("https://www.emag.ro/", 200, fx("emag-listare.html")), "http: pagina de validare anti-bot e detectata ca blocare");
 
   const h = {};

@@ -83,7 +83,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
 
   let st = reia ? citeste(P.stare, null) : null;
   if (!st || st.terminat || st.mod !== mod) st = null;
-  st ??= { id: new Date().toISOString(), mod, magazin, inceput: new Date().toISOString(), terminat: false, oprit: false, gata: [], urmatoare: {}, campanii: {}, produse: {}, erori: [], neverificate: [], contoare: { paginiCitite: 0, campaniiNoi: 0, campaniiActualizate: 0, produseCitite: 0, erori: 0, surseNoi: 0 } };
+  st ??= { id: new Date().toISOString(), mod, magazin, inceput: new Date().toISOString(), terminat: false, oprit: false, gata: [], urmatoare: {}, campanii: {}, produse: {}, erori: [], neverificate: [], informativ: [], contoare: { paginiCitite: 0, campaniiNoi: 0, campaniiActualizate: 0, produseCitite: 0, erori: 0, surseNoi: 0 } };
   st.oprit = false;
   const k = st.contoare;
   const progres = { stare: "ruleaza", mod, magazine: {}, contoare: k, inceput: st.inceput, actualizat: null };
@@ -141,7 +141,7 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
           const cid = `c-${hash(s.url)}`;
           if (pagina === 1 && !st.urmatoare[s.id]) {
             const meta = metaCampanie(root, s.url, r.url);
-            st.campanii[cid] = { id: cid, magazin: m, sursaId: s.id, ...meta, titlu: s.titlu ?? meta.titlu, urlOrigine: s.origine && s.origine !== "manual" ? s.origine : null, produse: [], verificat: true };
+            st.campanii[cid] = { id: cid, magazin: m, sursaId: s.id, ...meta, titluPagina: meta.titlu, titlu: s.descoperita ? (meta.titlu ?? s.titlu) : (s.titlu ?? meta.titlu), urlOrigine: s.origine && s.origine !== "manual" ? s.origine : null, produse: [], verificat: true };
             // descoperire (doar din sursele configurate, adancime 1, cu limite)
             if (!s.descoperita && lim.adancimeDescoperire >= 1) {
               for (const d of ad.descopera(root, r.url)) {
@@ -153,7 +153,10 @@ export async function ruleaza({ dir = ".", mod = "campanii", magazin = "toate", 
           }
           if (mod === "complet") {
             const { produse, urmatoarea } = ad.parseListare(root, r.url);
-            if (!produse.length && pagina === 1) erori(m, s.url, "nicio listare de produse recunoscuta pe pagina (posibil continut incarcat prin JavaScript sau pagina fara produse)");
+            if (!produse.length && pagina === 1) {
+              if (st.campanii[cid]?.titluPagina) st.informativ.push({ magazin: m, sursa: s.url, motiv: "pagina citita, fara lista de produse (pagina informativa sau lista neinteleasa)" });
+              else erori(m, s.url, "pagina goala sau neinteleasa: nici titlu, nici produse (posibil continut incarcat prin JavaScript)");
+            }
             for (const p of produse) {
               const pid = `${m}-${p.idMagazin ?? hash(p.url)}`;
               const ex = st.produse[pid];
@@ -257,6 +260,7 @@ function scrieRaport(P, st, azi, cfg, complet) {
   const verificate = cfg.surse.filter((s) => st.gata.includes(s.id));
   l.push("", `Verificate complet (${verificate.length}):`, ...verificate.map((s) => `  + ${s.url}`));
   if (st.erori.length) l.push("", "Erori / acces blocat:", ...st.erori.map((e) => `  ! [${e.magazin}] ${e.sursa}: ${e.motiv}${e.blocat ? "  -> blocat: reincearca mai tarziu sau introdu manual campania" : ""}`));
+  if (st.informativ?.length) l.push("", "Pagini citite fara lista de produse (informative):", ...st.informativ.map((e) => `  i [${e.magazin}] ${e.sursa}`));
   if (st.neverificate.length) l.push("", "Neverificate:", ...st.neverificate.map((e) => `  ? [${e.magazin}] ${e.sursa}: ${e.motiv}`));
   l.push("", "Datele existente nu au fost sterse. Campaniile cu verificare esuata sunt marcate „neverificata”.");
   mkdirSync(join(P.raport, ".."), { recursive: true });

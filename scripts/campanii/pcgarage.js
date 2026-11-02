@@ -1,8 +1,9 @@
 // PC Garage: site-ul cere o validare anti-bot (Cloudflare Turnstile, /validare-acces/) inainte de pagini.
 // Validarea NU se completeaza si NU se ocoleste. Daca apare, sursa e raportata „blocata”; reincercare sau introducere manuala.
 // Structura paginilor PC Garage NU a putut fi analizata (acces blocat), deci se folosesc doar date structurate standard (JSON-LD/microdata).
-import { qsa, attr, text } from "../lib/dom.js";
-import { absolut, paginaUrmatoare, produseStructurate } from "./generic.js";
+import { qsa, qs, attr, text } from "../lib/dom.js";
+import { parsePret } from "../lib/oferta.js";
+import { absolut, fara, paginaUrmatoare, produseStructurate } from "./generic.js";
 
 export const DOMENII = ["pcgarage.ro"];
 const PERMISE = /(oferte|promo|campanie|campanii|black-?friday|reduceri|outlet|lichidare|zilele|craciun)/i;
@@ -18,6 +19,43 @@ export function descopera(root, baza) {
   }
   return [...out.values()];
 }
+// Structura verificata (nov. 2026) in Chrome pe /extra-reduceri-*/ si /notebook-laptop/:
+//  - lista campanii: .product_box cu .bf_ptitle_link (titlu+URL), .bfp_new (pret), .bfp_old (pret vechi, poate fi gol), .bf_pdiscount, imagine .bf_pimage_img
+//  - lista categorie: .product_box cu .product_box_name a (titlu+URL), .pb-price .price (pret), .aq_prod_p_old / .pbe-price-old (pret vechi), .product_box_availability
+//  - paginare: /<categorie>/paginaN/
+const OLD = ".bfp_old,.aq_prod_p_old,.pbe-price-old,.pb-price-old,[class*=price-old]";
+const stoc = (card) => {
+  const el = qs(card, ".product_box_availability");
+  const t = fara(text(el)).toLowerCase();
+  if (!el && !t) return "necunoscut";
+  if (/epuizat|indisponibil|nu este in stoc|fara stoc/.test(t)) return "indisponibil";
+  if (/precomand|comanda la furnizor|la comanda/.test(t)) return "la_comanda";
+  return /stoc|disponibil/.test(t) || /instock/.test(el?.attrs?.class ?? "") ? "in_stoc" : "necunoscut";
+};
 export function parseListare(root, baza) {
-  return { produse: produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: paginaUrmatoare(root, baza) };
+  const produse = [];
+  for (const card of qsa(root, ".product_box")) {
+    const a = qs(card, ".bf_ptitle_link") ?? qs(card, ".product_box_name a") ?? qs(card, "a[href]");
+    const titlu = text(a) || text(qs(card, ".product_box_name"));
+    const url = absolut(attr(a, "href") ?? "", baza)?.split("?")[0];
+    const pret = parsePret(text(qs(card, ".bfp_new")) || text(qs(card, ".pb-price .price")) || text(qs(card, ".price")));
+    if (!titlu || !url || !pret) continue;
+    const vechi = parsePret(text(qs(card, OLD)));
+    const img = qs(card, "img");
+    const src = attr(img, "src") && !/^data:/.test(attr(img, "src")) ? attr(img, "src") : (attr(img, "srcset") ?? "").split(/[\s,]+/)[0] || attr(img, "data-src") || null;
+    const slug = new URL(url).pathname.replace(/\/$/, "").split("/").pop();
+    produse.push({
+      idMagazin: slug, idOferta: null, titlu, url, imagine: src ? absolut(src, baza) : null, pret, pretReferinta: vechi && vechi > pret ? vechi : null,
+      reducereAfisata: text(qs(card, ".bf_pdiscount")) || null, disponibilitate: stoc(card), vandut: "PC Garage", categorie: null,
+    });
+  }
+  const vazut = new Set();
+  const unice = produse.filter((p) => !vazut.has(p.url) && vazut.add(p.url));
+  return { produse: unice.length ? unice : produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: urmatoarea(root, baza) };
+}
+function urmatoarea(root, baza) {
+  const m = baza.match(/\/pagina(\d+)\/?(?:\?.*)?$/);
+  const n = m ? Number(m[1]) + 1 : 2;
+  const a = qsa(root, ".pagination a, .lr-pagination a").find((x) => new RegExp(`/pagina${n}/?$`).test(attr(x, "href") ?? ""));
+  return a ? absolut(attr(a, "href"), baza) : paginaUrmatoare(root, baza);
 }

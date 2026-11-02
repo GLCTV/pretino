@@ -35,6 +35,8 @@ try { sh(`git push origin HEAD:refs/heads/backup/${ts.slice(0, 8)}-${ts.slice(8,
 
 rulez("bun", ["scripts/build.js"]);
 if (JSON.parse(readFileSync("dist/version.json", "utf8")).demo) stop("build demo – nu se publică.");
+// paginile legale trebuie completate (nume operator, email) in src/config.js inainte de publicare
+{ const necompletat = ["despre", "contact", "confidentialitate", "cookies", "termeni"].filter((p) => readFileSync(`dist/${p}/index.html`, "utf8").includes("[COMPLETEAZĂ")); if (necompletat.length) stop(`paginile legale au câmpuri necompletate (${necompletat.join(", ")}). Completează OPERATOR în src/config.js (nume, email).`); }
 rulez("bunx", ["wrangler@latest", "pages", "deploy", "dist", `--project-name=${CF_PAGES_PROJECT}`, "--branch=main", "--commit-dirty=true"]);
 
 const sha = sh("git rev-parse HEAD");

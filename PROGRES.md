@@ -85,3 +85,8 @@
 
 ## v1.29
 - PUBLICA LIVE: daca singurele modificari necomise sunt catalogul generat (data/oferte.json, istoric-preturi.json), le comite si le urca pe main inainte de publicare.
+
+## v1.30 – pagini legale
+- Pagini noi: /despre/, /contact/, /confidentialitate/, /cookies/, /termeni/ (scripts/lib/legal.js, sablon RO), legate din subsolul tuturor paginilor.
+- Operatorul se completeaza in src/config.js (OPERATOR: nume, email, cui optional). PUBLICA LIVE se opreste cat timp raman marcaje „[COMPLETEAZĂ”.
+- De facut: cand se adauga scriptul Profitshare (dupa aprobare), verificat daca seteaza cookie-uri la incarcare -> bannerul de consimtamant + actualizat /cookies/.

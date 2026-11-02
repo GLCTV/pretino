@@ -68,6 +68,9 @@ ok(i.x.length === 2 && i.x[1].p === 8, "istoric: preț schimbat adaugă intrare"
   ok(eroare, "profitshare: fara feed in secrete.env da eroare clara");
 }
 ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"), "CLAUDE.md, README.md, PROGRES.md există");
+{ const { PAGINI_LEGALE } = await import("./lib/legal.js");
+  ok(PAGINI_LEGALE.length === 5 && PAGINI_LEGALE.every((p) => p.corp().includes("<h1>")), "pagini legale: despre, contact, confidentialitate, cookies, termeni");
+  ok(PAGINI_LEGALE.some((p) => p.corp().includes("[COMPLETEAZĂ")), "pagini legale: campurile operatorului necompletate sunt marcate (publicarea se opreste)"); }
 { const { dinProdus } = await import("./surse/campanii.js");
   const mg = [{ id: "emag", nume: "eMAG" }, { id: "pcgarage", nume: "PC Garage" }], acum = Date.parse("2026-11-02T15:00:00Z"), v = "2026-11-02T14:00:00Z";
   const base = { magazin: "emag", titlu: "Laptop X", url: "https://www.emag.ro/x/pd/A/", pret: 1000, pretReferinta: 1500, disponibilitate: "in_stoc", ultimaVerificare: v, campanii: ["c1"] };

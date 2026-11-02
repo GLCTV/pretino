@@ -2,6 +2,7 @@
 import { mkdirSync, writeFileSync, readFileSync, cpSync, rmSync, existsSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE } from "../src/config.js";
+import { PAGINI_LEGALE } from "./lib/legal.js";
 import { esc, lei, reducere } from "./lib/html.js";
 
 const DEMO = process.argv.includes("--demo");
@@ -22,7 +23,7 @@ nav{display:flex;gap:12px;flex-wrap:wrap}.grid{display:grid;grid-template-column
 .pret{font-size:1.3rem;font-weight:700}.vechi{color:var(--mut);text-decoration:line-through;margin-left:8px;font-weight:400;font-size:1rem}
 .badge{background:var(--acc);color:#fff;border-radius:8px;padding:1px 8px;font-size:.85rem;align-self:flex-start}
 .btn{margin-top:auto;display:inline-block;background:var(--acc);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;text-align:center}
-.demo{background:#b45309;color:#fff;text-align:center;padding:6px}.mut{color:var(--mut)}footer{color:var(--mut);font-size:.9rem}`;
+.demo{background:#b45309;color:#fff;text-align:center;padding:6px}.mut{color:var(--mut)}footer{color:var(--mut);font-size:.9rem}footer .legal{margin-bottom:8px}main h2{margin-top:1.4em}`;
 
 function pagina({ titlu, descriere, cale, corp, noindex = false }) {
   const robots = noindex || DEMO ? '<meta name="robots" content="noindex">' : "";
@@ -32,7 +33,7 @@ function pagina({ titlu, descriere, cale, corp, noindex = false }) {
 ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și nu se publică</div>' : ""}
 <header><a class="logo" href="/">${esc(SITE_NAME)}</a><nav>${categorii.map((c) => `<a href="/categorie/${c.slug}/">${esc(c.nume)}</a>`).join("")}</nav></header>
 <main>${corp}</main>
-<footer>Pretino.ro afișează oferte din magazine partenere. Unele linkuri pot fi linkuri de afiliere (marcate sponsorizat); prețul pentru tine nu se schimbă. Unde apare „reducere afișată de magazin”, prețul vechi este cel de referință arătat de magazin, nu istoricul Pretino. Verifică mereu prețul final în magazin.</footer></body></html>`;
+<footer><nav class="legal">${PAGINI_LEGALE.map((p) => `<a href="${p.cale}">${esc(p.nume)}</a>`).join("")}</nav>Pretino.ro afișează oferte din magazine partenere. Unele linkuri pot fi linkuri de afiliere (marcate sponsorizat); prețul pentru tine nu se schimbă. Unde apare „reducere afișată de magazin”, prețul vechi este cel de referință arătat de magazin, nu istoricul Pretino. Verifică mereu prețul final în magazin.</footer></body></html>`;
 }
 
 const card = (o) => {
@@ -63,6 +64,7 @@ for (const c of categorii) {
   const cale = `/categorie/${c.slug}/`;
   pagini.push({ cale, index: true, html: pagina({ titlu: `Oferte ${c.nume} – ${SITE_NAME}`, descriere: `Oferte actuale la ${c.nume.toLowerCase()} din magazinele din România.`, cale, corp: `<h1>Oferte ${esc(c.nume)}</h1>${grila(l)}` }) });
 }
+for (const p of PAGINI_LEGALE) pagini.push({ cale: p.cale, index: true, html: pagina({ titlu: `${p.titlu} – ${SITE_NAME}`, descriere: p.descriere, cale: p.cale, corp: p.corp() }) });
 for (const m of magazine) {
   const l = sortate.filter((o) => o.magazin === m.id);
   if (!l.length) continue;

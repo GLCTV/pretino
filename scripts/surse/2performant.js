@@ -29,15 +29,17 @@ export async function citeste(magazine, secrete, fetchFn = fetch) {
   if (!feeds.length) throw new Error("lipsește PRETINO_TWOPERF_FEEDS din secrete.env");
   const oferte = [], omise = {};
   let esantion = "";
+  const categorii = {};
   for (const f of feeds) {
     const res = await fetchFn(f, { signal: AbortSignal.timeout(120000) });
     if (!res.ok) throw new Error(`feed 2Performant: HTTP ${res.status}`);
     const rows = parseCsv(await res.text());
     if (!esantion && rows[0]) esantion = `coloane: ${Object.keys(rows[0]).join(" | ")}\nrand1: ${JSON.stringify(rows[0])}\nrand2: ${JSON.stringify(rows[1] ?? {})}\n`;
     for (const x of rows) {
+      { const k = [x.category, x.subcategory].join(" | "); const c = categorii[k] ??= { n: 0 }; c.n++; }
       const r = dinRand(x, magazine, secrete.PRETINO_TWOPERF_AFF_CODE);
       if (r.oferta) oferte.push(r.oferta); else omise[r.omis] = (omise[r.omis] ?? 0) + 1;
     }
   }
-  return { oferte, omise, esantion };
+  return { oferte, omise, esantion, categorii };
 }

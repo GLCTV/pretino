@@ -5,7 +5,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { idOferta, mapCategorie } from "../lib/oferta.js";
 
 const MAX_ZILE = 3;           // date mai vechi de atat nu intra in catalog (pretul s-ar putea sa nu mai fie valabil)
-const REDUCERE_MAX = 90;      // peste acest procent datele sunt suspecte
+const REDUCERE_MAX = 60;      // peste acest procent preturile de referinta afisate (adesea puse de vanzatori Marketplace) sunt prea nesigure
 const EXCLUS = /resigilat|desigilat|refurbished|renewed/i;
 const citesteJson = (c, impl) => { try { return existsSync(c) ? JSON.parse(readFileSync(c, "utf8")) : impl; } catch { return impl; } };
 
@@ -21,7 +21,7 @@ export function dinProdus(p, magazine, campanii = {}, acum = Date.now()) {
   const ref = p.pretReferinta;
   if (!(ref > p.pret)) return { omis: "fara pret de referinta afisat" };
   const red = (1 - p.pret / ref) * 100;
-  if (red > REDUCERE_MAX) return { omis: "reducere suspecta (>90%)" };
+  if (red > REDUCERE_MAX) return { omis: "reducere suspecta (>60%)" };
   const dinListaIT = (p.campanii ?? []).some((c) => String(campanii[c]?.sursaId ?? "").startsWith("emag-red-"));
   const categorie = mapCategorie([p.categorie, p.titlu].filter(Boolean).join(" ")) ?? (dinListaIT ? "electronice" : null);
   return { oferta: { id: idOferta("camp", p.url), sursa: "campanii", titlu: p.titlu, categorie, magazin: m.id, pret: p.pret, pretVechi: ref, referintaMagazin: true, url: p.url, afiliat: false, ...(p.vandut && p.vandut !== "Necunoscut" ? { vandut: p.vandut } : {}), ...(p.imagine ? { imagine: p.imagine } : {}) } };

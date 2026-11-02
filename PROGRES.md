@@ -99,3 +99,6 @@
 ## v1.32 – panou de control (email + stare site)
 - panou/: Worker Cloudflare propriu (primire contact@ -> D1 + copie Gmail, trimitere Resend, stare site, Cloudflare Access verificat in Worker). scripts/panou-deploy.js (pornit manual de Laur). Build emite dist/status.json. Teste: scripts/test-panou.js; Worker verificat local cu D1 simulat (postal-mime nu s-a putut instala in cloud, folosit stub).
 - De facut de Laur: pasii din panou/README.md (Resend, deploy, Access, regula Email Routing -> Worker). Neverificat pe Cloudflare real: postal-mime ^2.4, deploy cu domeniu custom, Access.
+
+## v1.33 – panou cu parola
+- Panoul se deschide cu parola (PANOU_KEY, secret Cloudflare setat de Laur cu `--parola`), fara Zero Trust. Limitare incercari per IP, Cc/Bcc, retentie 6 luni, Reincarca/Iesi. Cloudflare Access ramane optional. Teste actualizate.

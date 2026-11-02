@@ -12,3 +12,5 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 CREATE INDEX IF NOT EXISTS idx_folder_date ON messages(folder, date DESC);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_mid ON messages(folder, message_id) WHERE message_id IS NOT NULL;
+CREATE TABLE IF NOT EXISTS incercari (ip TEXT NOT NULL, t INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_inc ON incercari(ip, t);

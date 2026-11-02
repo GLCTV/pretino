@@ -13,17 +13,29 @@ export function htmlInText(h) {
 }
 export const taie = (s, n = LIMITA_TEXT) => (String(s ?? "").length > n ? String(s).slice(0, n) + "\n[…taiat]" : String(s ?? ""));
 
+// Lista de adrese separate prin virgula / punct si virgula / spatiu. Intoarce { lista } sau { eroare }.
+export function listaAdrese(v) {
+  const lista = [...new Set(String(v ?? "").split(/[,;\s]+/).map((x) => x.trim()).filter(Boolean))];
+  const rau = lista.find((x) => !EMAIL_RE.test(x));
+  return rau ? { eroare: `Adresa nu e valida: ${rau.slice(0, 80)}` } : { lista };
+}
+export const MAX_DESTINATARI = 40;
 // Valideaza o cerere de trimitere; intoarce { eroare } sau { ok: {...} }
 export function valideazaTrimitere(b) {
-  const to = String(b?.to ?? "").trim(), subject = String(b?.subject ?? "").replace(/[\r\n]+/g, " ").trim(), text = String(b?.text ?? "");
-  if (!EMAIL_RE.test(to)) return { eroare: "Adresa destinatarului nu e valida." };
+  const subject = String(b?.subject ?? "").replace(/[\r\n]+/g, " ").trim(), text = String(b?.text ?? "");
+  const to = listaAdrese(b?.to), cc = listaAdrese(b?.cc), bcc = listaAdrese(b?.bcc);
+  if (to.eroare || cc.eroare || bcc.eroare) return { eroare: to.eroare || cc.eroare || bcc.eroare };
+  if (!to.lista.length) return { eroare: "Adauga cel putin un destinatar." };
+  if (to.lista.length + cc.lista.length + bcc.lista.length > MAX_DESTINATARI) return { eroare: `Maximum ${MAX_DESTINATARI} de destinatari.` };
   if (!subject || subject.length > 200) return { eroare: "Subiectul e obligatoriu (maxim 200 de caractere)." };
   if (!text.trim() || text.length > 20000) return { eroare: "Mesajul e gol sau prea lung (maxim 20.000 de caractere)." };
-  const inReplyTo = b?.inReplyTo && /^[^\s<>]{3,300}$/.test(String(b.inReplyTo).replace(/^<|>$/g, "")) ? String(b.inReplyTo).replace(/^<|>$/g, "") : null;
-  return { ok: { to, subject, text, inReplyTo } };
+  const id = String(b?.inReplyTo ?? "").replace(/^<|>$/g, "");
+  return { ok: { to: to.lista, cc: cc.lista, bcc: bcc.lista, subject, text, inReplyTo: /^[^\s<>]{3,300}$/.test(id) ? id : null } };
 }
-export function corpResend({ to, subject, text, inReplyTo }, from) {
-  const o = { from, to: [to], subject, text };
+export function corpResend({ to, cc = [], bcc = [], subject, text, inReplyTo }, from) {
+  const o = { from, to: [].concat(to), subject, text };
+  if (cc.length) o.cc = cc;
+  if (bcc.length) o.bcc = bcc;
   if (inReplyTo) o.headers = { "In-Reply-To": `<${inReplyTo}>`, References: `<${inReplyTo}>` };
   return o;
 }

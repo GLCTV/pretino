@@ -37,3 +37,15 @@ export async function verificaAccess(request, env, { fetchFn = fetch, acum = Dat
     return email && email === String(env.ALLOWED_EMAIL).toLowerCase() ? email : null;
   } catch { return null; }
 }
+
+// Autentificare cu parola (fara Zero Trust): antet Authorization: Bearer <parola>. Parola e secretul Worker-ului PANOU_KEY (minim 12 caractere,
+// altfel autentificarea e refuzata). Comparatie in timp constant, prin hash SHA-256 al ambelor valori.
+const sha = async (s) => new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(s))));
+export async function verificaParola(request, env) {
+  const m = (request.headers.get("Authorization") ?? "").match(/^Bearer (.+)$/);
+  if (!m || !env.PANOU_KEY || String(env.PANOU_KEY).length < 12) return false;
+  const [x, y] = await Promise.all([sha(m[1]), sha(env.PANOU_KEY)]);
+  let d = 0; for (let i = 0; i < x.length; i++) d |= x[i] ^ y[i];
+  return d === 0;
+}
+export const areAntetParola = (request) => /^Bearer .+$/.test(request.headers.get("Authorization") ?? "");

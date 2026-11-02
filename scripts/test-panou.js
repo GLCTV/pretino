@@ -1,5 +1,5 @@
 // Teste pentru panoul de control (logica pura: autentificare Access, utilitare email, Worker cu D1 simulat).
-import { verificaAccess, reseteazaCache } from "../panou/src/auth.js";
+import { verificaAccess, reseteazaCache, verificaParola } from "../panou/src/auth.js";
 import { htmlInText, valideazaTrimitere, corpResend, adresa, taie } from "../panou/src/mail.js";
 
 const b64u = (b) => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -11,8 +11,17 @@ export async function testePanou(ok) {
   ok(valideazaTrimitere({ to: "a@b.ro", subject: "Salut", text: "Mesaj" }).ok, "panou: trimitere valida acceptata");
   ok(valideazaTrimitere({ to: "nu-e-email", subject: "x", text: "y" }).eroare && valideazaTrimitere({ to: "a@b.ro", subject: "", text: "y" }).eroare && valideazaTrimitere({ to: "a@b.ro", subject: "x", text: " " }).eroare, "panou: trimitere invalida respinsa (adresa, subiect, mesaj)");
   ok(valideazaTrimitere({ to: "a@b.ro", subject: "linie1\r\nBcc: x@y.ro", text: "t" }).ok.subject === "linie1 Bcc: x@y.ro", "panou: subiectul nu poate injecta antete");
-  ok(corpResend({ to: "a@b.ro", subject: "S", text: "T", inReplyTo: "id1@x" }, "Pretino <contact@pretino.ro>").headers["In-Reply-To"] === "<id1@x>", "panou: raspuns cu antet In-Reply-To");
+  ok(corpResend({ to: ["a@b.ro"], subject: "S", text: "T", inReplyTo: "id1@x" }, "Pretino <contact@pretino.ro>").headers["In-Reply-To"] === "<id1@x>", "panou: raspuns cu antet In-Reply-To");
+  { const v = valideazaTrimitere({ to: "a@b.ro, c@d.ro", cc: "e@f.ro", bcc: "g@h.ro", subject: "S", text: "T" }).ok;
+    ok(v.to.length === 2 && v.cc[0] === "e@f.ro" && corpResend(v, "x@y.ro").bcc[0] === "g@h.ro", "panou: Cc/Bcc si mai multi destinatari");
+    ok(valideazaTrimitere({ to: Array.from({ length: 41 }, (_, i) => `a${i}@b.ro`).join(","), subject: "S", text: "T" }).eroare && valideazaTrimitere({ to: "a@b.ro", cc: "nu-e-email", subject: "S", text: "T" }).eroare, "panou: maxim 40 de destinatari, Cc invalid respins"); }
   ok(adresa("Nume <Ab@X.ro>") === "ab@x.ro" && taie("a".repeat(300000)).length < 300000, "panou: adresa extrasa, textul lung taiat");
+
+  // --- parola ---
+  const R = (p) => new Request("https://x/", { headers: p ? { Authorization: "Bearer " + p } : {} });
+  ok(await verificaParola(R("parola-foarte-lunga-123"), { PANOU_KEY: "parola-foarte-lunga-123" }), "panou: parola corecta acceptata");
+  ok(!(await verificaParola(R("alta-parola-lunga-12"), { PANOU_KEY: "parola-foarte-lunga-123" })) && !(await verificaParola(R(null), { PANOU_KEY: "parola-foarte-lunga-123" })), "panou: parola gresita sau lipsa respinsa");
+  ok(!(await verificaParola(R("scurta"), { PANOU_KEY: "scurta" })) && !(await verificaParola(R("x"), {})), "panou: parola scurta (<12) sau nesetata -> refuzata");
 
   // --- Cloudflare Access ---
   const kp = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]);

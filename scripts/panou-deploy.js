@@ -1,6 +1,7 @@
 // Instaleaza / actualizeaza panoul de control Pretino (Worker Cloudflare „pretino-panou", baza D1 „pretino-mail"). Pornit DOAR manual de Laur:
 //   bun scripts/panou-deploy.js --deploy            (instaleaza / actualizeaza)
 //   bun scripts/panou-deploy.js --deploy --resend   (+ iti cere cheia Resend si o salveaza ca secret in Cloudflare)
+//   bun scripts/panou-deploy.js --deploy --parola   (+ iti cere parola panoului, minim 12 caractere, salvata ca secret PANOU_KEY)
 // Autentificare Cloudflare: CLOUDFLARE_API_TOKEN din %LOCALAPPDATA%\Pretino\secrete.env (daca are drepturi pentru Workers/D1/DNS) sau `wrangler login`.
 // Setari neSecrete din secrete.env: ACCESS_TEAM_DOMAIN (ex. nume.cloudflareaccess.com) si ACCESS_AUD (din aplicatia Access). Fara ele panoul refuza orice acces.
 import { spawnSync } from "node:child_process";
@@ -32,12 +33,16 @@ console.log("3/5 Configuratie…");
 const sablon = readFileSync("panou/wrangler.sablon.jsonc", "utf8").replace(/^\s*\/\/.*$/gm, "");
 const cfg = sablon.replace("__DATABASE_ID__", db.uuid).replace("__ACCESS_TEAM_DOMAIN__", secrete.ACCESS_TEAM_DOMAIN ?? "").replace("__ACCESS_AUD__", secrete.ACCESS_AUD ?? "");
 writeFileSync("panou/wrangler.local.jsonc", cfg);
-if (!secrete.ACCESS_TEAM_DOMAIN || !secrete.ACCESS_AUD) console.warn("AVERTISMENT: lipsesc ACCESS_TEAM_DOMAIN / ACCESS_AUD din secrete.env - panoul va refuza accesul pana le completezi si rulezi din nou.");
+if (!secrete.ACCESS_TEAM_DOMAIN || !secrete.ACCESS_AUD) console.log("Cloudflare Access nu e configurat (optional): panoul se deschide cu parola PANOU_KEY (foloseste --parola o data).");
 
 if (process.argv.includes("--resend")) {
   console.log("4/5 Cheia Resend: lipeste-o cand ti se cere (nu se afiseaza si nu se salveaza in repo).");
   wr(["secret", "put", "RESEND_API_KEY", "-c", "wrangler.local.jsonc"]);
 } else console.log("4/5 Cheia Resend: sarita (foloseste --resend pentru a o seta).");
+if (process.argv.includes("--parola")) {
+  console.log("Parola panoului (minim 12 caractere, lunga si unica): scrie-o cand ti se cere. Nu se afiseaza si nu se salveaza in repo.");
+  wr(["secret", "put", "PANOU_KEY", "-c", "wrangler.local.jsonc"]);
+}
 
 console.log("5/5 Publicare Worker…");
 wr(["deploy", "-c", "wrangler.local.jsonc"]);

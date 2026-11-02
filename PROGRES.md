@@ -79,3 +79,6 @@
 
 ## v1.27
 - Validare website pretino.ro la Profitshare: tag meta profitshareid in antetul tuturor paginilor (scripts/build.js). Dupa PUBLICA LIVE: „valideaza website” in Profitshare; apoi script link automat pentru eMAG.
+
+## v1.28
+- Catalog real (3867 oferte) comis pe main; testul de independenta nu mai scaneaza catalogul generat dupa codul de afiliat (apare legitim in linkurile evoMAG), dar verifica ca nu contine nimic ConfiguratiePC.

@@ -16,11 +16,13 @@ function fisiere(d, acc = []) {
   return acc;
 }
 const toate = fisiere(".").map((f) => f.replace(/\\/g, "/")); // căi cu / și pe Windows
-const cod = toate.filter((f) => /\.(js|ps1|bat|yml|json|html|css)$/.test(f) && !f.endsWith("scripts/test.js"));
+const DATE_GENERATE = /(^|\/)data\/(oferte|istoric-preturi)\.json$/; // catalog generat din feed-urile magazinelor (linkurile de afiliere ale contului de afiliat apar legitim in el)
+const cod = toate.filter((f) => /\.(js|ps1|bat|yml|json|html|css)$/.test(f) && !f.endsWith("scripts/test.js") && !DATE_GENERATE.test(f));
 
 // 1. Independență: codul nu citește/folosește resurse ale altui proiect
 const interzise = /configuratiepc|pc-potrivit|ConfiguratiePC|PROFITSHARE_API|aff_code=647099a0b|GVYDBDQ9/i;
 ok(!cod.some((f) => interzise.test(readFileSync(f, "utf8"))), "nicio referință la resursele ConfigurațiePC în cod/config");
+ok(!toate.filter((f) => DATE_GENERATE.test(f)).some((f) => /configuratiepc|pc-potrivit/i.test(readFileSync(f, "utf8"))), "catalogul nu contine nimic din ConfigurațiePC");
 // 2. Secrete
 const secret = /(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|CLOUDFLARE_API_TOKEN\s*=\s*\S{10,})/;
 ok(!toate.filter((f) => !f.endsWith("scripts/test.js")).some((f) => secret.test(readFileSync(f, "utf8"))), "niciun token/secret în fișiere");

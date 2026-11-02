@@ -40,12 +40,15 @@ export function parseListare(root, baza) {
   const produse = [];
   // pe paginile de categorie, pretul vechi (.pbe-price-old) e in blocul .pb-extra de langa .product_box, ambele in .product_box_container
   const cutii = qsa(root, ".product_box"), containere = qsa(root, ".product_box_container");
+  const modCategorie = containere.length > 0 && containere.length === cutii.length;
   for (const card of containere.length && containere.length === cutii.length ? containere : cutii) { // containere folosite doar daca fiecare card are propriul container
     const a = qs(card, ".bf_ptitle_link") ?? qs(card, ".bf_ptitle a") ?? qs(card, ".product_box_name a") ?? qs(card, "a[href]");
     const titlu = text(a) || text(qs(card, ".product_box_name"));
     const url = absolut(attr(a, "href") ?? "", baza)?.split("?")[0];
     const pret = parsePret(text(qs(card, ".bfp_new")) || text(qs(card, ".pb-price .price")) || text(qs(card, ".price")));
     if (!titlu || !url || !pret) continue;
+    // lista de categorie: doar produsele cu insigna „DISCOUNT” (.pbe-type) si pret vechi; restul nu se citesc
+    if (modCategorie && !qsa(card, ".pbe-type").some((e) => /^\s*discount\s*$/i.test(text(e)))) continue;
     const vechi = parsePret(text(qs(card, OLD)));
     const img = qs(card, "img");
     const src = attr(img, "src") && !/^data:/.test(attr(img, "src")) ? attr(img, "src") : (attr(img, "srcset") ?? "").split(/[\s,]+/)[0] || attr(img, "data-src") || null;
@@ -62,7 +65,7 @@ export function parseListare(root, baza) {
   // numarul live al produselor din pagina de categorie („18 produse de la 7 producatori”, .products-count)
   const mt = text(qs(root, ".products-count")).match(/(\d[\d.]*)\s+produs/i);
   const total = mt ? Number(mt[1].replace(/\./g, "")) : null;
-  return { produse: unice.length ? unice : produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: urmatoarea(root, baza), total: total > 0 ? total : null };
+  return { produse: unice.length ? unice : produseStructurate(root, baza).map((p) => ({ ...p, vandut: p.vandut ?? "PC Garage" })), urmatoarea: modCategorie && !produse.length ? null : urmatoarea(root, baza), total: total > 0 && /\/filtre\/discount\/?(\?|$)/.test(baza) ? total : null };
 }
 function urmatoarea(root, baza) {
   // formele reale: /<cat>/paginaN/ si /<cat>/paginaN/filtre/discount/

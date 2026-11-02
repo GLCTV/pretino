@@ -24,9 +24,9 @@ for (const sursa of surse) {
   if (!existsSync(adaptor)) { raport.push(`[${sursa}] activ, dar lipseste scripts/surse/${sursa}.js (oferte vechi pastrate: ${pastrate.length})`); rezultat.push(...pastrate); continue; }
   try {
     const { citeste } = await import(adaptor.href);
-    const { oferte, omise, esantion, categorii } = await citeste(magazine.filter((m) => m.activ && m.sursa === sursa), secrete);
+    const { oferte, omise, esantion, categorii: catFeed } = await citeste(magazine.filter((m) => m.activ && m.sursa === sursa), secrete);
     if (esantion) writeFileSync(`rapoarte/esantion-${sursa}.txt`, esantion);
-    if (categorii) writeFileSync(`rapoarte/categorii-${sursa}.txt`, Object.entries(categorii).sort((p, q) => q[1].n - p[1].n).slice(0, 300).map(([k, v]) => `${v.n}\t${k}`).join("\n"));
+    if (catFeed) writeFileSync(`rapoarte/categorii-${sursa}.txt`, Object.entries(catFeed).sort((p, q) => q[1].n - p[1].n).slice(0, 300).map(([k, v]) => `${v.n}\t${k}`).join("\n"));
     const bune = [], respinse = { ...omise };
     for (const o of oferte) {
       if (!o.categorie || !categorii.has(o.categorie)) { respinse["fara categorie"] = (respinse["fara categorie"] ?? 0) + 1; continue; }

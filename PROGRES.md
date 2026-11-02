@@ -49,3 +49,6 @@
 
 ## 2026-11-02 – program v1.18: browser vizibil mai robust
 - Raportat: la eMAG (HTTP 511) fereastra de browser se deschidea goală. Fereastra se maximizează și e adusă în față; în browser, conținutul real (pagină mare, fără marcaje de verificare) are prioritate față de statusul 511; după ~16 s de pagină goală se încarcă o dată pagina principală a magazinului; jurnalul afișează la fiecare ~10 s starea paginii (URL, status, lungime, titlu). NEREZOLVAT dacă eMAG afișează ceva ce trebuie făcut manual – de verificat pe PC.
+
+## 2026-11-02 – program v1.19: pornirea browserului (fereastra goală `about:blank`)
+- Cauză probabilă: o instanță Chrome rămasă din rularea anterioară (același profil Pretino) „fuzionează” cu cea nouă, care nu mai pornește cu depanare → fereastră goală și „browserul nu a pornit”. Acum: înainte de pornire se închid instanțele rămase pe profilul `.pretino-local\\browser-profil` și se șterg fișierele de blocare; port de depanare ales automat (fișierul `DevToolsActivePort`); se încearcă pe rând Chrome apoi Edge; la eșec, mesajul spune motivul (cod de ieșire / nu răspunde). La final browserul și procesele lui se închid.

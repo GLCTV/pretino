@@ -1,8 +1,8 @@
 // Browser vizibil pentru citirea paginilor cand magazinul cere verificare anti-bot (CAPTCHA / Turnstile).
 // Programul NU rezolva si NU ocoleste verificarea: o deschide intr-o fereastra de browser, anunta utilizatorul,
 // asteapta ca TU sa o completezi si apoi continua citirea. Profil dedicat Pretino (fara conturile tale), local, pe 127.0.0.1.
-import { spawn } from "node:child_process";
-import { existsSync, mkdirSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { esteBlocare, BlocatError } from "./http.js";
 
@@ -15,13 +15,22 @@ export function blocatInBrowser(s) {
   return html.length < 5000 && esteBlocare(s.url ?? "", s.status, "") ? `HTTP ${s.status}` : null;
 }
 
-export function gasesteBrowser(env = process.env) {
+export function gasesteBrowsere(env = process.env) {
   const c = [env.PRETINO_BROWSER,
     "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
     env.LOCALAPPDATA && join(env.LOCALAPPDATA, "Google", "Chrome", "Application", "chrome.exe"),
     "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
     "/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser"].filter(Boolean);
-  return c.find((x) => existsSync(x)) ?? null;
+  return [...new Set(c.filter((x) => existsSync(x)))];
+}
+export const gasesteBrowser = (env) => gasesteBrowsere(env)[0] ?? null;
+
+// Inchide instantele ramase din rulari anterioare care folosesc profilul dedicat Pretino (altfel o instanta noua s-ar „lipi” de ele si nu ar porni cu depanare)
+export function curataProfil(profil) {
+  if (process.platform === "win32") {
+    try { spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*browser-profil*' -and $_.ProcessId -ne $PID } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"], { stdio: "ignore", timeout: 20000 }); } catch {}
+  }
+  for (const f of ["DevToolsActivePort", "SingletonLock", "SingletonCookie", "SingletonSocket", "lockfile"]) { try { rmSync(join(profil, f), { force: true }); } catch {} }
 }
 
 class Cdp {
@@ -39,16 +48,24 @@ class Cdp {
   }
 }
 
-export async function lanseazaBrowser({ exe = gasesteBrowser(), profil, port = 9333, headless = false } = {}) {
-  if (!exe) throw new Error("nu am gasit Chrome sau Edge pe acest PC (poti seta PRETINO_BROWSER)");
+async function lanseazaCu(exe, { profil, headless }) {
+  curataProfil(profil);
   mkdirSync(profil, { recursive: true });
-  const proc = spawn(exe, [`--remote-debugging-port=${port}`, "--remote-debugging-address=127.0.0.1", `--user-data-dir=${profil}`, "--no-first-run", "--no-default-browser-check", "--start-maximized", "--disable-popup-blocking", ...(headless ? ["--headless=new", "--no-sandbox"] : []), "about:blank"], { stdio: "ignore" });
-  let tinta = null;
-  for (let i = 0; i < 80 && !tinta; i++) {
-    try { tinta = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find((t) => t.type === "page"); } catch {}
-    if (!tinta) await sleep(500);
+  const args = ["--remote-debugging-port=0", "--remote-debugging-address=127.0.0.1", `--user-data-dir=${profil}`, "--no-first-run", "--no-default-browser-check", "--start-maximized", "--disable-popup-blocking", ...(headless ? ["--headless=new", "--no-sandbox"] : []), "about:blank"];
+  const proc = spawn(exe, args, { stdio: ["ignore", "ignore", "pipe"] });
+  let iesit = null, err = "";
+  proc.on("exit", (cod) => { iesit = cod ?? -1; });
+  proc.stderr?.on("data", (d) => { if (err.length < 400) err += String(d); });
+  let port = null, tinta = null;
+  for (let i = 0; i < 100 && !tinta; i++) {
+    if (!port) { try { port = Number(readFileSync(join(profil, "DevToolsActivePort"), "utf8").split(/\r?\n/)[0]) || null; } catch {} }
+    if (port) { try { tinta = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find((t) => t.type === "page"); } catch {} }
+    if (!tinta) { if (iesit !== null && i > 6) break; await sleep(500); }
   }
-  if (!tinta) { proc.kill(); throw new Error("browserul nu a pornit"); }
+  if (!tinta) {
+    try { proc.kill(); } catch {}
+    throw new Error(iesit !== null ? `s-a inchis imediat (cod ${iesit}; probabil a „fuzionat” cu o instanta deja deschisa) ${err.trim().slice(0, 150)}` : `nu raspunde la depanare ${err.trim().slice(0, 150)}`);
+  }
   const ws = new WebSocket(tinta.webSocketDebuggerUrl);
   await new Promise((ok, ko) => { ws.onopen = ok; ws.onerror = () => ko(new Error("conexiune CDP esuata")); });
   const cdp = new Cdp(ws);
@@ -68,8 +85,19 @@ export async function lanseazaBrowser({ exe = gasesteBrowser(), profil, port = 9
     },
     stare: async () => ({ url: await ev("location.href"), html: await ev("document.documentElement.outerHTML"), status }),
     adaInFata: () => cdp.trimite("Page.bringToFront").catch(() => {}),
-    async inchide() { try { await cdp.trimite("Browser.close"); } catch {} try { ws.close(); } catch {} try { proc.kill(); } catch {} },
+    async inchide() { try { await cdp.trimite("Browser.close"); } catch {} try { ws.close(); } catch {} try { proc.kill(); } catch {} await sleep(500); curataProfil(profil); },
   };
+}
+
+// Incearca pe rand Chrome, apoi Edge (sau PRETINO_BROWSER / exe dat)
+export async function lanseazaBrowser({ exe, profil, headless = false } = {}) {
+  const lista = exe ? [exe] : gasesteBrowsere();
+  if (!lista.length) throw new Error("nu am gasit Chrome sau Edge pe acest PC (poti seta PRETINO_BROWSER)");
+  const erori = [];
+  for (const e of lista) {
+    try { return await lanseazaCu(e, { profil, headless }); } catch (x) { erori.push(`${e.split(/[\\/]/).pop()}: ${x.message}`); }
+  }
+  throw new Error(erori.join(" | "));
 }
 
 // fetch compatibil cu clientul HTTP; cand apare verificare anti-bot, anunta si asteapta utilizatorul

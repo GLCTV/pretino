@@ -10,6 +10,7 @@ $script:Proc = $null
 $script:Preview = $null
 $script:LogFile = $null
 $script:DupaProgram = $false
+$script:Oprit = $false
 
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Pretino v$AppVersion" Width="1060" Height="920" MinWidth="900" MinHeight="640" Background="#0b1220" WindowStartupLocation="CenterScreen" FontFamily="Segoe UI" FontSize="13">
@@ -110,6 +111,7 @@ $script:DupaProgram = $false
             <Button Name="SVerifica" Content="Verific&#x103; site-ul live" Style="{StaticResource BtnVerde}"/>
             <Button Name="STrimite" Content="Trimite paginile noi la Bing" Style="{StaticResource BtnVerde}"/>
             <Button Name="SViteza" Content="M&#x103;soar&#x103; viteza (mobil)" Style="{StaticResource BtnVerde}"/>
+            <Button Name="SOpreste" Content="Opre&#x219;te" Style="{StaticResource BtnPortocaliu}" IsEnabled="False"/>
           </WrapPanel>
           <TextBlock Text="Google nu permite trimitere automat&#x103; f&#x103;r&#x103; cont conectat. Aceste butoane deschid direct paginile potrivite:" Foreground="#94a3b8" TextWrapping="Wrap" Margin="0,0,0,6"/>
           <WrapPanel Margin="0,0,0,8">
@@ -141,9 +143,9 @@ try {
   exit 1
 }
 
-$c = @{}; foreach ($n in 'Stare','StareBox','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
+$c = @{}; foreach ($n in 'Stare','StareBox','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SOpreste','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
 
-function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram','STot','SVerifica','STrimite','SViteza') { $c[$n].IsEnabled = -not $busy } }
+function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram','STot','SVerifica','STrimite','SViteza') { $c[$n].IsEnabled = -not $busy }; $c.SOpreste.IsEnabled = $busy }
 
 function Start-Task($nume, $comanda) {
   if ($script:Proc -and -not $script:Proc.HasExited) { return }
@@ -156,7 +158,8 @@ function Start-Task($nume, $comanda) {
 function Set-CuloareStare {
   $t = "$($c.Stare.Text)"
   $col = '#16a34a'
-  if ($t -match 'eroare|esuat|invalid') { $col = '#dc2626' }
+  if ($t -match 'Oprit') { $col = '#ea580c' }
+  elseif ($t -match 'eroare|esuat|invalid') { $col = '#dc2626' }
   elseif ($t -match 'ASTEPT|Alege') { $col = '#ea580c' }
   elseif ($t -match 'Ruleaza|ruleaza|Opresc|pornita') { $col = '#2563eb' }
   $c.StareBox.BorderBrush = (New-Object System.Windows.Media.BrushConverter).ConvertFromString($col)
@@ -170,8 +173,8 @@ $timer.Add_Tick({
     try { $c.Jurnal.Text = (Get-Content $script:LogFile -Raw -Encoding UTF8 -ErrorAction Stop); $c.Jurnal.ScrollToEnd() } catch {}
   }
   if ($script:Proc -and $script:Proc.HasExited) {
-    $c.Stare.Text = if ($script:Proc.ExitCode -eq 0) { 'Terminat cu succes.' } else { "Terminat cu eroare (cod $($script:Proc.ExitCode))." }
-    $script:Proc = $null; Set-Busy $false
+    $c.Stare.Text = if ($script:Oprit) { 'Oprit de tine.' } elseif ($script:Proc.ExitCode -eq 0) { 'Terminat cu succes.' } else { "Terminat cu eroare (cod $($script:Proc.ExitCode))." }
+    $script:Proc = $null; $script:Oprit = $false; Set-Busy $false
     if ($script:DupaProgram) {
       $script:DupaProgram = $false
       $vNou = (Get-Content (Join-Path $Root 'versiune-program.txt') -ErrorAction SilentlyContinue | Select-Object -First 1)
@@ -216,6 +219,13 @@ $c.STot.Add_Click({ Start-Task 'seo-tot' 'bun scripts/seo-motoare.js --tot' })
 $c.SVerifica.Add_Click({ Start-Task 'seo-verifica' 'bun scripts/seo-motoare.js --verifica' })
 $c.STrimite.Add_Click({ Start-Task 'seo-trimite' 'bun scripts/seo-motoare.js --trimite' })
 $c.SViteza.Add_Click({ Start-Task 'seo-viteza' 'bun scripts/seo-motoare.js --viteza' })
+$c.SOpreste.Add_Click({
+  if ($script:Proc -and -not $script:Proc.HasExited) {
+    $script:Oprit = $true
+    & taskkill /PID $script:Proc.Id /T /F | Out-Null
+    $c.Stare.Text = 'Opresc...'
+  }
+})
 $c.SGSitemap.Add_Click({ Start-Process 'https://search.google.com/search-console/sitemaps?resource_id=sc-domain%3Apretino.ro' })
 $c.SGInspect.Add_Click({ Start-Process 'https://search.google.com/search-console/inspect?resource_id=sc-domain%3Apretino.ro' })
 $c.SGPerf.Add_Click({ Start-Process 'https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain%3Apretino.ro' })

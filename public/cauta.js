@@ -70,7 +70,7 @@
       (o.i ? '<img src="' + esc(o.i) + '" alt="' + esc(o.t) + '" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="167" onerror="this.parentNode.classList.add(\'fara\')">' : "") + "</a>";
     var k = data.k && data.k[o.m];
     var cupon = k ? '<div class="cupon"><span>Cupon <b>' + esc(k.cod) + "</b> (" + esc(k.text) + ') în coș · prețul afișat nu îl include</span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
-    return '<article class="card">' + poza + '<span class="badge">-' + o.r2 + '%</span>' +
+    return '<article class="card">' + poza + '<span class="badge ' + (o.r2 >= 50 ? "t3" : o.r2 >= 30 ? "t2" : "t1") + '">-' + o.r2 + '%</span>' +
       '<button class="fav" type="button" data-id="' + esc(o.id) + '" aria-pressed="false" aria-label="Adaugă la favorite">' + ICON_INIMA + "</button>" +
       '<a class="titlu" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank">' + esc(o.t) + "</a>" +
       '<span class="magazin"><a href="/magazin/' + esc(o.m) + '/">' + esc(data.m[o.m] || o.m) + "</a>" + (o.x ? '<span class="cond">' + COND[o.x] + "</span>" : "") + "</span>" +

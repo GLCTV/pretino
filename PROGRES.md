@@ -236,3 +236,10 @@
 ## Butoane „Descopera” (ramura `butoane-descopera`, doar site)
 - Legaturile din blocul „Descopera” (home/categorii) si din randul de legaturi al topurilor/ghidurilor sunt acum butoane pill in stilul site-ului (tema inchisa + luminoasa), cu hover, focus vizibil si buton principal cu sageata (Toate ghidurile / Toate brandurile / Vezi toate ofertele). Verificat desktop 1366 si telefon 390.
 - STATUS: asteptam OK de la Laur inainte de main.
+
+## Culori de accent (ramura `butoane-descopera`, impreuna cu butoanele pill; doar site)
+- Culoare de accent pe categorie (`--c`, doua tonuri: tema inchisa/luminoasa): iconitele din meniu colorate, categoria activa evidentiata, linie sub meniu, chip-ul activ, butoanele principale si breadcrumb in culoarea categoriei (`data-cat` pe body si pe linkurile din meniu).
+- Insigna de reducere pe trepte: sub 30% galben, 30-49% portocaliu, 50%+ rosu (in HTML si in cauta.js).
+- „Economisesti” in auriu cald (ambele teme). Butoanele „Vezi oferta” raman teal.
+- Butoanele pill trec pe mai multe randuri daca textul e lung (fara scroll orizontal 390 px).
+- STATUS: asteptam OK de la Laur inainte de main.

@@ -67,7 +67,7 @@
   var COND = { 1: "Resigilat", 2: "Refurbished" };
   function card(o, i) {
     var poza = '<a class="poza' + (o.i ? "" : " fara") + '" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true">' +
-      (o.i ? '<img src="' + esc(o.i) + '" alt="" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="167" onerror="this.parentNode.classList.add(\'fara\')">' : "") + "</a>";
+      (o.i ? '<img src="' + esc(o.i) + '" alt="' + esc(o.t) + '" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="167" onerror="this.parentNode.classList.add(\'fara\')">' : "") + "</a>";
     var k = data.k && data.k[o.m];
     var cupon = k ? '<div class="cupon"><span>Cupon <b>' + esc(k.cod) + "</b> (" + esc(k.text) + ') în coș · prețul afișat nu îl include</span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
     return '<article class="card">' + poza + '<span class="badge">-' + o.r2 + '%</span>' +
@@ -112,7 +112,7 @@
   var cfg = JSON.parse(main.getAttribute("data-lista"));
   var lista = $("lista"), mai = $("mai"), gol = $("rez-gol"), nrRez = $("nr-rez"), PAS = cfg.pe || 48;
   var elMin = $("p-min"), elMax = $("p-max"), rMin = $("p-min-r"), rMax = $("p-max-r"), umplere = $("umplere"), sortSel = $("sortare");
-  var state = { sub: "", mags: [], min: 0, max: cfg.max, red: 0, sort: "red" };
+  var state = { sub: "", mags: [], min: 0, max: cfg.max, red: 0, sort: "red", nou: false };
   var baza = [], rez = [], shown = 0, maxScope = cfg.max;
   var params = new URLSearchParams(location.search);
   var pregatit = false, client = false;   // client = lista e (re)construita din catalog in browser; altfel ramane HTML-ul primit
@@ -122,7 +122,7 @@
     "pret-cresc": function (a, b) { return a.p - b.p; },
     "pret-desc": function (a, b) { return b.p - a.p; }
   };
-  var PARAMETRI = ["sub", "m", "min", "max", "red", "sort"];
+  var PARAMETRI = ["sub", "m", "min", "max", "red", "sort", "nou"];
   var areParametri = PARAMETRI.some(function (k) { return params.has(k); });
   var numar = function (v) { var n = Number(v); return isFinite(n) && n >= 0 ? n : null; };
 
@@ -135,6 +135,7 @@
     state.red = [20, 30, 40, 50].indexOf(red) >= 0 ? red : 0;
     var sort = params.get("sort");
     state.sort = SORT[sort] ? sort : "red";
+    state.nou = params.get("nou") === "1";
     state.min = numar(params.get("min")) || 0;
     state.max = params.get("max") === null ? null : numar(params.get("max"));
   }
@@ -147,6 +148,7 @@
     if (state.max !== null && state.max < maxScope) p.set("max", state.max);
     if (state.red) p.set("red", state.red);
     if (state.sort !== "red") p.set("sort", state.sort);
+    if (state.nou) p.set("nou", "1");
     var s = p.toString();
     // dupa filtrare in browser lista porneste de la inceput: adresa revine la prima pagina a listei (cfg.baza)
     try { history.replaceState(null, "", (cfg.baza || location.pathname) + (s ? "?" + s : "")); } catch (e) { /* ignorat */ }
@@ -156,7 +158,7 @@
     client = true; ascundePagini();
     var mn = state.min, mx = state.max === null ? Infinity : state.max;
     rez = baza.filter(function (o) {
-      return (!state.sub || o.s === state.sub) && (!state.mags.length || state.mags.indexOf(o.m) >= 0) && o.p >= mn && o.p <= mx && o.r2 >= state.red;
+      return (!state.sub || o.s === state.sub) && (!state.mags.length || state.mags.indexOf(o.m) >= 0) && o.p >= mn && o.p <= mx && o.r2 >= state.red && (!state.nou || !o.x);
     }).sort(SORT[state.sort] || SORT.red);
     shown = 0; lista.innerHTML = ""; randeaza(); scrieUrl();
     nrRez.textContent = rez.length + (rez.length === 1 ? " ofertă" : " oferte");
@@ -194,6 +196,7 @@
     sincronizeazaPret("max");
     var radios = document.querySelectorAll('input[name="red"]');
     for (var i = 0; i < radios.length; i++) radios[i].checked = Number(radios[i].value) === state.red;
+    var nn = $("f-nou"); if (nn) nn.checked = state.nou;
     var cbs = document.querySelectorAll('#f-mag input');
     for (var j = 0; j < cbs.length; j++) cbs[j].checked = state.mags.indexOf(cbs[j].value) >= 0;
     var chips = document.querySelectorAll(".subcats .chip[data-sub]");
@@ -210,6 +213,7 @@
   function pregatesteScope() {
     var q = params.get("q") || "";
     if (cfg.mod === "categorie") baza = data.o.filter(function (o) { return o.c === cfg.cat && (!cfg.sub || o.s === cfg.sub); });
+    else if (cfg.mod === "brand") baza = data.o.filter(function (o) { return o.b === cfg.brand; });
     else if (cfg.mod === "magazin") baza = data.o.filter(function (o) { return o.m === cfg.mag; });
     else if (cfg.mod === "cauta") baza = cauta(q);
     else if (cfg.mod === "favorite") baza = data.o.filter(function (o) { return favorite.indexOf(o.id) >= 0; });
@@ -239,7 +243,7 @@
     if (pregatit) return fn();
     load().then(function () { if (!pregatit) pregateste(); fn(); }).catch(function () { /* fara catalog ramane lista din HTML */ });
   }
-  function reseteaza() { state.sub = ""; state.mags = []; state.min = 0; state.max = null; state.red = 0; state.sort = "red"; seteazaControale(); if (client) cuDate(aplica); }
+  function reseteaza() { state.sub = ""; state.mags = []; state.min = 0; state.max = null; state.red = 0; state.sort = "red"; state.nou = false; seteazaControale(); if (client) cuDate(aplica); }
 
   // evenimente
   var ft = $("filtre");
@@ -247,6 +251,7 @@
     var t = e.target;
     if (t.name === "m") state.mags = Array.prototype.map.call(document.querySelectorAll('#f-mag input:checked'), function (x) { return x.value; });
     else if (t.name === "red") state.red = Number(t.value);
+    else if (t.name === "nou") state.nou = t.checked;
     else return;
     cuDate(aplica);
   });

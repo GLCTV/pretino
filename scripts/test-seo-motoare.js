@@ -28,7 +28,13 @@ export async function testeSeoMotoare(ok) {
     const stare2 = join(tmp, "hash2.json");
     r = await trimiteIndexNow(baza, urls, { post: post(403), stare: stare2, scrie: mut });
     ok(r.eroare && !existsSync(stare2), "seo-motoare: la eroare IndexNow starea nu se salveaza (se reincearca data viitoare)");
-    const { default: _ } = { default: 0 };
+    const stareVeche = join(tmp, "veche.json"); const { writeFileSync } = await import("node:fs"); writeFileSync(stareVeche, JSON.stringify(Object.fromEntries(urls.map((u) => [u, "x"]))));
+    const n0 = trimise.length; r = await trimiteIndexNow(baza, urls, { post: post(200), stare: stareVeche, scrie: mut });
+    ok(r.trimise === urls.length && trimise.length === n0 + 1, "seo-motoare: starea veche (fara verificarea cheii) este ignorata si paginile se retrimit");
+    const srvFaraCheie = Bun.serve({ port: 0, fetch: () => new Response("nu", { status: 404 }) });
+    const n1 = trimise.length; const stare3 = join(tmp, "hash3.json");
+    r = await trimiteIndexNow(`http://localhost:${srvFaraCheie.port}`, urls, { post: post(202), stare: stare3, scrie: mut }); srvFaraCheie.stop(true);
+    ok(r.eroare && trimise.length === n1 && !existsSync(stare3), "seo-motoare: fara fisier cheie pe site nu se trimite nimic si starea nu se salveaza");
     const verifFara = await verificaSite("http://localhost:1", mut);
     ok(verifFara.probleme > 0, "seo-motoare: site inaccesibil este raportat ca problema");
   } finally { srv.stop(true); rmSync(tmp, { recursive: true, force: true }); }

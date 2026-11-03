@@ -213,3 +213,8 @@
 - Plasa de siguranta: daca interfata nu se incarca, se face git pull si se arata mesajul de eroare.
 - Neverificat: aspectul in WPF real (nu se poate rula in cloud); XAML validat ca XML si toate numele de control verificate.
 - STATUS: pe ramura `gui-nou`.
+
+## v1.63 – IndexNow: verificare cheie + PageSpeed cu reincercari
+- Raportat de Laur (captura): fisierul cheie IndexNow dadea 404 pe site-ul publicat inainte de v1.61, iar trimiterea se marca totusi reusita. Acum nu se trimite nimic (si starea nu se salveaza) cat timp cheia nu se deschide pe site; starea veche se ignora, deci paginile se retrimit dupa publicare.
+- PageSpeed: la limita Google (429) reincearca de 3 ori la 30 s; accepta `PAGESPEED_API_KEY` din secrete.env.
+- STATUS: pe ramura `seo-indexnow-fix`.

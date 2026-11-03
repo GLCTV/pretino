@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname } from "node:path";
 import { SITE_URL } from "../src/config.js";
+import { incarcaSecrete } from "./lib/secrete.js";
 
 const CONFIG = "data/seo-motoare.json";
 const STARE = ".pretino-local/seo-hash.json"; // hash-uri locale ale paginilor deja trimise (nu se publica)
@@ -82,7 +83,11 @@ const postImplicit = (url, corp) => fetch(url, { method: "POST", headers: { "con
 export async function trimiteIndexNow(baza, urlsSitemap, { post = postImplicit, stare = STARE, scrie = console.log, host = new URL(SITE_URL).host, site = SITE_URL } = {}) {
   const cfg = citesteJson(CONFIG, {});
   if (!/^[0-9a-f]{8,128}$/.test(cfg.indexnowKey ?? "")) { scrie("PROBLEMA cheia IndexNow lipseste din " + CONFIG); return { trimise: 0, eroare: true }; }
-  const vechi = citesteJson(stare, {});
+  const salvat = citesteJson(stare, {});
+  const vechi = salvat.v === 2 ? salvat.h : {}; // starea veche (fara verificarea cheii) se ignora: paginile se retrimit
+  // IndexNow ignora trimiterea daca fisierul cheie nu poate fi citit pe site: nu trimitem (si nu salvam starea) pana nu e publicat
+  const k = await ia(`${baza}/${cfg.indexnowKey}.txt`);
+  if (k.status !== 200 || k.text.trim() !== cfg.indexnowKey) { scrie(`PROBLEMA fisierul cheie IndexNow nu se deschide pe site (status ${k.status}). Apasa PUBLICA LIVE (versiunea 1.61 sau mai noua), apoi reincearca. Nu am trimis nimic.`); return { trimise: 0, eroare: true }; }
   const noi = {}; const schimbate = [];
   const hashuri = await inParalel(urlsSitemap, 6, async (u) => { const r = await ia(peBaza(u, baza)); return r.status === 200 ? createHash("sha1").update(r.text).digest("hex") : null; });
   urlsSitemap.forEach((u, i) => { if (!hashuri[i]) return; noi[u] = hashuri[i]; if (vechi[u] !== hashuri[i]) schimbate.push(u); });
@@ -90,7 +95,7 @@ export async function trimiteIndexNow(baza, urlsSitemap, { post = postImplicit, 
   const r = await post("https://api.indexnow.org/indexnow", { host, key: cfg.indexnowKey, keyLocation: `${site}/${cfg.indexnowKey}.txt`, urlList: schimbate.slice(0, 10000) });
   if (r.status === 200 || r.status === 202) {
     mkdirSync(dirname(stare), { recursive: true });
-    writeFileSync(stare, JSON.stringify({ ...vechi, ...noi }, null, 1));
+    writeFileSync(stare, JSON.stringify({ v: 2, h: { ...vechi, ...noi } }, null, 1));
     scrie(`OK     IndexNow: ${schimbate.length} pagini trimise (status ${r.status}). Bing le va programa la accesare; indexarea nu e garantata si nu e instantanee.`);
     return { trimise: schimbate.length };
   }
@@ -98,13 +103,14 @@ export async function trimiteIndexNow(baza, urlsSitemap, { post = postImplicit, 
   return { trimise: 0, eroare: true };
 }
 
-export async function masoaraViteza(baza, urls, scrie = console.log, cheie = process.env.PAGESPEED_API_KEY) {
+export async function masoaraViteza(baza, urls, scrie = console.log, cheie = process.env.PAGESPEED_API_KEY || incarcaSecrete().PAGESPEED_API_KEY, pauza = 30000) {
   const alese = [urls.find((u) => new URL(u).pathname === "/"), urls.find((u) => /\/categorie\/[^/]+\/$/.test(u)), urls.find((u) => /\/magazin\/[^/]+\/$/.test(u))].filter(Boolean);
   let probleme = 0;
   for (const u of alese) {
     const api = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?strategy=mobile&locale=ro&category=performance&category=accessibility&category=seo&category=best-practices&url=" + encodeURIComponent(peBaza(u, baza)) + (cheie ? "&key=" + cheie : "");
-    const r = await ia(api, { redirect: "follow" });
-    if (r.status === 429) { scrie("PROBLEMA PageSpeed: prea multe cereri (limita Google). Reincearca peste cateva minute."); probleme++; continue; }
+    let r = await ia(api, { redirect: "follow" });
+    for (let incercare = 0; r.status === 429 && incercare < 3; incercare++) { scrie(`   PageSpeed: limita Google atinsa, astept ${pauza / 1000} s si reincerc...`); await new Promise((ok) => setTimeout(ok, pauza)); r = await ia(api, { redirect: "follow" }); }
+    if (r.status === 429) { scrie("PROBLEMA PageSpeed: limita Google. Reincearca peste cateva minute sau pune o cheie gratuita PAGESPEED_API_KEY in secrete.env (Google Cloud: activeaza PageSpeed Insights API)."); probleme++; continue; }
     if (r.status !== 200) { scrie(`PROBLEMA PageSpeed ${u}: status ${r.status}`); probleme++; continue; }
     const j = JSON.parse(r.text); const lh = j.lighthouseResult; const cat = (n) => Math.round((lh.categories[n]?.score ?? 0) * 100); const au = (n) => lh.audits[n]?.displayValue ?? "?";
     scrie(`${new URL(u).pathname}  Performanta ${cat("performance")} | Accesibilitate ${cat("accessibility")} | Practici ${cat("best-practices")} | SEO ${cat("seo")} | LCP ${au("largest-contentful-paint")} | CLS ${au("cumulative-layout-shift")} | TBT ${au("total-blocking-time")}`);

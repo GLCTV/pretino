@@ -28,7 +28,9 @@ $script:DupaProgram = $false
       <Button Name="BTeste" Content="Ruleaza testele" Padding="12,6" Margin="0,0,8,0"/>
       <Button Name="BLive" Content="PUBLICA LIVE" Padding="12,6" Background="#b91c1c" Foreground="White" FontWeight="Bold"/>
     </WrapPanel>
-    <Border Grid.Row="3" BorderBrush="#2dd4bf" BorderThickness="0,1,0,0" Padding="0,8,0,8" Margin="0,0,0,8">
+    <TabControl Grid.Row="3" Margin="0,0,0,8">
+    <TabItem Header="Campanii si oferte">
+    <Border BorderBrush="#2dd4bf" BorderThickness="0,1,0,0" Padding="0,8,0,8">
       <StackPanel>
         <TextBlock Text="Campanii si oferte (PC Garage) - doar citire si consultare, nu publica nimic pe site" Foreground="#2dd4bf" FontWeight="Bold" Margin="0,0,0,6"/>
         <WrapPanel Margin="0,0,0,6">
@@ -59,15 +61,40 @@ $script:DupaProgram = $false
         <TextBox Name="CDetalii" Height="86" IsReadOnly="True" Background="#142120" Foreground="#e6f0ee" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
       </StackPanel>
     </Border>
+    </TabItem>
+    <TabItem Header="SEO si motoare de cautare">
+      <Border BorderBrush="#2dd4bf" BorderThickness="0,1,0,0" Padding="0,8,0,8">
+        <StackPanel>
+          <TextBlock Text="Verificari si trimitere catre Google si Bing - nu modifica site-ul si nu publica nimic (ruleaza pe site-ul LIVE, dupa PUBLICA LIVE)" Foreground="#2dd4bf" FontWeight="Bold" Margin="0,0,0,6" TextWrapping="Wrap"/>
+          <WrapPanel Margin="0,0,0,8">
+            <Button Name="STot" Content="Fa tot (verifica + trimite la Bing + viteza)" Padding="10,5" Margin="0,0,8,0" FontWeight="Bold"/>
+            <Button Name="SVerifica" Content="Verifica site-ul live" Padding="10,5" Margin="0,0,8,0"/>
+            <Button Name="STrimite" Content="Trimite paginile noi la Bing (IndexNow)" Padding="10,5" Margin="0,0,8,0"/>
+            <Button Name="SViteza" Content="Masoara viteza (PageSpeed, mobil)" Padding="10,5"/>
+          </WrapPanel>
+          <TextBlock Text="Google nu permite trimitere automata pentru acest tip de site (fara cont conectat). Foloseste aceste butoane, care deschid direct paginile potrivite:" Foreground="#9bb0ad" TextWrapping="Wrap" Margin="0,0,0,6"/>
+          <WrapPanel Margin="0,0,0,8">
+            <Button Name="SGSitemap" Content="Google: Sitemaps" Padding="8,4" Margin="0,0,8,0"/>
+            <Button Name="SGInspect" Content="Google: Inspectare URL" Padding="8,4" Margin="0,0,8,0"/>
+            <Button Name="SGPerf" Content="Google: Performanta" Padding="8,4" Margin="0,0,8,0"/>
+            <Button Name="SRich" Content="Test rezultate imbogatite" Padding="8,4" Margin="0,0,8,0"/>
+            <Button Name="SBing" Content="Bing Webmaster" Padding="8,4" Margin="0,0,8,0"/>
+            <Button Name="SPageSpeed" Content="PageSpeed (site)" Padding="8,4"/>
+          </WrapPanel>
+          <TextBlock Text="Sitemap: https://pretino.ro/sitemap.xml  |  Raportul apare in jurnalul de jos. Trimiterea la Bing trimite doar paginile noi sau schimbate de la ultima trimitere." Foreground="#9bb0ad" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Border>
+    </TabItem>
+    </TabControl>
     <TextBox Name="Jurnal" Grid.Row="4" IsReadOnly="True" Background="#142120" Foreground="#e6f0ee" FontFamily="Consolas" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
   </Grid>
 </Window>
 "@
 $win = [Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $xaml))
 
-$c = @{}; foreach ($n in 'Stare','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii') { $c[$n] = $win.FindName($n) }
+$c = @{}; foreach ($n in 'Stare','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
 
-function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram') { $c[$n].IsEnabled = -not $busy } }
+function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram','STot','SVerifica','STrimite','SViteza') { $c[$n].IsEnabled = -not $busy } }
 
 function Start-Task($nume, $comanda) {
   if ($script:Proc -and -not $script:Proc.HasExited) { return }
@@ -124,6 +151,18 @@ $c.BLive.Add_Click({
   $r = [System.Windows.MessageBox]::Show('Publici LIVE pe pretino.ro versiunea de pe main?', 'PUBLICA LIVE', 'YesNo', 'Warning')
   if ($r -eq 'Yes') { Start-Task 'publica-live' 'bun scripts/publica.js --live' }
 })
+
+# ---------- SEO si motoare de cautare (ruleaza pe site-ul live; scripts/seo-motoare.js) ----------
+$c.STot.Add_Click({ Start-Task 'seo-tot' 'bun scripts/seo-motoare.js --tot' })
+$c.SVerifica.Add_Click({ Start-Task 'seo-verifica' 'bun scripts/seo-motoare.js --verifica' })
+$c.STrimite.Add_Click({ Start-Task 'seo-trimite' 'bun scripts/seo-motoare.js --trimite' })
+$c.SViteza.Add_Click({ Start-Task 'seo-viteza' 'bun scripts/seo-motoare.js --viteza' })
+$c.SGSitemap.Add_Click({ Start-Process 'https://search.google.com/search-console/sitemaps?resource_id=sc-domain%3Apretino.ro' })
+$c.SGInspect.Add_Click({ Start-Process 'https://search.google.com/search-console/inspect?resource_id=sc-domain%3Apretino.ro' })
+$c.SGPerf.Add_Click({ Start-Process 'https://search.google.com/search-console/performance/search-analytics?resource_id=sc-domain%3Apretino.ro' })
+$c.SRich.Add_Click({ Start-Process 'https://search.google.com/test/rich-results?url=https%3A%2F%2Fpretino.ro%2F' })
+$c.SBing.Add_Click({ Start-Process 'https://www.bing.com/webmasters' })
+$c.SPageSpeed.Add_Click({ Start-Process 'https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fpretino.ro%2F&form_factor=mobile' })
 
 # ---------- Campanii si oferte (modul propriu Pretino; ruleaza in fundal) ----------
 $script:ProcC = $null

@@ -200,3 +200,9 @@
 
 ## v1.60 – verificare Bing Webmaster
 - `public/BingSiteAuth.xml` copiat in radacina site-ului (Bing Webmaster Tools). STATUS: pe ramura `bing-verificare`, asteptam OK de la Laur.
+
+## v1.61 – tab „SEO si motoare de cautare” in program
+- Tab nou (langa „Campanii si oferte”): „Fa tot”, „Verifica site-ul live” (sitemap, robots, 200 pe toate paginile din sitemap, noindex, canonical, 404 real, fisiere de verificare Bing/IndexNow), „Trimite paginile noi la Bing (IndexNow)” (doar pagini noi/modificate, hash local in `.pretino-local/seo-hash.json`), „Masoara viteza” (PageSpeed Insights mobil, optional `PAGESPEED_API_KEY` in secrete.env). Butoane care deschid Search Console (Sitemaps, Inspectare URL, Performanta), Rich Results Test, Bing Webmaster, PageSpeed.
+- Backend: `scripts/seo-motoare.js`, config `data/seo-motoare.json`, cheie IndexNow publica `public/<cheie>.txt`. Teste: `scripts/test-seo-motoare.js`.
+- Google: fara trimitere automata (ar cere OAuth Search Console; ping-ul de sitemap a fost desfiintat). Neverificat: aspectul tab-ului in WPF (nu se poate rula in cloud), trimiterea reala IndexNow (dupa PUBLICA LIVE).
+- STATUS: pe ramura `tab-seo`, asteptam OK de la Laur inainte de main.

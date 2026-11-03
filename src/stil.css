@@ -238,8 +238,13 @@ main.simplu h2{margin-top:1.4em}
 .lista-ghiduri li{padding:12px 0;border-bottom:1px solid var(--bd)}
 .lista-ghiduri a{font-weight:700;font-size:17px}
 .lista-ghiduri p{margin:.3em 0 0;color:var(--fg2);line-height:1.5}
-.descopera{display:flex;flex-wrap:wrap;gap:6px 22px;padding:12px 11px 0;font-size:13.5px;color:var(--fg2)}
-.d-grup{display:inline-flex;flex-wrap:wrap;gap:4px 12px;align-items:center}
-.d-grup b{color:var(--fg);font-weight:700}
-.descopera a{color:var(--acc-txt);text-decoration:none;font-weight:600}
-.descopera a:hover{text-decoration:underline}
+.descopera{display:flex;flex-direction:column;gap:10px;padding:14px 11px 2px}
+.d-grup{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.d-grup b{flex:0 0 118px;color:var(--fg2);font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.descopera a,.continut .legaturi a{display:inline-flex;align-items:center;height:34px;padding:0 16px;border-radius:var(--r-pill);border:1.5px solid var(--bd-chip);background:var(--card);color:var(--fg);font:600 13px var(--font);text-decoration:none;white-space:nowrap;transition:transform .15s,border-color .15s,box-shadow .15s}
+.descopera a:hover,.continut .legaturi a:hover{border-color:var(--acc);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.descopera a:focus-visible,.continut .legaturi a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.descopera a.mare,.continut .legaturi a.mare{background:var(--grad);border-color:transparent;color:var(--acc-fg)}
+.descopera a.mare::after,.continut .legaturi a.mare::after{content:"\203A";margin-left:8px;font-size:17px;line-height:1}
+.continut .legaturi{display:flex;flex-wrap:wrap;gap:8px;align-items:center;line-height:1.2}
+@media(max-width:760px){.d-grup b{flex:1 0 100%}.descopera a,.continut .legaturi a{height:32px;padding:0 13px;font-size:12.5px}}

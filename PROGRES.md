@@ -232,3 +232,7 @@
 - Legaturi interne: blocul „Descopera” pe homepage si categorii, subsol (Ghiduri, Top economii, Branduri). Teste noi in `scripts/test-seo.js` (sectiunea 10). Verificat in Chrome (desktop 1366 si telefon 390): fara scroll orizontal, fara erori JS.
 - Neverificat: imaginile produselor (hotlink, nu se incarca in cloud), titluri/descrieri pe Google (Search Console).
 - STATUS: pe ramura `seo-continut`, asteptam OK de la Laur inainte de main.
+
+## Butoane „Descopera” (ramura `butoane-descopera`, doar site)
+- Legaturile din blocul „Descopera” (home/categorii) si din randul de legaturi al topurilor/ghidurilor sunt acum butoane pill in stilul site-ului (tema inchisa + luminoasa), cu hover, focus vizibil si buton principal cu sageata (Toate ghidurile / Toate brandurile / Vezi toate ofertele). Verificat desktop 1366 si telefon 390.
+- STATUS: asteptam OK de la Laur inainte de main.

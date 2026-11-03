@@ -12,87 +12,136 @@ $script:LogFile = $null
 $script:DupaProgram = $false
 
 [xml]$xaml = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Title="Pretino v$AppVersion" Width="980" Height="860" Background="#0d1514" WindowStartupLocation="CenterScreen">
-  <Grid Margin="14">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Pretino v$AppVersion" Width="1060" Height="920" MinWidth="900" MinHeight="640" Background="#0b1220" WindowStartupLocation="CenterScreen" FontFamily="Segoe UI" FontSize="13">
+  <Window.Resources>
+    <Style TargetType="TextBlock"><Setter Property="Foreground" Value="#f1f5f9"/></Style>
+    <Style TargetType="CheckBox"><Setter Property="Foreground" Value="#f1f5f9"/></Style>
+    <Style TargetType="TextBox"><Setter Property="Background" Value="#0f172a"/><Setter Property="Foreground" Value="#f1f5f9"/><Setter Property="BorderBrush" Value="#334155"/><Setter Property="CaretBrush" Value="#f1f5f9"/><Setter Property="Padding" Value="6,4"/></Style>
+    <Style TargetType="ListBox"><Setter Property="Background" Value="#0f172a"/><Setter Property="Foreground" Value="#f1f5f9"/><Setter Property="BorderBrush" Value="#334155"/></Style>
+    <Style x:Key="Btn" TargetType="Button">
+      <Setter Property="Foreground" Value="White"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Padding" Value="14,8"/><Setter Property="Margin" Value="0,0,8,6"/><Setter Property="Cursor" Value="Hand"/><Setter Property="Background" Value="#334155"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" CornerRadius="7" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Setter.Value></Setter>
+      <Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Opacity" Value="0.82"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.35"/></Trigger></Style.Triggers>
+    </Style>
+    <Style x:Key="BtnVerde" TargetType="Button" BasedOn="{StaticResource Btn}"><Setter Property="Background" Value="#15803d"/></Style>
+    <Style x:Key="BtnAlbastru" TargetType="Button" BasedOn="{StaticResource Btn}"><Setter Property="Background" Value="#2563eb"/></Style>
+    <Style x:Key="BtnPortocaliu" TargetType="Button" BasedOn="{StaticResource Btn}"><Setter Property="Background" Value="#c2410c"/></Style>
+    <Style x:Key="BtnRosu" TargetType="Button" BasedOn="{StaticResource Btn}"><Setter Property="Background" Value="#dc2626"/></Style>
+    <Style x:Key="BtnGri" TargetType="Button" BasedOn="{StaticResource Btn}"><Setter Property="Background" Value="#475569"/></Style>
+    <Style TargetType="TabControl"><Setter Property="Background" Value="#131c2e"/><Setter Property="BorderBrush" Value="#24324d"/><Setter Property="BorderThickness" Value="1"/><Setter Property="Padding" Value="12"/></Style>
+    <Style TargetType="TabItem">
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabItem">
+        <Border Name="Bd" Background="#1e293b" CornerRadius="8,8,0,0" Padding="18,9" Margin="0,0,4,0"><ContentPresenter Name="Cp" ContentSource="Header" TextElement.Foreground="#94a3b8" TextElement.FontWeight="SemiBold"/></Border>
+        <ControlTemplate.Triggers><Trigger Property="IsSelected" Value="True"><Setter TargetName="Bd" Property="Background" Value="#2563eb"/><Setter TargetName="Cp" Property="TextElement.Foreground" Value="White"/></Trigger></ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+  </Window.Resources>
+  <Grid Margin="16">
     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-    <DockPanel>
-      <Button Name="BProgram" DockPanel.Dock="Right" Content="Actualizeaza programul" Padding="12,6" VerticalAlignment="Center"/>
-      <TextBlock Name="Titlu" Text="Pretino.ro - oferte actuale (v$AppVersion)" Foreground="#2dd4bf" FontSize="22" FontWeight="Bold"/>
-    </DockPanel>
-    <TextBlock Name="Stare" Grid.Row="1" Foreground="#9bb0ad" Margin="0,4,0,10" Text="Gata."/>
-    <WrapPanel Grid.Row="2" Margin="0,0,0,10">
-      <CheckBox Name="Demo" Content="Date DEMO in previzualizare" Foreground="#e6f0ee" IsChecked="True" Margin="0,0,14,0" VerticalAlignment="Center"/>
-      <Button Name="BPreview" Content="Porneste previzualizarea" Padding="12,6" Margin="0,0,8,0"/>
-      <Button Name="BOprestePreview" Content="Opreste previzualizarea" Padding="12,6" Margin="0,0,8,0"/>
-      <Button Name="BActualizare" Content="Actualizeaza oferte" Padding="12,6" Margin="0,0,8,0"/>
-      <Button Name="BTeste" Content="Ruleaza testele" Padding="12,6" Margin="0,0,8,0"/>
-      <Button Name="BLive" Content="PUBLICA LIVE" Padding="12,6" Background="#b91c1c" Foreground="White" FontWeight="Bold"/>
-    </WrapPanel>
-    <TabControl Grid.Row="3" Margin="0,0,0,8">
-    <TabItem Header="Campanii si oferte">
-    <Border BorderBrush="#2dd4bf" BorderThickness="0,1,0,0" Padding="0,8,0,8">
+    <DockPanel Margin="0,0,0,10">
+      <Button Name="BProgram" DockPanel.Dock="Right" Content="Actualizeaz&#x103; programul" Style="{StaticResource BtnAlbastru}" VerticalAlignment="Center" Margin="0"/>
       <StackPanel>
-        <TextBlock Text="Campanii si oferte (PC Garage) - doar citire si consultare, nu publica nimic pe site" Foreground="#2dd4bf" FontWeight="Bold" Margin="0,0,0,6"/>
-        <WrapPanel Margin="0,0,0,6">
-          <TextBlock Text="Magazin:" Foreground="#e6f0ee" VerticalAlignment="Center" Margin="0,0,6,0"/>
-          <ComboBox Name="CMagazin" Width="100" SelectedIndex="0" Margin="0,0,10,0"><ComboBoxItem Content="toate"/><ComboBoxItem Content="pcgarage"/></ComboBox>
-          <Button Name="CCauta" Content="Cauta campanii" Padding="10,4" Margin="0,0,8,0"/>
-          <Button Name="CActualizeaza" Content="Actualizeaza campanii si oferte" Padding="10,4" Margin="0,0,8,0"/>
-          <Button Name="COpreste" Content="Opreste" Padding="10,4" Margin="0,0,8,0"/>
-          <Button Name="CReia" Content="Reia verificarea intrerupta" Padding="10,4" Margin="0,0,8,0"/>
-          <Button Name="CRaport" Content="Raport" Padding="10,4" Margin="0,0,8,0"/>
-          <Button Name="CVerifica" Content="Deschide Chrome pentru verificare" Padding="10,4"/>
-        </WrapPanel>
-        <TextBlock Name="CProgres" Foreground="#9bb0ad" TextWrapping="Wrap" Margin="0,0,0,6" Text="Campanii: nicio verificare in aceasta sesiune."/>
-        <Grid Margin="0,0,0,6">
-          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-          <DockPanel Margin="0,0,6,0"><TextBlock DockPanel.Dock="Top" Text="Surse configurate (URL-uri)" Foreground="#9bb0ad"/><ListBox Name="CSurse" Height="110" Background="#142120" Foreground="#e6f0ee"/></DockPanel>
-          <DockPanel Grid.Column="1"><TextBlock DockPanel.Dock="Top" Text="Campanii gasite" Foreground="#9bb0ad"/><ListBox Name="CCampanii" Height="110" Background="#142120" Foreground="#e6f0ee"/></DockPanel>
-        </Grid>
-        <WrapPanel Margin="0,0,0,6">
-          <TextBox Name="CUrl" Width="360" Margin="0,0,6,0" ToolTip="URL pe domeniul PC Garage"/>
-          <TextBox Name="CTitlu" Width="130" Margin="0,0,6,0" ToolTip="Titlu (optional)"/>
-          <Button Name="CAdauga" Content="Adauga URL sursa" Padding="8,3" Margin="0,0,6,0"/>
-          <Button Name="CManual" Content="Adauga campanie manual" Padding="8,3" Margin="0,0,6,0"/>
-          <Button Name="CComuta" Content="Activeaza / Dezactiveaza sursa" Padding="8,3" Margin="0,0,6,0"/>
-          <Button Name="CSterge" Content="Sterge sursa" Padding="8,3" Margin="0,0,6,0"/>
-          <Button Name="CDeschide" Content="Deschide pagina oficiala" Padding="8,3"/>
-        </WrapPanel>
-        <TextBox Name="CDetalii" Height="86" IsReadOnly="True" Background="#142120" Foreground="#e6f0ee" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+        <TextBlock Text="Pretino.ro" Foreground="#2dd4bf" FontSize="28" FontWeight="Bold"/>
+        <TextBlock Text="Program de administrare - oferte din magazinele din Rom&#xE2;nia  |  versiunea $AppVersion" Foreground="#94a3b8"/>
       </StackPanel>
+    </DockPanel>
+    <Border Name="StareBox" Grid.Row="1" Background="#131c2e" BorderBrush="#16a34a" BorderThickness="6,0,0,0" CornerRadius="4" Padding="12,10" Margin="0,0,0,8">
+      <TextBlock Name="Stare" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" Text="Gata."/>
     </Border>
-    </TabItem>
-    <TabItem Header="SEO si motoare de cautare">
-      <Border BorderBrush="#2dd4bf" BorderThickness="0,1,0,0" Padding="0,8,0,8">
+    <WrapPanel Grid.Row="2" Margin="0,0,0,10">
+      <TextBlock Text="Ce &#xEE;nseamn&#x103; culorile:  " Foreground="#94a3b8"/>
+      <TextBlock Text="VERDE" Foreground="#4ade80" FontWeight="Bold"/><TextBlock Text=" = cite&#x219;te / verific&#x103;, sigur  &#xB7;  " Foreground="#94a3b8"/>
+      <TextBlock Text="ALBASTRU" Foreground="#60a5fa" FontWeight="Bold"/><TextBlock Text=" = local, doar la tine pe PC  &#xB7;  " Foreground="#94a3b8"/>
+      <TextBlock Text="PORTOCALIU" Foreground="#fb923c" FontWeight="Bold"/><TextBlock Text=" = aten&#x21B;ie / opre&#x219;te  &#xB7;  " Foreground="#94a3b8"/>
+      <TextBlock Text="RO&#x218;U" Foreground="#f87171" FontWeight="Bold"/><TextBlock Text=" = public pe site sau &#x219;terge  &#xB7;  " Foreground="#94a3b8"/>
+      <TextBlock Text="GRI" Foreground="#cbd5e1" FontWeight="Bold"/><TextBlock Text=" = deschide o pagin&#x103;" Foreground="#94a3b8"/>
+    </WrapPanel>
+    <TabControl Grid.Row="3" Margin="0,0,0,10">
+      <TabItem Header="1. Site: de la oferte la publicare">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+          <Button Name="BActualizare" Content="1. Actualizeaz&#x103; oferte" Style="{StaticResource BtnVerde}" Width="260"/>
+          <TextBlock Grid.Column="1" Text="Cite&#x219;te ofertele din magazine (Profitshare, evoMAG, PC Garage) &#x219;i le salveaz&#x103;. Nu schimb&#x103; site-ul public." Foreground="#cbd5e1" VerticalAlignment="Center" TextWrapping="Wrap" Margin="6,0,0,6"/>
+          <StackPanel Grid.Row="1" Orientation="Horizontal"><Button Name="BPreview" Content="2. Porne&#x219;te previzualizarea" Style="{StaticResource BtnAlbastru}" Width="190"/><Button Name="BOprestePreview" Content="Opre&#x219;te" Style="{StaticResource BtnGri}" Width="62"/></StackPanel>
+          <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="6,0,0,6"><CheckBox Name="Demo" Content="Date DEMO" IsChecked="True" VerticalAlignment="Center" Margin="0,0,12,0"/><TextBlock Text="Vezi site-ul doar la tine, pe http://localhost:3100. Nu e public." Foreground="#cbd5e1" VerticalAlignment="Center"/></StackPanel>
+          <Button Grid.Row="2" Name="BTeste" Content="3. Ruleaz&#x103; testele" Style="{StaticResource BtnAlbastru}" Width="260"/>
+          <TextBlock Grid.Row="2" Grid.Column="1" Text="Verific&#x103; dac&#x103; totul e &#xEE;n regul&#x103; &#xEE;nainte de publicare." Foreground="#cbd5e1" VerticalAlignment="Center" Margin="6,0,0,6"/>
+          <Button Grid.Row="3" Name="BLive" Content="4. PUBLIC&#x102; LIVE" Style="{StaticResource BtnRosu}" Width="260" FontSize="15"/>
+          <TextBlock Grid.Row="3" Grid.Column="1" Text="ATEN&#x21A;IE: pune pe pretino.ro versiunea de pe main. Se vede imediat pentru toat&#x103; lumea." Foreground="#fca5a5" FontWeight="SemiBold" VerticalAlignment="Center" TextWrapping="Wrap" Margin="6,0,0,6"/>
+        </Grid>
+      </TabItem>
+      <TabItem Header="2. Campanii PC Garage">
         <StackPanel>
-          <TextBlock Text="Verificari si trimitere catre Google si Bing - nu modifica site-ul si nu publica nimic (ruleaza pe site-ul LIVE, dupa PUBLICA LIVE)" Foreground="#2dd4bf" FontWeight="Bold" Margin="0,0,0,6" TextWrapping="Wrap"/>
-          <WrapPanel Margin="0,0,0,8">
-            <Button Name="STot" Content="Fa tot (verifica + trimite la Bing + viteza)" Padding="10,5" Margin="0,0,8,0" FontWeight="Bold"/>
-            <Button Name="SVerifica" Content="Verifica site-ul live" Padding="10,5" Margin="0,0,8,0"/>
-            <Button Name="STrimite" Content="Trimite paginile noi la Bing (IndexNow)" Padding="10,5" Margin="0,0,8,0"/>
-            <Button Name="SViteza" Content="Masoara viteza (PageSpeed, mobil)" Padding="10,5"/>
+          <TextBlock Text="Doar citire &#x219;i consultare - nu public&#x103; nimic pe site." Foreground="#94a3b8" Margin="0,0,0,8"/>
+          <WrapPanel Margin="0,0,0,6">
+            <TextBlock Text="Magazin:" VerticalAlignment="Center" Margin="0,0,6,6"/>
+            <ComboBox Name="CMagazin" Width="100" SelectedIndex="0" Margin="0,0,10,6"><ComboBoxItem Content="toate"/><ComboBoxItem Content="pcgarage"/></ComboBox>
+            <Button Name="CCauta" Content="Caut&#x103; campanii" Style="{StaticResource BtnVerde}"/>
+            <Button Name="CActualizeaza" Content="Actualizeaz&#x103; campanii &#x219;i oferte" Style="{StaticResource BtnVerde}"/>
+            <Button Name="COpreste" Content="Opre&#x219;te" Style="{StaticResource BtnPortocaliu}"/>
+            <Button Name="CReia" Content="Reia verificarea &#xEE;ntrerupt&#x103;" Style="{StaticResource BtnAlbastru}"/>
+            <Button Name="CRaport" Content="Raport" Style="{StaticResource BtnGri}"/>
+            <Button Name="CVerifica" Content="Deschide Chrome pentru verificare" Style="{StaticResource BtnPortocaliu}"/>
           </WrapPanel>
-          <TextBlock Text="Google nu permite trimitere automata pentru acest tip de site (fara cont conectat). Foloseste aceste butoane, care deschid direct paginile potrivite:" Foreground="#9bb0ad" TextWrapping="Wrap" Margin="0,0,0,6"/>
-          <WrapPanel Margin="0,0,0,8">
-            <Button Name="SGSitemap" Content="Google: Sitemaps" Padding="8,4" Margin="0,0,8,0"/>
-            <Button Name="SGInspect" Content="Google: Inspectare URL" Padding="8,4" Margin="0,0,8,0"/>
-            <Button Name="SGPerf" Content="Google: Performanta" Padding="8,4" Margin="0,0,8,0"/>
-            <Button Name="SRich" Content="Test rezultate imbogatite" Padding="8,4" Margin="0,0,8,0"/>
-            <Button Name="SBing" Content="Bing Webmaster" Padding="8,4" Margin="0,0,8,0"/>
-            <Button Name="SPageSpeed" Content="PageSpeed (site)" Padding="8,4"/>
+          <TextBlock Name="CProgres" Foreground="#cbd5e1" TextWrapping="Wrap" Margin="0,0,0,8" Text="Campanii: nicio verificare &#xEE;n aceast&#x103; sesiune."/>
+          <Grid Margin="0,0,0,8">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <DockPanel Margin="0,0,6,0"><TextBlock DockPanel.Dock="Top" Text="Surse configurate (adrese)" Foreground="#94a3b8" Margin="0,0,0,3"/><ListBox Name="CSurse" Height="105"/></DockPanel>
+            <DockPanel Grid.Column="1"><TextBlock DockPanel.Dock="Top" Text="Campanii g&#x103;site" Foreground="#94a3b8" Margin="0,0,0,3"/><ListBox Name="CCampanii" Height="105"/></DockPanel>
+          </Grid>
+          <WrapPanel Margin="0,0,0,6">
+            <TextBox Name="CUrl" Width="340" Margin="0,0,6,6" ToolTip="Adres&#x103; pe domeniul PC Garage"/>
+            <TextBox Name="CTitlu" Width="130" Margin="0,0,6,6" ToolTip="Titlu (op&#x21B;ional)"/>
+            <Button Name="CAdauga" Content="Adaug&#x103; surs&#x103;" Style="{StaticResource BtnVerde}" Padding="10,5"/>
+            <Button Name="CManual" Content="Adaug&#x103; campanie manual" Style="{StaticResource BtnVerde}" Padding="10,5"/>
+            <Button Name="CComuta" Content="Activeaz&#x103; / Dezactiveaz&#x103; sursa" Style="{StaticResource BtnGri}" Padding="10,5"/>
+            <Button Name="CSterge" Content="&#x218;terge sursa" Style="{StaticResource BtnRosu}" Padding="10,5"/>
+            <Button Name="CDeschide" Content="Deschide pagina oficial&#x103;" Style="{StaticResource BtnGri}" Padding="10,5"/>
           </WrapPanel>
-          <TextBlock Text="Sitemap: https://pretino.ro/sitemap.xml  |  Raportul apare in jurnalul de jos. Trimiterea la Bing trimite doar paginile noi sau schimbate de la ultima trimitere." Foreground="#9bb0ad" TextWrapping="Wrap"/>
+          <TextBox Name="CDetalii" Height="80" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
         </StackPanel>
-      </Border>
-    </TabItem>
+      </TabItem>
+      <TabItem Header="3. SEO: Google &#x219;i Bing">
+        <StackPanel>
+          <TextBlock Text="Verific&#x103;ri &#x219;i trimitere c&#x103;tre Google &#x219;i Bing. Nu modific&#x103; site-ul &#x219;i nu public&#x103; nimic. Ruleaz&#x103; pe site-ul LIVE, deci folose&#x219;te-le dup&#x103; PUBLIC&#x102; LIVE." Foreground="#94a3b8" TextWrapping="Wrap" Margin="0,0,0,10"/>
+          <WrapPanel Margin="0,0,0,10">
+            <Button Name="STot" Content="F&#x103; tot (verific&#x103; + Bing + vitez&#x103;)" Style="{StaticResource BtnVerde}" FontSize="14"/>
+            <Button Name="SVerifica" Content="Verific&#x103; site-ul live" Style="{StaticResource BtnVerde}"/>
+            <Button Name="STrimite" Content="Trimite paginile noi la Bing" Style="{StaticResource BtnVerde}"/>
+            <Button Name="SViteza" Content="M&#x103;soar&#x103; viteza (mobil)" Style="{StaticResource BtnVerde}"/>
+          </WrapPanel>
+          <TextBlock Text="Google nu permite trimitere automat&#x103; f&#x103;r&#x103; cont conectat. Aceste butoane deschid direct paginile potrivite:" Foreground="#94a3b8" TextWrapping="Wrap" Margin="0,0,0,6"/>
+          <WrapPanel Margin="0,0,0,8">
+            <Button Name="SGSitemap" Content="Google: Sitemaps" Style="{StaticResource BtnGri}"/>
+            <Button Name="SGInspect" Content="Google: Inspectare adres&#x103;" Style="{StaticResource BtnGri}"/>
+            <Button Name="SGPerf" Content="Google: Performan&#x21B;&#x103;" Style="{StaticResource BtnGri}"/>
+            <Button Name="SRich" Content="Test rezultate &#xEE;mbog&#x103;&#x21B;ite" Style="{StaticResource BtnGri}"/>
+            <Button Name="SBing" Content="Bing Webmaster" Style="{StaticResource BtnGri}"/>
+            <Button Name="SPageSpeed" Content="PageSpeed (site)" Style="{StaticResource BtnGri}"/>
+          </WrapPanel>
+          <TextBlock Text="Sitemap: https://pretino.ro/sitemap.xml  |  Raportul apare &#xEE;n jurnalul de jos." Foreground="#94a3b8"/>
+        </StackPanel>
+      </TabItem>
     </TabControl>
-    <TextBox Name="Jurnal" Grid.Row="4" IsReadOnly="True" Background="#142120" Foreground="#e6f0ee" FontFamily="Consolas" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
+    <DockPanel Grid.Row="4">
+      <TextBlock DockPanel.Dock="Top" Text="Jurnal (ce face programul acum)" Foreground="#94a3b8" Margin="0,0,0,3"/>
+      <TextBox Name="Jurnal" IsReadOnly="True" FontFamily="Consolas" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
+    </DockPanel>
   </Grid>
 </Window>
 "@
-$win = [Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $xaml))
+try {
+  $win = [Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $xaml))
+} catch {
+  # Plasa de siguranta: daca interfata nu se poate incarca, descarca ultima versiune a proiectului ca sa se poata repara
+  $eroare = "$_"
+  try { Push-Location $Root; git pull --rebase --autostash -q 2>$null; Pop-Location } catch { Pop-Location }
+  [void][System.Windows.MessageBox]::Show("Interfata programului nu s-a putut incarca.`n`nAm descarcat ultima versiune a proiectului. Inchide si porneste programul din nou.`nDaca apare din nou, trimite captura acestui mesaj:`n`n$eroare", 'Pretino - eroare interfata', 'OK', 'Error')
+  exit 1
+}
 
-$c = @{}; foreach ($n in 'Stare','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
+$c = @{}; foreach ($n in 'Stare','StareBox','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
 
 function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram','STot','SVerifica','STrimite','SViteza') { $c[$n].IsEnabled = -not $busy } }
 
@@ -104,9 +153,19 @@ function Start-Task($nume, $comanda) {
   $script:Proc = Start-Process -FilePath 'cmd.exe' -ArgumentList "/c cd /d `"$Root`" && $comanda > `"$script:LogFile`" 2>&1" -WindowStyle Hidden -PassThru
 }
 
+function Set-CuloareStare {
+  $t = "$($c.Stare.Text)"
+  $col = '#16a34a'
+  if ($t -match 'eroare|esuat|invalid') { $col = '#dc2626' }
+  elseif ($t -match 'ASTEPT|Alege') { $col = '#ea580c' }
+  elseif ($t -match 'Ruleaza|ruleaza|Opresc|pornita') { $col = '#2563eb' }
+  $c.StareBox.BorderBrush = (New-Object System.Windows.Media.BrushConverter).ConvertFromString($col)
+}
+
 $timer = New-Object System.Windows.Threading.DispatcherTimer
 $timer.Interval = [TimeSpan]::FromMilliseconds(700)
 $timer.Add_Tick({
+  Set-CuloareStare
   if ($script:LogFile -and (Test-Path $script:LogFile)) {
     try { $c.Jurnal.Text = (Get-Content $script:LogFile -Raw -Encoding UTF8 -ErrorAction Stop); $c.Jurnal.ScrollToEnd() } catch {}
   }
@@ -234,7 +293,7 @@ function Mag-DinUrl($u) { if ($u -match 'pcgarage\.ro') { return 'pcgarage' } el
 $campTimer = New-Object System.Windows.Threading.DispatcherTimer
 $campTimer.Interval = [TimeSpan]::FromMilliseconds(1200)
 $campTimer.Add_Tick({
-  Show-Progres
+  Show-Progres; Set-CuloareStare
   if ($script:ProcC -and $script:ProcC.HasExited) {
     $script:ProcC = $null; Set-BusyC $false; Load-Surse; Load-Campanii
     $c.Stare.Text = 'Campanii: verificare terminata. Vezi raportul pentru ce a ramas neverificat.'

@@ -197,3 +197,6 @@
 ## v1.59 – accesibilitate
 - Select-ul „Sortează” are nume accesibil (aria-label; eticheta e ascunsa pe telefon). Chip-urile de subcategorie sunt linkuri: aria-pressed scos (nepermis pe <a>), ramane aria-current. Raportat de PageSpeed (Accesibilitate 86–91).
 - STATUS: pe ramura `accesibilitate-v1`, asteptam OK de la Laur inainte de main.
+
+## v1.60 – verificare Bing Webmaster
+- `public/BingSiteAuth.xml` copiat in radacina site-ului (Bing Webmaster Tools). STATUS: pe ramura `bing-verificare`, asteptam OK de la Laur.

@@ -354,3 +354,85 @@ body[data-cat] .hero h1,body[data-cat] .continut h1{border-left:5px solid var(--
 :root[data-theme="light"] .ghid-surori a[data-cat=electronice]{--c:#1d4ed8}
 .ghid-surori a[data-cat=electrocasnice]{--c:#fb923c}
 :root[data-theme="light"] .ghid-surori a[data-cat=electrocasnice]{--c:#c2410c}
+
+/* ---- UX: linie de actualizare compacta, Descopera pliabil, indicii de derulare, tinte tactile, filtre active, stari goale, comparare, „Inapoi sus” ---- */
+.info-pret{margin:6px 0 0}
+.info-pret summary{display:inline-flex;align-items:center;gap:8px;cursor:pointer;list-style:none;min-height:32px}
+.info-pret summary::-webkit-details-marker{display:none}
+.info-pret .i{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--mut);color:var(--mut);font:700 12px var(--font)}
+.info-pret summary:hover .i,.info-pret summary:focus-visible .i{border-color:var(--acc);color:var(--acc-txt)}
+.info-pret summary:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:6px}
+.info-pret p{margin:2px 0 0;max-width:640px;line-height:1.5}
+.descopera summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--fg2);min-height:36px;padding:0 2px}
+.descopera summary::-webkit-details-marker{display:none}
+.descopera summary::after{content:"\25BE";font-size:14px;transition:transform .15s}
+.descopera details[open]>summary::after{transform:rotate(180deg)}
+.descopera details>.d-grup{margin-top:10px}
+.descopera summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+@media(min-width:761px){.descopera summary{display:none}.descopera details>.d-grup{margin-top:0}.descopera details>.d-grup+.d-grup{margin-top:10px}}
+.cats,.subcats{position:relative}
+.poate-dr:not(.poate-st){-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 44px),transparent)}
+.poate-st:not(.poate-dr){-webkit-mask-image:linear-gradient(to left,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(to left,#000 calc(100% - 44px),transparent)}
+.poate-st.poate-dr{-webkit-mask-image:linear-gradient(to right,transparent,#000 36px,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(to right,transparent,#000 36px,#000 calc(100% - 44px),transparent)}
+/* tinte tactile mai mari fara sa schimbe aspectul */
+.fav{width:40px;height:40px;right:2px;top:3px}
+.fav .ic{width:24px;height:24px}
+.migaje a{display:inline-flex;align-items:center;min-height:32px;padding:0 2px}
+footer .legal a,footer .magazine-f a{display:inline-flex;align-items:center;min-height:34px}
+.magazin a{display:inline-flex;align-items:center;min-height:26px;padding:0 9px;border-radius:var(--r-pill);border:1px solid var(--bd2);background:color-mix(in srgb,var(--c) 8%,transparent);font-weight:600}
+.specs{display:flex;flex-wrap:wrap;gap:4px;margin:4px 3px 0}
+.specs i{font-style:normal;font-size:11.5px;font-weight:600;color:var(--fg2);padding:1px 7px;border-radius:6px;background:color-mix(in srgb,var(--c) 12%,var(--panel));border:1px solid var(--bd)}
+.btn{overflow:hidden;white-space:nowrap}
+.btn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+/* filtre active + contor */
+.btn-filtre .cnt{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--acc);color:var(--acc-fg);font:800 12px var(--font)}
+.btn-filtre .cnt[hidden]{display:none}
+.active{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.active[hidden]{display:none}
+.ach{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:0 12px;border-radius:var(--r-pill);border:1.5px solid var(--bd-acc);background:var(--acc-bg);color:var(--acc-txt);font:600 13px var(--font);cursor:pointer}
+.ach:hover,.ach:focus-visible{border-color:var(--acc);outline:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 40%,transparent)}
+.ach.tot{background:transparent;border-color:var(--bd2);color:var(--fg2)}
+.aplica{display:none}
+@media(max-width:1000px){.aplica{display:block;position:sticky;bottom:0;width:100%;margin-top:14px;height:46px;border:0;border-radius:12px;background:var(--grad);color:var(--acc-fg);font:800 15px var(--font);cursor:pointer;box-shadow:0 -10px 18px var(--panel)}}
+/* stari goale */
+.rez-gol p{margin:10px 0 0}
+.rez-gol a:not(.btn-link){color:var(--acc-txt);font-weight:700}
+.gol-ic{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 14px;border-radius:50%;background:color-mix(in srgb,#e0475b 14%,var(--panel));color:#e0475b}
+.gol-ic .ic{width:36px;height:36px}
+.gol-et{margin-top:18px!important}
+.gol-acte{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.btn-link{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 16px;border-radius:var(--r-pill);border:1.5px solid var(--bd-chip);background:var(--card);color:var(--fg);font:600 13.5px var(--font);text-decoration:none;cursor:pointer}
+.btn-link:hover,.btn-link:focus-visible{border-color:var(--acc)}
+.btn-link.mare{background:var(--grad);border-color:transparent;color:var(--acc-fg);font-weight:800}
+.fav-gol .filtre,.fav-gol .rez-cap,.fav-gol .btn-filtre{display:none}
+.fav-gol .cont{grid-template-columns:minmax(0,1fr)}
+.legaturi404{display:flex;flex-wrap:wrap;gap:8px}
+/* favorite: pret la salvare + comparare */
+.pret-salvat{margin:6px 3px 0;font-size:12px;font-weight:600;padding:3px 8px;border-radius:8px;line-height:1.35}
+.pret-salvat.scazut{background:color-mix(in srgb,#22c55e 16%,transparent);color:#22c55e}
+.pret-salvat.crescut{background:color-mix(in srgb,#f59e0b 16%,transparent);color:#f59e0b}
+:root[data-theme="light"] .pret-salvat.scazut{color:#15803d}
+:root[data-theme="light"] .pret-salvat.crescut{color:#b45309}
+.cmp{display:flex;align-items:center;gap:8px;margin:8px 3px 0;min-height:34px;font-size:13px;font-weight:600;color:var(--fg2);cursor:pointer}
+.cmp input{width:19px;height:19px;accent-color:var(--acc)}
+.compara{margin:0 0 18px;padding:14px;border:1px solid var(--bd2);border-radius:var(--r-card);background:var(--panel)}
+.compara[hidden]{display:none}
+.cmp-cap{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.cmp-cap h3{margin:0;font-size:17px}
+.cmp-ind{margin:0;color:var(--fg2)}
+.cmp-tabel{overflow-x:auto}
+.cmp-tabel table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+.cmp-tabel th,.cmp-tabel td{padding:9px 10px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+.cmp-tabel thead th{font-size:13px;line-height:1.35;color:var(--fg)}
+.cmp-tabel tbody th{color:var(--fg2);font-weight:700;white-space:nowrap}
+.cmp-tabel td.cel-mai-bun{color:#22c55e}
+:root[data-theme="light"] .cmp-tabel td.cel-mai-bun{color:#15803d}
+.cmp-tabel a{color:var(--acc-txt);font-weight:700}
+/* semnal de scadere de pret in antet */
+.ibtn .nr.scazut{background:#22c55e;color:#04210f;box-shadow:0 0 0 2px var(--hdr)}
+/* inapoi sus */
+.sus{position:fixed;right:16px;bottom:18px;z-index:50;width:46px;height:46px;display:grid;place-items:center;border:1.5px solid var(--bd-acc);border-radius:50%;background:var(--panel);color:var(--acc-txt);cursor:pointer;box-shadow:var(--sh)}
+.sus[hidden]{display:none}
+.sus .ic{width:24px;height:24px;stroke-width:2.2}
+.sus:hover,.sus:focus-visible{border-color:var(--acc);outline:none}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:auto}}

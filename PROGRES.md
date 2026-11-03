@@ -254,3 +254,6 @@ Nefacut (intentionat): istoric/grafic de pret (datele din data/istoric-preturi.j
 
 ## Grafica (branch grafica, doar site)
 Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-sursa.html`); fundal cu lumina de accent in culoarea categoriei; tipografie (balance, tabular-nums); carduri cu hover, poza cu fundal curat, insigne cu gradient, butoane cu umbra; hero cu statistici reale pe prima pagina (oferte, magazine, cea mai mare reducere); ilustratie hero redesenata (carduri suprapuse + insigna %) in culoarea categoriei; poza lipsa tintita pe categorie; subsol cu marca si linie de accent; selectie, focus si scrollbar in tema.
+
+## Scene ilustrate pe categorii si subcategorii (branch grafica-scene, doar site)
+`scripts/lib/ilustratii.js`: 8 scene de categorie (laptop+telefon+chip, frigider+masina de spalat, casa+copac, rochie+geanta+pantof, masina, gantera+mingi, ursulet+cuburi, cos de cumparaturi) si 39 de scene de subcategorie compuse din ~55 de obiecte desenate de noi (laptop, router, imprimanta, aspirator, bicicleta, cort etc.). Culoare = accentul categoriei (--c), tema inchisa/deschisa. Apar doar pe paginile care exista (subcategoriile cu destule oferte). Fara imagini externe.

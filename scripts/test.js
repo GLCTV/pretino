@@ -101,6 +101,7 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   ok(pag.every((f) => !/emag\.ro/i.test(readFileSync(f, "utf8"))), "eMAG interzis (regula Profitshare): niciun link emag.ro in paginile generate"); }
 { const { testePanou } = await import("./test-panou.js"); await testePanou(ok); }
 { const { testeSeo } = await import("./test-seo.js"); testeSeo(ok); }
+{ const { testeSeoMotoare } = await import("./test-seo-motoare.js"); await testeSeoMotoare(ok); }
 { const { testeCampanii } = await import("./test-campanii.js"); await testeCampanii(ok); }
 console.log(esecuri ? `\n${esecuri} teste eșuate` : "\nToate testele au trecut");
 process.exit(esecuri ? 1 : 0);

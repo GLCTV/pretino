@@ -218,3 +218,7 @@
 - Raportat de Laur (captura): fisierul cheie IndexNow dadea 404 pe site-ul publicat inainte de v1.61, iar trimiterea se marca totusi reusita. Acum nu se trimite nimic (si starea nu se salveaza) cat timp cheia nu se deschide pe site; starea veche se ignora, deci paginile se retrimit dupa publicare.
 - PageSpeed: la limita Google (429) reincearca de 3 ori la 30 s; accepta `PAGESPEED_API_KEY` din secrete.env.
 - STATUS: pe ramura `seo-indexnow-fix`.
+
+## v1.64 – buton Opreste in tab-ul SEO
+- Buton portocaliu „Opreste” (activ doar cat ruleaza o actiune) opreste procesul pornit din program; bara de stare arata „Oprit de tine.”. Doar program, fara schimbari pe site.
+- STATUS: pe ramura `seo-oprire`.

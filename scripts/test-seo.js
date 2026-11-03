@@ -144,6 +144,12 @@ export function testeSeo(ok) {
   ok(/Încearcă: /.test(cs) && /Nu ai salvat nicio ofertă/.test(cs) && /Nicio ofertă cu filtrele alese/.test(cs), "ux: stări goale utile (căutare, favorite, filtre)");
   const f404 = readFileSync("dist/404.html", "utf8");
   ok(/href="\/categorie\/electronice\/"/.test(f404) && /name="q"/.test(f404), "ux: pagina 404 are căutare și categorii");
+  // grafica: imagine Open Graph, carduri sociale, statistici reale pe prima pagina, ilustratie in culoarea categoriei
+  ok(/property="og:image" content="https:\/\/[^"]+\/og\.png"/.test(home.html) && /name="twitter:card" content="summary_large_image"/.test(home.html) && /property="og:title"/.test(home.html) && existsSync("dist/og.png") && statSync("dist/og.png").size > 5000, "grafica: Open Graph + Twitter Card cu imagine 1200x630 existentă");
+  const st = home.html.match(/<ul class="hero-stat"[\s\S]*?<\/ul>/);
+  ok(!!st && /<b>[\d.]+<\/b>/.test(st[0]), "grafica: prima pagină are statistici din catalog (număr de oferte, magazine)");
+  ok(/var\(--c,#61e2c5\)/.test(P.get("/categorie/electronice/").html), "grafica: ilustrația din hero folosește culoarea categoriei");
+  ok(/<footer><div class="f-marca">/.test(home.html) && /class="f-legal"/.test(home.html), "grafica: subsolul are marca și textul legal în blocuri proprii");
   const imgs = [...home.html.matchAll(/<img src="https:[^"]*" alt="([^"]*)"/g)];
   ok(imgs.length > 0 && imgs.every((x) => x[1].trim().length > 3), "seo: imaginile produselor au text alternativ (titlul produsului)");
   // ghiduri imbogatite: cuprins cu ancore valide, casete, tabele accesibile, FAQ cu schema, calculator/checklist, oferte reale in text

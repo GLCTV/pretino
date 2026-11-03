@@ -115,7 +115,9 @@ ${FOOTER()}</body></html>`;
 
 // poza produsului: URL-ul din feed-ul magazinului (hotlink); primele carduri (probabil LCP) nu se incarca lenes, restul da. Fara poza / eroare: zona ramane uniforma.
 const areImg = (o) => /^https:\/\//.test(o.imagine ?? "");
-const poza = (o, i) => `<a class="poza${areImg(o) ? "" : " fara"}" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true">${areImg(o) ? `<img src="${esc(o.imagine)}" alt="${esc(o.titlu)}" ${i < 4 ? (i === 0 ? 'fetchpriority="high" ' : "") : 'loading="lazy" '}decoding="async" referrerpolicy="no-referrer" width="275" height="167" onerror="this.parentNode.classList.add('fara')">` : ""}</a>`;
+// PC Garage serveaza in catalog miniaturi (/thumbnails/); cerem varianta mare, cu revenire automata la miniatura
+const imgMare = (u) => (/^https:\/\/\d\.grgs\.ro\/images\/products\/.+\/thumbnails\//.test(u) ? u.replace("/thumbnails/", "/") : u);
+const poza = (o, i) => { const mare = imgMare(o.imagine); const fb = mare !== o.imagine; return `<a class="poza${areImg(o) ? "" : " fara"}" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true">${areImg(o) ? `<img src="${esc(mare)}" alt="${esc(o.titlu)}" ${i < 4 ? (i === 0 ? 'fetchpriority="high" ' : "") : 'loading="lazy" '}decoding="async" referrerpolicy="no-referrer" width="275" height="167"${fb ? ` data-t="${esc(o.imagine)}"` : ""} onerror="${fb ? "if(this.dataset.t){this.src=this.dataset.t;delete this.dataset.t;return}" : ""}this.parentNode.classList.add('fara')">` : ""}</a>`; };
 // cupon al magazinului (ex. PC Garage): afisat pe card, se introduce in cos; butonul copiaza codul (cauta.js). Pretul afisat NU include cuponul.
 const cupon = (c) => c ? `<div class="cupon"><span>Cupon <b>${esc(c.cod)}</b> (${esc(c.text)}) în coș · prețul afișat nu îl include</span><button type="button" class="copiaza" data-cod="${esc(c.cod)}">Copiază</button></div>` : "";
 // specificatii citite LITERAL din titlu (diagonala, memorie/stocare), doar la electronice; nu se deduce nimic

@@ -93,9 +93,11 @@
     return r.slice(0, 3);
   }
   var COND = { 1: "Resigilat", 2: "Refurbished" };
+  // PC Garage: miniatura -> varianta mare (cu revenire la miniatura daca nu exista)
+  function imgMare(u) { return /^https:\/\/\d\.grgs\.ro\/images\/products\/.+\/thumbnails\//.test(u) ? u.replace("/thumbnails/", "/") : u; }
   function card(o, i) {
     var poza = '<a class="poza' + (o.i ? "" : " fara") + '" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true">' +
-      (o.i ? '<img src="' + esc(o.i) + '" alt="' + esc(o.t) + '" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="167" onerror="this.parentNode.classList.add(\'fara\')">' : "") + "</a>";
+      (o.i ? '<img src="' + esc(imgMare(o.i)) + '" alt="' + esc(o.t) + '" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="167"' + (imgMare(o.i) !== o.i ? ' data-t="' + esc(o.i) + '"' : "") + ' onerror="' + (imgMare(o.i) !== o.i ? "if(this.dataset.t){this.src=this.dataset.t;delete this.dataset.t;return}" : "") + 'this.parentNode.classList.add(\'fara\')">' : "") + "</a>";
     var k = data.k && data.k[o.m], sp = specuri(o.t, o.c), mn = data.m[o.m] || o.m;
     var cupon = k ? '<div class="cupon"><span>Cupon <b>' + esc(k.cod) + "</b> (" + esc(k.text) + ') în coș · prețul afișat nu îl include</span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
     return '<article class="card">' + poza + '<span class="badge ' + (o.r2 >= 50 ? "t3" : o.r2 >= 30 ? "t2" : "t1") + '">-' + o.r2 + '%</span>' +

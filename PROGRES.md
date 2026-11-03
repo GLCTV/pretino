@@ -263,3 +263,7 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Poze produs: aceeasi rama; object-position centrat, fundal alb topit in rama (multiply); fara zoom la hover.
 - Miscare: tranzitii 120-200 ms, hover card max 2px, feedback la apasare, panouri cu aparitie scurta, prefers-reduced-motion respectat.
 - Preconnect catre CDN-urile pozelor din pagina. Fara schimbari de layout (verificat cu capturi inainte/dupa).
+
+## Poze PC Garage (ramura imagini-pcgarage)
+- Cardurile PC Garage cer varianta mare (fara /thumbnails/), cu revenire automata la miniatura daca nu exista (server `poza()` + client `card()`).
+- Neverificat din cloud: daca adresele mari exista pe CDN (de verificat in preview).

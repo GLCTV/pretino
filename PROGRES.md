@@ -206,3 +206,10 @@
 - Backend: `scripts/seo-motoare.js`, config `data/seo-motoare.json`, cheie IndexNow publica `public/<cheie>.txt`. Teste: `scripts/test-seo-motoare.js`.
 - Google: fara trimitere automata (ar cere OAuth Search Console; ping-ul de sitemap a fost desfiintat). Neverificat: aspectul tab-ului in WPF (nu se poate rula in cloud), trimiterea reala IndexNow (dupa PUBLICA LIVE).
 - STATUS: pe ramura `tab-seo`, asteptam OK de la Laur inainte de main.
+
+## v1.62 – interfata program noua
+- Culori cu sens (legenda in program): verde = citeste/verifica, albastru = local, portocaliu = atentie/opreste, rosu = public pe site sau sterge, gri = deschide pagina. Bara de stare isi schimba culoarea (verde gata, albastru ruleaza, portocaliu te asteapta, rosu eroare).
+- Programul are 3 taburi: „1. Site” (pasi numerotati: actualizeaza oferte, previzualizare, teste, PUBLICA LIVE, cu explicatie langa fiecare), „2. Campanii PC Garage”, „3. SEO Google si Bing”. Jurnal comun jos. Logica butoanelor neschimbata (aceleasi nume de control).
+- Plasa de siguranta: daca interfata nu se incarca, se face git pull si se arata mesajul de eroare.
+- Neverificat: aspectul in WPF real (nu se poate rula in cloud); XAML validat ca XML si toate numele de control verificate.
+- STATUS: pe ramura `gui-nou`.

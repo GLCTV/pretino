@@ -133,5 +133,17 @@ export function testeSeo(ok) {
   ok(!/oferte relevante acum/i.test(P.get("/ghiduri/cum-verifici-o-reducere-reala/").html) && /Oferte relevante acum/.test(P.get("/ghiduri/produse-resigilate-si-refurbished/").html) === ec(P.get("/ghiduri/produse-resigilate-si-refurbished/").html).length > 0, "seo: ofertele relevante apar in ghid doar cand exista in catalog");
   const imgs = [...home.html.matchAll(/<img src="https:[^"]*" alt="([^"]*)"/g)];
   ok(imgs.length > 0 && imgs.every((x) => x[1].trim().length > 3), "seo: imaginile produselor au text alternativ (titlul produsului)");
+  // ghiduri imbogatite: cuprins cu ancore valide, casete, tabele accesibile, FAQ cu schema, calculator/checklist, oferte reale in text
+  for (const c of ghiduri) {
+    const h = P.get(c).html, ids = new Set([...h.matchAll(/\sid="([^"]+)"/g)].map((x) => x[1]));
+    const ancore = [...h.matchAll(/<nav class="cuprins"[\s\S]*?<\/nav>/g)].flatMap((n) => [...n[0].matchAll(/href="#([^"]+)"/g)].map((x) => x[1]));
+    ok(ancore.length >= 4 && ancore.every((a) => ids.has(a)), `seo: ${c} are cuprins cu ancore care exista in pagina`);
+    ok(/class="caseta verdict"/.test(h) && /class="caseta (tip|atentie)"/.test(h) && /\d+ min de citit/.test(h) && /class="hero ghid-hero"/.test(h), `seo: ${c} are verdict, casete, timp de citit si ilustratie`);
+    ok(/<details><summary>/.test(h) && /"@type":"FAQPage"/.test(h) && /data-check=/.test(h), `seo: ${c} are FAQ (cu schema) si checklist`);
+    ok(/<table>/.test(h) ? /<caption>/.test(h) && /scope="col"/.test(h) && /scope="row"/.test(h) : true, `seo: tabelele din ${c} sunt accesibile (caption, scope)`);
+    ok(!/<script[^>]*ghid\.js/.test(h) || existsSync("dist/ghid.js"), `seo: ${c} incarca ghid.js existent`);
+  }
+  ok(/data-calc/.test(P.get("/ghiduri/cum-verifici-o-reducere-reala/").html), "seo: ghidul despre reduceri are calculator");
+  ok(ghiduri.filter((c) => /class="ghid-inline"/.test(P.get(c).html)).every((c) => ec(P.get(c).html).length >= 3), "seo: ofertele din interiorul ghidurilor sunt carduri reale din catalog");
   ok(home.html.includes('id="f-nou"') && /f-nou/.test(readFileSync("public/cauta.js", "utf8")), "seo: filtrul „Doar produse noi” este prezent in HTML si in cauta.js");
 }

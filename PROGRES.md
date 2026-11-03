@@ -243,3 +243,7 @@
 - „Economisesti” in auriu cald (ambele teme). Butoanele „Vezi oferta” raman teal.
 - Butoanele pill trec pe mai multe randuri daca textul e lung (fara scroll orizontal 390 px).
 - STATUS: asteptam OK de la Laur inainte de main.
+
+## Ghiduri bogate (branch ghiduri-bogate, doar site, fara schimbare de versiune program)
+- Ghidurile au: ilustratie in hero, „Pe scurt” (verdict), casete Sfat/Atentie, tabele comparative accesibile, cuprins (sticky pe desktop), timp de citit, oferte reale din catalog in text si la final, calculator „reducere reala” (ghidul despre reduceri), checklist bifabil (salvat local), FAQ cu schema FAQPage, ghiduri similare ca carduri colorate pe categorie.
+- Continut in `scripts/lib/continut.js` (`GHID_EXTRA`), randare in `scripts/build.js`, interactivitate `public/ghid.js`, stiluri in `src/stil.css`; teste in `scripts/test-seo.js`.

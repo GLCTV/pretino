@@ -53,3 +53,16 @@ export const metaMagazin = (m, n, p = 1) => ({
   descriere: `Reduceri la produse de la ${m.nume}, adunate în Pretino: filtrează după preț și reducere și verifică oferta direct în magazin.`,
   intro: `${n} ${n === 1 ? "ofertă" : "oferte"} cu preț redus de la ${m.nume}. Prețul final se verifică în magazin.`,
 });
+
+// pagini noi: marci, topuri de economii, ghiduri
+export const metaMarca = (nume, n, nMag, p = 1) => ({
+  titlu: pag(`Oferte ${nume} – reduceri la produse ${nume}`, p) + sufix,
+  h1: `Oferte ${nume}`,
+  descriere: `Reduceri la produse ${nume} din magazine din România. Compară prețul cu cel de referință, filtrează după magazin și verifică oferta în magazin.`,
+  intro: `${n} ${n === 1 ? "ofertă" : "oferte"} la produse ${nume}, din ${nMag} ${nMag === 1 ? "magazin" : "magazine"}. Compară prețul cu cel de referință și verifică oferta în magazin.`,
+});
+export const metaTop = (nume) => ({
+  titlu: (`Top economii la ${nume} – cele mai mari reduceri în lei${sufix}`.length <= 72 ? `Top economii la ${nume} – cele mai mari reduceri în lei${sufix}` : `Top economii la ${nume}${sufix}`),
+  h1: `Top economii la ${nume}`,
+  descriere: `Ofertele cu cea mai mare economie în lei la ${nume}, din magazine din România. Verifică prețul final în magazin.`,
+});

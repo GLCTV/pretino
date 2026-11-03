@@ -116,4 +116,22 @@ export function testeSeo(ok) {
   const ghid = P.get("/cum-interpretam-reducerile/").html;
   ok(!/cel mai mic pre[tț] din ultimele 30 de zile[^.]*\.\s*(Pretino|Acesta este)/.test(ghid) && /nu înseamnă automat cel mai mic preț din ultimele 30 de zile/.test(ghid), "seo: pretul de referinta nu e prezentat drept „cel mai mic pret din 30 de zile”");
   ok(fisiere.every((f) => !/GVYDBDQ9<\/b>\) în coș/.test(readFileSync(f, "utf8")) || /prețul afișat nu îl include/.test(readFileSync(f, "utf8"))), "seo: cuponul e prezentat cu diferenta fata de pretul afisat");
+
+  // 10. pagini editoriale: ghiduri, topuri de economii, branduri
+  const cai = [...P.keys()], sitemap = readFileSync("dist/sitemap.xml", "utf8");
+  const ghiduri = cai.filter((c) => /^\/ghiduri\/[^/]+\/$/.test(c));
+  ok(ghiduri.length >= 4 && ghiduri.every((c) => /"@type":"Article"/.test(P.get(c).html) && /"datePublished":"\d{4}-\d{2}-\d{2}"/.test(P.get(c).html) && sitemap.includes(`<loc>${SITE_URL}${c}</loc>`)), "seo: ghidurile au Article + data publicarii reala si sunt in sitemap");
+  ok(P.has("/ghiduri/") && sitemap.includes(`${SITE_URL}/ghiduri/`) && home.html.includes('href="/ghiduri/"'), "seo: pagina Ghiduri exista, e in sitemap si legata din site");
+  const topuri = cai.filter((c) => /^\/top-oferte\/[^/]+\/(?:[^/]+\/)?$/.test(c));
+  const ec = (h) => [...h.matchAll(/<span class="econ">Economisești<b>([\d.,]+) lei<\/b>/g)].map((x) => Number(x[1].replace(/\./g, "").replace(",", ".")));
+  ok(topuri.length >= 3 && topuri.every((c) => { const e = ec(P.get(c).html); return e.length >= 8 && e.length <= 24 && e.every((x, i) => !i || e[i - 1] >= x); }), `seo: topurile de economii au 8-24 oferte ordonate dupa economia in lei (${topuri.length} pagini)`);
+  ok(P.has("/top-oferte/") && home.html.includes('href="/top-oferte/"'), "seo: pagina Top economii exista si e legata din site");
+  const marci = cai.filter((c) => /^\/brand\/[^/]+\/$/.test(c));
+  const indexMarci = JSON.parse(readFileSync("dist/cauta-index.json", "utf8")).o;
+  ok(marci.length >= 3 && marci.every((c) => { const id = c.split("/")[2], l = indexMarci.filter((o) => o.b === id); return l.length >= 15 && sitemap.includes(`<loc>${SITE_URL}${c}</loc>`); }), `seo: paginile de brand au minimum 15 oferte si sunt in sitemap (${marci.length} marci)`);
+  ok(marci.every((c) => { const id = c.split("/")[2], h = P.get(c).html; const titluri = [...h.matchAll(/<a class="titlu"[^>]*>([^<]*)</g)].map((x) => dec(x[1]).toLowerCase().replace(/[^a-z0-9+ -]/g, " ")); return titluri.length > 0 && titluri.every((t) => t.replace(/[- ]+/g, "").includes(id.replace(/-/g, ""))); }), "seo: ofertele de pe pagina unui brand contin numele brandului in titlu");
+  ok(!/oferte relevante acum/i.test(P.get("/ghiduri/cum-verifici-o-reducere-reala/").html) && /Oferte relevante acum/.test(P.get("/ghiduri/produse-resigilate-si-refurbished/").html) === ec(P.get("/ghiduri/produse-resigilate-si-refurbished/").html).length > 0, "seo: ofertele relevante apar in ghid doar cand exista in catalog");
+  const imgs = [...home.html.matchAll(/<img src="https:[^"]*" alt="([^"]*)"/g)];
+  ok(imgs.length > 0 && imgs.every((x) => x[1].trim().length > 3), "seo: imaginile produselor au text alternativ (titlul produsului)");
+  ok(home.html.includes('id="f-nou"') && /f-nou/.test(readFileSync("public/cauta.js", "utf8")), "seo: filtrul „Doar produse noi” este prezent in HTML si in cauta.js");
 }

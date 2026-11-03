@@ -222,3 +222,13 @@
 ## v1.64 – buton Opreste in tab-ul SEO
 - Buton portocaliu „Opreste” (activ doar cat ruleaza o actiune) opreste procesul pornit din program; bara de stare arata „Oprit de tine.”. Doar program, fara schimbari pe site.
 - STATUS: pe ramura `seo-oprire`.
+
+## Continut SEO + filtru (ramura `seo-continut`, fara schimbari de program)
+- Ghiduri originale (`/ghiduri/`, 5 ghiduri: reducere reala, laptop, monitor, mouse/tastatura gaming, resigilate/refurbished) cu Article + BreadcrumbList; „oferte relevante” luate live din catalog. Text in `scripts/lib/continut.js`.
+- Top economii (`/top-oferte/<cat>/[<sub>/]`): ordonat dupa economia in lei (alt criteriu decat lista implicita, dupa procent), min. 8 oferte (subcategorii: 15), max. 24 afisate, statistici calculate.
+- Branduri (`/brand/<marca>/`, `/branduri/`): marci recunoscute dupa titlu (primele 4 cuvinte, fara accesorii), doar cu minimum 15 oferte; filtre complete ca la categorii (mod „brand” in cauta.js, camp `b` in cauta-index.json).
+- Text alternativ pe imaginile produselor (titlul produsului), in HTML si in cauta.js.
+- Plus: filtru „Doar produse noi” (ascunde resigilate/refurbished), parametru `?nou=1`.
+- Legaturi interne: blocul „Descopera” pe homepage si categorii, subsol (Ghiduri, Top economii, Branduri). Teste noi in `scripts/test-seo.js` (sectiunea 10). Verificat in Chrome (desktop 1366 si telefon 390): fara scroll orizontal, fara erori JS.
+- Neverificat: imaginile produselor (hotlink, nu se incarca in cloud), titluri/descrieri pe Google (Search Console).
+- STATUS: pe ramura `seo-continut`, asteptam OK de la Laur inainte de main.

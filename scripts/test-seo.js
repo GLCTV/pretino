@@ -148,8 +148,15 @@ export function testeSeo(ok) {
   ok(/property="og:image" content="https:\/\/[^"]+\/og\.png"/.test(home.html) && /name="twitter:card" content="summary_large_image"/.test(home.html) && /property="og:title"/.test(home.html) && existsSync("dist/og.png") && statSync("dist/og.png").size > 5000, "grafica: Open Graph + Twitter Card cu imagine 1200x630 existentă");
   const st = home.html.match(/<ul class="hero-stat"[\s\S]*?<\/ul>/);
   ok(!!st && /<b>[\d.]+<\/b>/.test(st[0]), "grafica: prima pagină are statistici din catalog (număr de oferte, magazine)");
-  ok(/var\(--c,#61e2c5\)/.test(P.get("/categorie/electronice/").html), "grafica: ilustrația din hero folosește culoarea categoriei");
+  ok(/<svg class="ilu"/.test(P.get("/categorie/electronice/").html) && /\.ilu \.a\{fill:url\(#gc\)\}/.test(readFileSync("src/stil.css", "utf8")), "grafica: ilustrația din hero folosește culoarea categoriei (clase .ilu)");
   ok(/<footer><div class="f-marca">/.test(home.html) && /class="f-legal"/.test(home.html), "grafica: subsolul are marca și textul legal în blocuri proprii");
+  // scene de categorie: fiecare categorie are propria ilustratie, subcategoriile folosesc placa cu pictograma lor
+  const SCENE_CAT = ["electronice", "electrocasnice", "casa-si-gradina", "moda", "auto", "sport", "copii", "supermarket"];
+  const sceneHtml = SCENE_CAT.map((k) => (P.get(`/categorie/${k}/`)?.html.match(/<svg class="ilu"[\s\S]*?<\/svg>/) ?? [""])[0]);
+  ok(sceneHtml.every((h) => h.length > 1200) && new Set(sceneHtml).size === SCENE_CAT.length, "grafica: fiecare categorie are propria scenă ilustrată (8 desene distincte)");
+  const subPagesScena = cai.filter((c) => /^\/categorie\/[^/]+\/(?!pagina-)[^/]+\/$/.test(c) && /class="hero-poza hero-scena"/.test(P.get(c).html));
+  const scSub = subPagesScena.map((c) => (P.get(c).html.match(/<svg class="ilu"[\s\S]*?<\/svg>/) ?? [""])[0]);
+  ok(subPagesScena.length >= 3 && new Set(scSub).size === scSub.length && scSub.every((h) => h.length > 1000), `grafica: fiecare subcategorie cu pagină proprie are scena ei (${subPagesScena.length} desene distincte)`);
   const imgs = [...home.html.matchAll(/<img src="https:[^"]*" alt="([^"]*)"/g)];
   ok(imgs.length > 0 && imgs.every((x) => x[1].trim().length > 3), "seo: imaginile produselor au text alternativ (titlul produsului)");
   // ghiduri imbogatite: cuprins cu ancore valide, casete, tabele accesibile, FAQ cu schema, calculator/checklist, oferte reale in text

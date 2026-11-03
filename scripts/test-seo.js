@@ -112,7 +112,7 @@ export function testeSeo(ok) {
   ok(/rel="sponsored nofollow noopener"/.test(home.html) && home.html.includes("l.profitshare.ro"), "seo: scriptul Profitshare ramane pe pagini");
 
   // 9. transparenta ofertelor
-  ok(/class="actualizat"/.test(home.html) && P.has("/cum-interpretam-reducerile/") && home.html.includes('href="/cum-interpretam-reducerile/"'), "seo: data verificarii + material „Cum interpretam reducerile” legat din liste");
+  ok(/class="actualizat[ "]/.test(home.html) && P.has("/cum-interpretam-reducerile/") && home.html.includes('href="/cum-interpretam-reducerile/"'), "seo: data verificarii + material „Cum interpretam reducerile” legat din liste");
   const ghid = P.get("/cum-interpretam-reducerile/").html;
   ok(!/cel mai mic pre[tț] din ultimele 30 de zile[^.]*\.\s*(Pretino|Acesta este)/.test(ghid) && /nu înseamnă automat cel mai mic preț din ultimele 30 de zile/.test(ghid), "seo: pretul de referinta nu e prezentat drept „cel mai mic pret din 30 de zile”");
   ok(fisiere.every((f) => !/GVYDBDQ9<\/b>\) în coș/.test(readFileSync(f, "utf8")) || /prețul afișat nu îl include/.test(readFileSync(f, "utf8"))), "seo: cuponul e prezentat cu diferenta fata de pretul afisat");
@@ -131,6 +131,19 @@ export function testeSeo(ok) {
   ok(marci.length >= 3 && marci.every((c) => { const id = c.split("/")[2], l = indexMarci.filter((o) => o.b === id); return l.length >= 15 && sitemap.includes(`<loc>${SITE_URL}${c}</loc>`); }), `seo: paginile de brand au minimum 15 oferte si sunt in sitemap (${marci.length} marci)`);
   ok(marci.every((c) => { const id = c.split("/")[2], h = P.get(c).html; const titluri = [...h.matchAll(/<a class="titlu"[^>]*>([^<]*)</g)].map((x) => dec(x[1]).toLowerCase().replace(/[^a-z0-9+ -]/g, " ")); return titluri.length > 0 && titluri.every((t) => t.replace(/[- ]+/g, "").includes(id.replace(/-/g, ""))); }), "seo: ofertele de pe pagina unui brand contin numele brandului in titlu");
   ok(!/oferte relevante acum/i.test(P.get("/ghiduri/cum-verifici-o-reducere-reala/").html) && /Oferte relevante acum/.test(P.get("/ghiduri/produse-resigilate-si-refurbished/").html) === ec(P.get("/ghiduri/produse-resigilate-si-refurbished/").html).length > 0, "seo: ofertele relevante apar in ghid doar cand exista in catalog");
+  // UX: linie de actualizare compacta, butoane cu numele magazinului, tinte tactile, filtre active, comparare, stari goale
+  const cs = readFileSync("public/cauta.js", "utf8"), css = readFileSync("src/stil.css", "utf8");
+  ok(/<details class="actualizat info-pret">/.test(home.html) && /<time datetime=/.test(home.html), "ux: linia „Prețuri actualizate” este compactă (detalii la cerere), cu <time>");
+  ok(/<a class="btn" href="[^"]*" rel="[^"]*" target="_blank" aria-label="Vezi oferta la [^"]+ \(se deschide în magazin/.test(home.html) && />Vezi la [^<]+ <svg/.test(home.html), "ux: butonul de pe card numește magazinul și anunță că se deschide în magazin");
+  ok(/class="fav"[^>]*data-p="[\d.]+"/.test(home.html) && /\.fav\{[^}]*width:40px;height:40px/.test(css), "ux: inima de favorite are preț (pentru alerta de scădere) și țintă tactilă de 40px");
+  ok(/<option value="red">Reducere mare<\/option>/.test(home.html) && !/descrescătoare/.test(home.html), "ux: etichetele de sortare sunt scurte");
+  ok(/id="active"/.test(home.html) && /id="cnt-filtre"/.test(home.html) && /id="aplica"/.test(home.html), "ux: filtre active, contor pe „Filtre” și buton „Vezi N oferte” în panou");
+  ok(/<nav class="descopera"[^>]*><details open>/.test(home.html), "ux: blocul Descoperă este pliabil");
+  ok(/prefers-color-scheme: light/.test(home.html) && /name="color-scheme"/.test(home.html), "ux: tema respectă setarea sistemului când nu există alegere");
+  ok(/dupaRelevanta/.test(cs) && /rel: function/.test(cs) && /pretino-fav-pret/.test(cs) && /data-cmp/.test(cs) && /class="sus"|"sus"/.test(cs) && /poate-dr/.test(cs), "ux: relevanță la căutare, preț la salvare, comparare, „Înapoi sus” și indicii de derulare există în cauta.js");
+  ok(/Încearcă: /.test(cs) && /Nu ai salvat nicio ofertă/.test(cs) && /Nicio ofertă cu filtrele alese/.test(cs), "ux: stări goale utile (căutare, favorite, filtre)");
+  const f404 = readFileSync("dist/404.html", "utf8");
+  ok(/href="\/categorie\/electronice\/"/.test(f404) && /name="q"/.test(f404), "ux: pagina 404 are căutare și categorii");
   const imgs = [...home.html.matchAll(/<img src="https:[^"]*" alt="([^"]*)"/g)];
   ok(imgs.length > 0 && imgs.every((x) => x[1].trim().length > 3), "seo: imaginile produselor au text alternativ (titlul produsului)");
   // ghiduri imbogatite: cuprins cu ancore valide, casete, tabele accesibile, FAQ cu schema, calculator/checklist, oferte reale in text

@@ -56,7 +56,7 @@ const VER_ASSET = createHash("sha1").update(CSS + (existsSync("public/cauta.js")
 // Script Profitshare „Linkuri automate" (cont Pretino, site validat): transforma linkurile catre magazinele partenere in linkuri de afiliere. Fara el, linkurile raman cele din catalog.
 const PROFITSHARE_SCRIPT = `<!-- Start ProfitShare Zone --><script>(function(){var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="//l.profitshare.ro/files_shared/lps/js/AZC/NI.js?v=1793640493";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(s);})();</script><!-- End ProfitShare Zone -->`;
 // tema: inchisa implicit (ca in design); alegerea utilizatorului se pastreaza local. Inline, ca sa nu apara „licarire” de tema.
-const TEMA_INIT = `<script>try{var t=localStorage.getItem("pretino-tema");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>`;
+const TEMA_INIT = `<script>try{var t=null;try{t=localStorage.getItem("pretino-tema")}catch(e){}if(t!=="light"&&t!=="dark")t=window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.setAttribute("data-theme",t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute("content",t==="light"?"#ffffff":"#0a1916")}catch(e){}</script>`;
 
 const jsonld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
 const abs = (cale) => `${SITE_URL}${cale}`;
@@ -96,7 +96,7 @@ function pagina({ titlu, descriere, cale, corp, noindex = false, catActiva = nul
   const robots = noindex || DEMO ? '<meta name="robots" content="noindex">' : "";
   return `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="profitshareid" content="7dd842fc7074c28872c609438ead55e6"><title>${esc(titlu)}</title><meta name="description" content="${esc(descriere)}">${robots}
-<link rel="canonical" href="${abs(cale)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#0a1916"><link rel="preload" href="/fonts/montserrat-var-latin.woff" as="font" type="font/woff" crossorigin><link rel="stylesheet" href="/stil.css?v=${VER_ASSET}">${TEMA_INIT}<script src="/cauta.js?v=${VER_ASSET}" defer></script>${DEMO ? "" : PROFITSHARE_SCRIPT}${schema.map(jsonld).join("")}</head><body${catActiva ? ` data-cat="${esc(catActiva)}"` : ""}>
+<link rel="canonical" href="${abs(cale)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#0a1916"><meta name="color-scheme" content="dark light"><link rel="preload" href="/fonts/montserrat-var-latin.woff" as="font" type="font/woff" crossorigin><link rel="stylesheet" href="/stil.css?v=${VER_ASSET}">${TEMA_INIT}<script src="/cauta.js?v=${VER_ASSET}" defer></script>${DEMO ? "" : PROFITSHARE_SCRIPT}${schema.map(jsonld).join("")}</head><body${catActiva ? ` data-cat="${esc(catActiva)}"` : ""}>
 ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și nu se publică</div>' : ""}
 ${antet(catActiva)}
 ${simplu ? `<main class="simplu">${corp}</main>` : corp}
@@ -108,12 +108,20 @@ const areImg = (o) => /^https:\/\//.test(o.imagine ?? "");
 const poza = (o, i) => `<a class="poza${areImg(o) ? "" : " fara"}" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true">${areImg(o) ? `<img src="${esc(o.imagine)}" alt="${esc(o.titlu)}" ${i < 4 ? (i === 0 ? 'fetchpriority="high" ' : "") : 'loading="lazy" '}decoding="async" referrerpolicy="no-referrer" width="275" height="167" onerror="this.parentNode.classList.add('fara')">` : ""}</a>`;
 // cupon al magazinului (ex. PC Garage): afisat pe card, se introduce in cos; butonul copiaza codul (cauta.js). Pretul afisat NU include cuponul.
 const cupon = (c) => c ? `<div class="cupon"><span>Cupon <b>${esc(c.cod)}</b> (${esc(c.text)}) în coș · prețul afișat nu îl include</span><button type="button" class="copiaza" data-cod="${esc(c.cod)}">Copiază</button></div>` : "";
+// specificatii citite LITERAL din titlu (diagonala, memorie/stocare), doar la electronice; nu se deduce nimic
+const specuri = (titlu, cat) => {
+  if (cat !== "electronice") return [];
+  const r = [], d = titlu.match(/(?<![\d.,])(\d{2}(?:[.,]\d)?)\s?(?:"|”|″|''|inch|inci)/i);
+  if (d) r.push(d[1].replace(",", ".") + '"');
+  for (const m of titlu.matchAll(/(?<![\d.,])(\d{1,4})\s?(GB|TB)\b/gi)) { const t = `${m[1]} ${m[2].toUpperCase()}`; if (!r.includes(t)) r.push(t); }
+  return r.slice(0, 3);
+};
 const card = (o, i = 99) => {
   const r = reducere(o), c = conditie(o);
-  return `<article class="card">${poza(o, i)}<span class="badge ${r >= 50 ? "t3" : r >= 30 ? "t2" : "t1"}">-${r}%</span><button class="fav" type="button" data-id="${esc(o.id)}" aria-pressed="false" aria-label="Adaugă la favorite">${icoana("inima")}</button>
-<a class="titlu" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">${esc(o.titlu)}</a><span class="magazin"><a href="/magazin/${esc(o.magazin)}/">${esc(numeMag(o.magazin))}</a>${c ? `<span class="cond">${COND[c]}</span>` : ""}</span>
+  return `<article class="card">${poza(o, i)}<span class="badge ${r >= 50 ? "t3" : r >= 30 ? "t2" : "t1"}">-${r}%</span><button class="fav" type="button" data-id="${esc(o.id)}" data-p="${o.pret}" aria-pressed="false" aria-label="Adaugă la favorite">${icoana("inima")}</button>
+<a class="titlu" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">${esc(o.titlu)}</a>${(() => { const sp = specuri(o.titlu, o.categorie); return sp.length ? `<span class="specs">${sp.map((x) => `<i>${esc(x)}</i>`).join("")}</span>` : ""; })()}<span class="magazin"><a href="/magazin/${esc(o.magazin)}/">${esc(numeMag(o.magazin))}</a>${c ? `<span class="cond">${COND[c]}</span>` : ""}</span>
 <div class="pretrand"><span class="pret">${lei(o.pret)}</span><span class="vechi"${o.referintaMagazin ? ' title="Preț de referință afișat de magazin"' : ""}>${lei(o.pretVechi)}</span><span class="econ">Economisești<b>${lei(o.pretVechi - o.pret)}</b></span></div>
-${cupon(mag[o.magazin]?.cupon)}<a class="btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">Vezi oferta ${icoana("extern")}</a></article>`;
+${cupon(mag[o.magazin]?.cupon)}<a class="btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" aria-label="Vezi oferta la ${esc(numeMag(o.magazin))} (se deschide în magazin, fereastră nouă)" title="Se deschide în magazin">Vezi la ${esc(numeMag(o.magazin))} ${icoana("extern")}</a></article>`;
 };
 
 // ilustratia din dreapta titlului: placa cu pictograma categoriei (desenata de noi)
@@ -152,7 +160,7 @@ function listare({ mod, meta, cale, catSlug = null, magId = null, subId = null, 
     if (mod !== "acasa" && mod !== "cauta" && mod !== "favorite") schema.push({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ name: "Acasă", cale: "/" }, ...migaje.slice(1).map((x) => ({ name: x.nume, cale: x.cale })), { name: m.migaja, cale: adr }].map((x, i) => ({ "@type": "ListItem", position: i + 1, name: x.name ?? x.nume, item: abs(x.cale) })) });
     const corp = `<main data-lista='${date}'>
 <nav class="migaje" aria-label="Navigare">${miez}</nav>
-<div class="hero"><div><h1 id="h1">${esc(m.h1)}</h1>${p === 1 && m.intro ? `<p class="intro" id="sub-titlu">${esc(m.intro)}</p>` : '<p class="intro" id="sub-titlu"></p>'}${actualizatText ? `<p class="actualizat"><time datetime="${dataActualizarii.toISOString()}">${esc(actualizatText)}</time> · prețurile se pot schimba în magazin; verifică prețul final pe pagina magazinului. <a href="${CALE_GHID}">Cum interpretăm reducerile</a></p>` : ""}</div>${ilustr ? ilustratie(ilustr) : ""}</div>
+<div class="hero"><div><h1 id="h1">${esc(m.h1)}</h1>${p === 1 && m.intro ? `<p class="intro" id="sub-titlu">${esc(m.intro)}</p>` : '<p class="intro" id="sub-titlu"></p>'}${actualizatText ? `<details class="actualizat info-pret"><summary><time datetime="${dataActualizarii.toISOString()}">${esc(actualizatText)}</time><span class="i" aria-hidden="true">i</span><span class="sr"> – detalii</span></summary><p>Prețurile se pot schimba în magazin; verifică prețul final pe pagina magazinului. <a href="${CALE_GHID}">Cum interpretăm reducerile</a></p></details>` : ""}</div>${ilustr ? ilustratie(ilustr) : ""}</div>
 ${chips ? `<div class="subcats" role="group" aria-label="Subcategorii">${chips}</div>` : '<div class="subcats-gol"></div>'}${extra}
 <div class="cont">
 <aside class="filtre" id="filtre" aria-label="Filtre"><button class="filtre-x" type="button" id="filtre-x" aria-label="Închide filtrele">${icoana("x")}</button>
@@ -162,11 +170,13 @@ ${magId ? "" : `<details class="fsec" open><summary>Magazine ${icoana("sus")}</s
 <div class="pret-in"><label><span>Min. (lei)</span><input type="number" id="p-min" min="0" max="${pasMax}" value="0" inputmode="numeric"></label><i>–</i><label><span>Max. (lei)</span><input type="number" id="p-max" min="0" max="${pasMax}" value="${pasMax}" inputmode="numeric"></label></div></details>
 <details class="fsec" open><summary>Reducere ${icoana("sus")}</summary><div id="f-red"><label class="opt"><input type="radio" name="red" value="0" checked><span>Orice reducere</span></label>${[20, 30, 40, 50].map((x) => `<label class="opt"><input type="radio" name="red" value="${x}"><span>Minim ${x}%</span></label>`).join("")}</div></details>
 <details class="fsec" open><summary>Condiție ${icoana("sus")}</summary><div><label class="opt"><input type="checkbox" name="nou" id="f-nou"><span>Doar produse noi (fără resigilate sau refurbished)</span></label></div></details>
-<button class="reset" type="button" id="reset">${icoana("reset")}Resetează filtrele</button></aside>
+<button class="reset" type="button" id="reset">${icoana("reset")}Resetează filtrele</button><button class="aplica" type="button" id="aplica">Vezi <span id="nr-aplica">${lista.length}</span> oferte</button></aside>
 <section aria-live="polite"><div class="rez-cap"><h2>Oferte disponibile<small id="nr-rez">${lista.length} oferte</small></h2>
-<div class="sort"><button class="btn-filtre" type="button" id="btn-filtre">${icoana("filtre")}Filtre</button><label class="sort-et" for="sortare">Sortează după:</label><select id="sortare" aria-label="Sortează ofertele după"><option value="red">Reducere descrescătoare</option><option value="econ">Economie descrescătoare</option><option value="pret-cresc">Preț crescător</option><option value="pret-desc">Preț descrescător</option></select></div></div>
+<div class="sort"><button class="btn-filtre" type="button" id="btn-filtre">${icoana("filtre")}Filtre<span class="cnt" id="cnt-filtre" hidden></span></button><label class="sort-et" for="sortare">Sortează după:</label><select id="sortare" aria-label="Sortează ofertele după"><option value="red">Reducere mare</option><option value="econ">Economie mare</option><option value="pret-cresc">Preț mic → mare</option><option value="pret-desc">Preț mare → mic</option></select></div></div>
+<div class="active" id="active" aria-label="Filtre active" hidden></div>
 <div class="grid" id="lista">${felie.map((o, i) => card(o, i)).join("")}</div>
 <div class="rez-gol" id="rez-gol" ${lista.length ? "hidden" : ""}><b>Nu am găsit oferte</b>Încearcă alte filtre sau o altă căutare.</div>
+<div id="compara" class="compara" hidden></div>
 <button id="mai" type="button" hidden>Arată mai multe</button>${navPagini(cale, p, nPagini)}</section></div><div class="vala" id="vala" hidden></div></main>`;
     out.push({ cale: adr, index: indexabil, html: pagina({ titlu: m.titlu, descriere: p > 1 ? `${m.descriere} Pagina ${p} din ${nPagini}.` : m.descriere, cale: adr, corp, noindex: !indexabil, catActiva: catSlug, schema }) });
   }
@@ -186,7 +196,7 @@ const linkuriDescopera = (cat = null) => {
   const t = cat ? [topDe(cat), ...topuri.filter((x) => x.cat.slug === cat && x.sub)].filter(Boolean).slice(0, 4) : topuri.filter((x) => !x.sub).slice(0, 5);
   const m = marciPagina.slice(0, cat ? 0 : 8);
   const grup = (eticheta, l) => (l.length ? `<span class="d-grup"><b>${eticheta}</b>${l.join("")}</span>` : "");
-  return `<nav class="descopera" aria-label="Descoperă">${grup("Top economii:", t.map((x) => `<a${x.sub || !cat ? "" : ' class="mare"'} href="${x.cale}">${esc(x.sub ? x.nume : cat ? "Toată categoria" : x.cat.nume)}</a>`))}${grup("Ghiduri:", g.slice(0, 3).map((x) => `<a href="/ghiduri/${x.slug}/">${esc(x.titlu)}</a>`).concat([`<a class="mare" href="/ghiduri/">Toate ghidurile</a>`]))}${grup("Branduri:", m.map((x) => `<a href="/brand/${x.id}/">${esc(x.nume)}</a>`).concat(m.length ? [`<a class="mare" href="/branduri/">Toate brandurile</a>`] : []))}</nav>`;
+  return `<nav class="descopera" aria-label="Descoperă"><details open><summary>Descoperă mai mult</summary>${grup("Top economii:", t.map((x) => `<a${x.sub || !cat ? "" : ' class="mare"'} href="${x.cale}">${esc(x.sub ? x.nume : cat ? "Toată categoria" : x.cat.nume)}</a>`))}${grup("Ghiduri:", g.slice(0, 3).map((x) => `<a href="/ghiduri/${x.slug}/">${esc(x.titlu)}</a>`).concat([`<a class="mare" href="/ghiduri/">Toate ghidurile</a>`]))}${grup("Branduri:", m.map((x) => `<a href="/brand/${x.id}/">${esc(x.nume)}</a>`).concat(m.length ? [`<a class="mare" href="/branduri/">Toate brandurile</a>`] : []))}</details></nav>`;
 };
 const dataRo = (iso) => new Date(iso).toLocaleDateString("ro-RO", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const migajeHtml = (items) => `<nav class="migaje" aria-label="Navigare">${items.map((x, i) => (i < items.length - 1 ? `<a href="${x.cale}">${esc(x.nume)}</a><span aria-hidden="true">/</span>` : `<span id="migaja-curenta">${esc(x.nume)}</span>`)).join("")}</nav>`;
@@ -292,7 +302,7 @@ for (const p of pagini) {
   mkdirSync(dir, { recursive: true });
   writeFileSync(dir + "index.html", p.html);
 }
-writeFileSync("dist/404.html", pagina({ titlu: `Pagină negăsită | ${BRAND}`, descriere: "Pagina nu există.", cale: "/404.html", noindex: true, corp: '<h1>Pagina nu există</h1><p><a href="/">Înapoi la oferte</a></p>', simplu: true }));
+writeFileSync("dist/404.html", pagina({ titlu: `Pagină negăsită | ${BRAND}`, descriere: "Pagina nu există.", cale: "/404.html", noindex: true, corp: `<h1>Pagina nu există</h1><p>Adresa nu mai există sau a fost scrisă greșit. Caută în caseta de sus sau alege una dintre variantele de mai jos.</p><p class="legaturi404"><a class="btn-link mare" href="/">Înapoi la oferte</a>${categorii.map((c) => `<a class="btn-link" href="/categorie/${c.slug}/">${esc(c.nume)}</a>`).join("")}<a class="btn-link" href="/ghiduri/">Ghiduri</a><a class="btn-link" href="/favorite/">Favorite</a></p>`, simplu: true }));
 // sitemap: doar pagini indexabile, prima pagina a fiecarei liste + paginile informative; fara lastmod (nu avem o data de modificare reala pe pagina)
 const nuPaginata = (p) => !/\/pagina-\d+\/$/.test(p.cale);
 const indexabile = pagini.filter((p) => p.index && nuPaginata(p));

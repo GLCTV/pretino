@@ -393,7 +393,7 @@ footer .legal a,footer .magazine-f a{display:inline-flex;align-items:center;min-
 .ach:hover,.ach:focus-visible{border-color:var(--acc);outline:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 40%,transparent)}
 .ach.tot{background:transparent;border-color:var(--bd2);color:var(--fg2)}
 .aplica{display:none}
-@media(max-width:1000px){.aplica{display:block;position:sticky;bottom:0;width:100%;margin-top:14px;height:46px;border:0;border-radius:12px;background:var(--grad);color:var(--acc-fg);font:800 15px var(--font);cursor:pointer;box-shadow:0 -10px 18px var(--panel)}}
+@media(max-width:960px){.aplica{display:block;position:sticky;bottom:0;width:100%;margin-top:14px;height:46px;border:0;border-radius:12px;background:var(--grad);color:var(--acc-fg);font:800 15px var(--font);cursor:pointer;box-shadow:0 -10px 18px var(--panel)}}
 /* stari goale */
 .rez-gol p{margin:10px 0 0}
 .rez-gol a:not(.btn-link){color:var(--acc-txt);font-weight:700}
@@ -451,12 +451,10 @@ h1{letter-spacing:-.025em}
 .antet{background:linear-gradient(180deg,var(--hdr),color-mix(in srgb,var(--hdr) 92%,var(--c)))}
 /* carduri */
 .card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;box-shadow:0 1px 2px rgba(0,0,0,.12)}
-@media(hover:hover){.card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.26);border-color:color-mix(in srgb,var(--c) 55%,var(--bd))}}
+@media(hover:hover){.card:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,0,0,.26);border-color:color-mix(in srgb,var(--c) 55%,var(--bd))}}
 :root[data-theme="light"] .card{box-shadow:0 1px 3px rgba(16,33,31,.07)}
 :root[data-theme="light"] .card:hover{box-shadow:0 14px 30px rgba(16,33,31,.16)}
 .poza{background:radial-gradient(120% 95% at 50% 38%,#fff 58%,#eaf1ef);box-shadow:inset 0 0 0 1px rgba(16,33,31,.06)}
-.poza img{transition:transform .25s ease}
-@media(hover:hover){.card:hover .poza img{transform:scale(1.04)}}
 .badge{box-shadow:0 2px 6px rgba(0,0,0,.28);letter-spacing:.01em}
 .badge.t1{background:linear-gradient(135deg,#fde08a,#fdc950)}
 .badge.t2{background:linear-gradient(135deg,#fdae6b,#fb923c)}
@@ -490,7 +488,6 @@ footer>*{max-width:var(--maxw);margin-left:auto;margin-right:auto;padding-left:v
 footer .legal{padding-top:14px!important}
 .f-legal{margin:0;padding-bottom:30px;line-height:1.55}
 @media(max-width:760px){footer>*{padding-left:16px;padding-right:16px}}
-@media(prefers-reduced-motion:reduce){.card,.poza img,.btn{transition:none!important}.card:hover{transform:none}}
 @media(min-width:1181px){.hero-acasa>div:first-child{max-width:calc(100% - 520px)}.hero-acasa h1{font-size:36px}}
 
 /* scene de categorie (hero): clase pentru desen */
@@ -503,4 +500,31 @@ footer .legal{padding-top:14px!important}
 .hero-scena{width:330px;height:194px;top:-52px;right:8px}
 @media(max-width:1500px){.hero-scena{width:290px;height:170px;top:-40px}}
 .ilu .sh{opacity:.24}
+:root[data-theme="light"]{--ds-o:.16}
 :root[data-theme="light"] .ilu .sh{opacity:.09}
+
+/* ---- IMAGINI PRODUS: acelasi cadru, aceeasi incadrare; fundalul alb al pozei se topeste in fundalul cadrului ---- */
+.poza img{object-position:center;mix-blend-mode:multiply}
+:root[data-theme="light"] .ilu .cs{opacity:.12}
+.ilu .cs{fill:#000;opacity:.34;filter:url(#bl)}
+
+/* ---- MISCARE: tranzitii scurte (120-200 ms), fara miscari care schimba spatiul ocupat sau mutam vecinii ---- */
+:root{--t-1:120ms;--t-2:160ms;--t-3:200ms;--ease:cubic-bezier(.2,.7,.2,1)}
+html{-webkit-tap-highlight-color:color-mix(in srgb,var(--c,#61e2c5) 24%,transparent)}
+a,button,select,summary,label,input{touch-action:manipulation}
+.card{transition:transform var(--t-2) var(--ease),box-shadow var(--t-2) var(--ease),border-color var(--t-2) var(--ease)}
+.btn,.btn-link,.ach,.chip,.cats a,.descopera a,.continut .legaturi a,.ghid-surori a,.fav,.ibtn,#mai,.reset,.btn-filtre,.copiaza,.sus,.aplica,.cauta button,.magazin a,.sugestii a{transition:transform var(--t-1) var(--ease),background-color var(--t-2) ease,border-color var(--t-2) ease,color var(--t-2) ease,box-shadow var(--t-2) ease,filter var(--t-2) ease}
+.btn:active,.btn-link:active,.ach:active,.chip:active,.cats a:active,.descopera a:active,.continut .legaturi a:active,#mai:active,.reset:active,.btn-filtre:active,.copiaza:active,.sus:active,.aplica:active,.cauta button:active{transform:scale(.97)}
+.fav:active{transform:scale(.86)}
+.ibtn:active{transform:scale(.9)}
+.ghid-surori a:active{transform:scale(.99)}
+.sugestii a:active{background:var(--bg)}
+@keyframes panou-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.sugestii:not([hidden]){animation:panou-in var(--t-2) var(--ease)}
+.compara:not([hidden]){animation:panou-in var(--t-2) var(--ease)}
+.vala:not([hidden]){animation:fade-in var(--t-2) linear}
+.sus:not([hidden]){animation:fade-in var(--t-2) linear}
+.info-pret[open] p{animation:fade-in var(--t-2) linear}
+@media(max-width:960px){.filtre{transition:transform var(--t-3) var(--ease),visibility 0s linear var(--t-3)}.filtre.deschis{transition:transform var(--t-3) var(--ease),visibility 0s}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;transition-delay:0s!important;animation-duration:.01ms!important;animation-iteration-count:1!important}.card:hover{transform:none}.btn:active,.btn-link:active,.ach:active,.chip:active,.cats a:active,.descopera a:active,.continut .legaturi a:active,#mai:active,.reset:active,.btn-filtre:active,.copiaza:active,.sus:active,.aplica:active,.cauta button:active,.fav:active,.ibtn:active,.ghid-surori a:active{transform:none}}

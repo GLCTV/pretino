@@ -97,8 +97,8 @@ ${PCT(262, 40)}${SPARK(30, 70, 1)}${SPARK(200, 36, .8)}`,
 ${PCT(250, 36)}${SPARK(28, 90, 1)}${SPARK(262, 116, .8)}`,
 };
 
-const DEFS = `<defs><radialGradient id="g1" cx=".5" cy=".6" r=".62"><stop offset="0" style="stop-color:var(--c)" stop-opacity=".36"/><stop offset="1" style="stop-color:var(--c)" stop-opacity="0"/></radialGradient><linearGradient id="gb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:color-mix(in srgb,var(--c) 30%,var(--ilu-a))"/><stop offset="1" style="stop-color:var(--ilu-b)"/></linearGradient><linearGradient id="gc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:color-mix(in srgb,var(--c) 92%,#fff)"/><stop offset="1" style="stop-color:color-mix(in srgb,var(--c) 70%,#000)"/></linearGradient><linearGradient id="gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>`;
-const invelis = (inner) => `<svg class="ilu" viewBox="0 0 290 170" fill="none">${DEFS}<ellipse cx="145" cy="112" rx="140" ry="58" fill="url(#g1)"/><ellipse class="sh" cx="145" cy="146" rx="108" ry="9" fill="#000"/>${inner}</svg>`;
+const DEFS = `<defs><radialGradient id="g1" cx=".5" cy=".6" r=".62"><stop offset="0" style="stop-color:var(--c)" stop-opacity=".36"/><stop offset="1" style="stop-color:var(--c)" stop-opacity="0"/></radialGradient><linearGradient id="gb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:color-mix(in srgb,var(--c) 40%,var(--ilu-a))"/><stop offset=".5" style="stop-color:color-mix(in srgb,var(--c) 26%,var(--ilu-a))"/><stop offset="1" style="stop-color:var(--ilu-b)"/></linearGradient><linearGradient id="gc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:color-mix(in srgb,var(--c) 84%,#fff)"/><stop offset=".45" style="stop-color:var(--c)"/><stop offset="1" style="stop-color:color-mix(in srgb,var(--c) 66%,#000)"/></linearGradient><linearGradient id="gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><filter id="ds" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="3.2" flood-color="#000" style="flood-opacity:var(--ds-o,.34)"/></filter><filter id="bl" x="-30%" y="-200%" width="160%" height="500%"><feGaussianBlur stdDeviation="3.600"/></filter></defs>`;
+const invelis = (inner) => `<svg class="ilu" viewBox="0 0 290 170" fill="none">${DEFS}<ellipse cx="145" cy="112" rx="140" ry="58" fill="url(#g1)"/><ellipse class="sh" cx="145" cy="146" rx="108" ry="9" fill="#000"/><g filter="url(#ds)">${inner}</g></svg>`;
 
 // ---- obiecte reutilizabile (caseta 100x100, baza ~y=92): din ele se compun scenele subcategoriilor ----
 const HL = (d, o = ".5") => `<path d="${d}" fill="url(#gh)" opacity="${o}"/>`;
@@ -172,7 +172,7 @@ const SUB = {
   "copii:jucarii": ["bear", "blocks", "balloon"], "copii:scoala": ["backpack", "book", "blocks"], "copii:bebelusi": ["babybottle", "pacifier", "bear"],
   "supermarket:ingrijire": ["pump", "sponge", "spray"], "supermarket:curatenie": ["spray", "sponge", "pump"], "supermarket:alimente": ["bread", "apple", "milk"], "supermarket:animale": ["paw", "bone", "bowl"],
 };
-const pune = (o, cx, baza, sc) => `<g transform="translate(${(cx - 50 * sc).toFixed(1)} ${(baza - 96 * sc).toFixed(1)}) scale(${sc})">${OBJ[o]}</g>`;
+const pune = (o, cx, baza, sc) => `<ellipse class="cs" cx="${cx}" cy="${baza + 1}" rx="${(40 * sc).toFixed(1)}" ry="${(4.5 * sc).toFixed(1)}"/><g transform="translate(${(cx - 50 * sc).toFixed(1)} ${(baza - 96 * sc).toFixed(1)}) scale(${sc})">${OBJ[o]}</g>`;
 
 export const areScena = (slug) => Object.hasOwn(SCENE, slug);
 export const scena = (slug) => invelis(SCENE[slug]);

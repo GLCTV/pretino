@@ -257,3 +257,9 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 
 ## Scene ilustrate pe categorii si subcategorii (branch grafica-scene, doar site)
 `scripts/lib/ilustratii.js`: 8 scene de categorie (laptop+telefon+chip, frigider+masina de spalat, casa+copac, rochie+geanta+pantof, masina, gantera+mingi, ursulet+cuburi, cos de cumparaturi) si 39 de scene de subcategorie compuse din ~55 de obiecte desenate de noi (laptop, router, imprimanta, aspirator, bicicleta, cort etc.). Culoare = accentul categoriei (--c), tema inchisa/deschisa. Apar doar pe paginile care exista (subcategoriile cu destule oferte). Fara imagini externe.
+
+## Upgrade grafic (ramura upgrade-grafic)
+- Ilustratii proprii (8 categorii + 39 subcategorii): gradiente cu 3 opriri, umbra proiectata (filtru), umbre de contact; aceeasi compozitie si culori.
+- Poze produs: aceeasi rama; object-position centrat, fundal alb topit in rama (multiply); fara zoom la hover.
+- Miscare: tranzitii 120-200 ms, hover card max 2px, feedback la apasare, panouri cu aparitie scurta, prefers-reduced-motion respectat.
+- Preconnect catre CDN-urile pozelor din pagina. Fara schimbari de layout (verificat cu capturi inainte/dupa).

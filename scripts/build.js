@@ -93,12 +93,20 @@ const antet = (catActiva) => `<header class="antet"><div class="antet-in">
 <div class="unelte"><a class="ibtn" id="fav-link" href="/favorite/" aria-label="Favorite">${icoana("inima")}<span class="nr" id="fav-nr" hidden>0</span></a><button class="ibtn" id="tema" type="button" aria-label="Schimbă tema (închisă / deschisă)"><span class="tema-luna">${icoana("luna")}</span><span class="tema-soare">${icoana("soare")}</span></button></div></div>
 <nav class="cats" aria-label="Categorii">${categorii.map((c) => `<a href="/categorie/${c.slug}/" data-cat="${c.slug}"${c.slug === catActiva ? ' aria-current="page"' : ""}>${icoana(c.slug)}<span>${esc(c.nume)}</span></a>`).join("")}</nav></div></header>`;
 
+// preconectare la CDN-urile pozelor de produs folosite chiar in pagina (primele 2 gazde)
+function preconectari(corp) {
+  if (!corp || !corp.includes('class="card"')) return "";
+  const gazde = [];
+  for (const m of corp.matchAll(/<img[^>]+src="https:\/\/([^\/"]+)/g)) if (!gazde.includes(m[1])) gazde.push(m[1]);
+  return gazde.slice(0, 2).map((h) => `<link rel="preconnect" href="https://${h}" crossorigin>`).join("");
+}
+
 function pagina({ titlu, descriere, cale, corp, noindex = false, catActiva = null, simplu = false, schema = [] }) {
   const robots = noindex || DEMO ? '<meta name="robots" content="noindex">' : "";
   return `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="profitshareid" content="7dd842fc7074c28872c609438ead55e6"><title>${esc(titlu)}</title><meta name="description" content="${esc(descriere)}">${robots}
 <meta property="og:type" content="website"><meta property="og:site_name" content="${esc(SITE_NAME)}"><meta property="og:locale" content="ro_RO"><meta property="og:title" content="${esc(titlu)}"><meta property="og:description" content="${esc(descriere)}"><meta property="og:url" content="${abs(cale)}"><meta property="og:image" content="${abs("/og.png")}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${esc(SITE_NAME)} – oferte și reduceri din magazinele din România"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(titlu)}"><meta name="twitter:description" content="${esc(descriere)}"><meta name="twitter:image" content="${abs("/og.png")}">
-<link rel="canonical" href="${abs(cale)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#0a1916"><meta name="color-scheme" content="dark light"><link rel="preload" href="/fonts/montserrat-var-latin.woff" as="font" type="font/woff" crossorigin><link rel="stylesheet" href="/stil.css?v=${VER_ASSET}">${TEMA_INIT}<script src="/cauta.js?v=${VER_ASSET}" defer></script>${DEMO ? "" : PROFITSHARE_SCRIPT}${schema.map(jsonld).join("")}</head><body${catActiva ? ` data-cat="${esc(catActiva)}"` : ""}>
+<link rel="canonical" href="${abs(cale)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#0a1916"><meta name="color-scheme" content="dark light"><link rel="preload" href="/fonts/montserrat-var-latin.woff" as="font" type="font/woff" crossorigin>${preconectari(corp)}<link rel="stylesheet" href="/stil.css?v=${VER_ASSET}">${TEMA_INIT}<script src="/cauta.js?v=${VER_ASSET}" defer></script>${DEMO ? "" : PROFITSHARE_SCRIPT}${schema.map(jsonld).join("")}</head><body${catActiva ? ` data-cat="${esc(catActiva)}"` : ""}>
 ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și nu se publică</div>' : ""}
 ${antet(catActiva)}
 ${simplu ? `<main class="simplu">${corp}</main>` : corp}

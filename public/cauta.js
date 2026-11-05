@@ -362,7 +362,7 @@
   }
   function pregatesteScope() {
     var q = params.get("q") || "";
-    if (cfg.mod === "categorie") baza = data.o.filter(function (o) { return o.c === cfg.cat && (!cfg.sub || o.s === cfg.sub); });
+    if (cfg.mod === "categorie") baza = data.o.filter(function (o) { return o.c === cfg.cat && (!cfg.sub || o.s === cfg.sub) && (!cfg.tip || o.g === cfg.tip); });
     else if (cfg.mod === "brand") baza = data.o.filter(function (o) { return o.b === cfg.brand; });
     else if (cfg.mod === "magazin") baza = data.o.filter(function (o) { return o.m === cfg.mag; });
     else if (cfg.mod === "cauta") baza = cauta(q);

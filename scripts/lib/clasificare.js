@@ -86,8 +86,38 @@ export function clasifica(o) {
   let categorie = o.categorie;
   for (const [slug, re] of REGULI_CATEGORIE) if (re.test(t)) { categorie = slug; break; }
   const sub = CAT_IMPLICIT(categorie).find(([, , , re, mod]) => re.test(mod === "cap" ? t.slice(0, CAP) : t));
-  return { categorie, sub: sub ? sub[0] : null, motivClasificare: sub ? `${categorie}/${sub[0]}: ${sub[3].source.slice(0, 40)}` : `${categorie}: fara subcategorie` };
+  const tipDef = sub ? (TIPURI[`${categorie}/${sub[0]}`] ?? []).find(([, , re]) => re.test(t)) : null;
+  return { categorie, sub: sub ? sub[0] : null, tip: tipDef ? tipDef[0] : null, motivClasificare: sub ? `${categorie}/${sub[0]}: ${sub[3].source.slice(0, 40)}` : `${categorie}: fara subcategorie` };
 }
+
+// Tipuri de produs in interiorul unei subcategorii (pagina proprie doar cu inventar suficient; parintele ramane director cu toate ofertele).
+// Regulile se aplica pe numele produsului (primele caractere), nu pe specificatii: „Mini PC ... 1TB SSD” nu e SSD.
+// slug, nume la singular-plural pentru H1, regex pe cap de titlu
+export const TIPURI = {
+  "electronice/componente": [
+    ["placi-video", "Plăci video", /^(placa|placi) video/],
+    ["procesoare", "Procesoare", /^(procesor|procesoare|cpu\b)/],
+    ["ssd", "SSD-uri", /^(ssd|unitate ssd|disc ssd|kit ssd)\b/],
+    ["memorii-ram", "Memorii RAM", /^((set|kit) )?(\d+ )?(memorie|memorii|ram)\b(?!.*(usb|card|microsd|flash|stick))/],
+  ],
+  "electronice/monitoare-tv": [
+    ["monitoare", "Monitoare", /^monitor/],
+    ["televizoare", "Televizoare", /^(televizor|tv\b)/],
+  ],
+  "electronice/periferice": [
+    ["tastaturi", "Tastaturi", /^(tastatur|kit tastatur|set tastatur)/],
+    ["mouse", "Mouse-uri", /^(mouse(?!pad)|kit mouse|set mouse)/],
+    ["casti", "Căști", /^(casti|set casti)/],
+  ],
+  "electrocasnice/curatenie": [
+    ["aspiratoare", "Aspiratoare", /^(aspirator|robot aspirator)/],
+  ],
+  "electrocasnice/bucatarie": [
+    ["espressoare", "Espressoare", /^(espressor|espresor|expresor|aparat de cafea|automat de cafea)/],
+    ["friteuze-aer-cald", "Friteuze cu aer cald", /^friteuz/],
+  ],
+};
+export const tipuriDe = (cat, sub) => (TIPURI[`${cat}/${sub}`] ?? []).map(([id, nume]) => ({ id, nume }));
 
 // ordinea chipurilor de pe pagina (altfel decat prioritatea regulilor)
 const ORDINE = { "casa-si-gradina": ["bucatarie", "gradina", "iluminat", "scule", "decoratiuni", "casa-inteligenta"] };

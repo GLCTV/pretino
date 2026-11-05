@@ -5,9 +5,9 @@ import { createHash } from "node:crypto";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE, OPERATOR } from "../src/config.js";
 import { PAGINI_LEGALE } from "./lib/legal.js";
 import { esc, reducere } from "./lib/html.js";
-import { clasifica, subcategoriiDe } from "./lib/clasificare.js";
+import { clasifica, subcategoriiDe, tipuriDe } from "./lib/clasificare.js";
 import { icoana } from "./lib/iconite.js";
-import { PE_PAGINA, MIN_SUB_PAGINA, MIN_MAGAZIN_INDEX, ZILE_DATE_VECHI, BRAND, jos, metaAcasa, metaCategorie, metaSub, metaMagazin, metaMarca, metaTop } from "../src/seo.js";
+import { PE_PAGINA, MIN_SUB_PAGINA, MIN_TIP_PAGINA, MIN_MAGAZIN_INDEX, ZILE_DATE_VECHI, BRAND, jos, metaAcasa, metaCategorie, metaSub, metaTip, metaComponente, metaMagazin, metaMarca, metaTop } from "../src/seo.js";
 import { paginaGhid, CALE_GHID } from "./lib/ghid.js";
 import { areScena, scena, areScenaSub, scenaSub } from "./lib/ilustratii.js";
 import { GHIDURI, GHID_EXTRA, MIN_TOP, N_TOP, MIN_BRAND, marcaOfertei } from "./lib/continut.js";
@@ -85,7 +85,7 @@ for (const t of topuri) if (t.sub && topuri.filter((x) => x.nume === t.nume).len
 const topDe = (cat, sub = null) => topuri.find((t) => t.cat.slug === cat && (t.sub?.id ?? null) === sub);
 
 const FOOTER = () => `<footer><div class="f-marca"><a class="logo" href="/" aria-label="${esc(SITE_NAME)} – prima pagină"><img class="l-noapte" src="/logo-dark-antet.svg" alt="" width="190" height="35" loading="lazy"><img class="l-lumina" src="/logo-antet.svg" alt="" width="190" height="35" loading="lazy" aria-hidden="true"></a><p>Oferte și reduceri din magazinele din România, într-un singur loc.</p></div><nav class="legal" aria-label="Informații">${[...PAGINI_LEGALE.map((p) => ({ cale: p.cale, nume: p.nume })), { cale: CALE_GHID, nume: "Cum interpretăm reducerile" }, { cale: "/ghiduri/", nume: "Ghiduri" }, ...(topuri.length ? [{ cale: "/top-oferte/", nume: "Top economii" }] : []), ...(marciPagina.length ? [{ cale: "/branduri/", nume: "Branduri" }] : [])].map((p) => `<a href="${p.cale}">${esc(p.nume)}</a>`).join("")}</nav>
-${magCuOferte.filter((m) => magIndexabil(m.id)).length ? `<nav class="magazine-f" aria-label="Magazine"><b>Magazine:</b>${magCuOferte.filter((m) => magIndexabil(m.id)).map((m) => `<a href="/magazin/${m.id}/">${esc(m.nume)}</a>`).join("")}</nav>` : ""}<p class="f-legal">Pretino.ro afișează oferte din magazine partenere. Unele linkuri pot fi linkuri de afiliere (marcate sponsorizat), iar unele magazine ne oferă un cod de cupon pentru care putem primi comision; prețul pentru tine nu se schimbă. Unde apare „reducere afișată de magazin”, prețul vechi este cel de referință arătat de magazin, nu istoricul Pretino. Verifică mereu prețul final în magazin.</p></footer>`;
+${magCuOferte.filter((m) => magIndexabil(m.id)).length ? `<nav class="magazine-f" aria-label="Magazine"><b>Magazine:</b>${magCuOferte.filter((m) => magIndexabil(m.id)).map((m) => `<a href="/magazin/${m.id}/">${esc(m.nume)}</a>`).join("")}<a href="/magazine/">Toate magazinele</a></nav>` : ""}<p class="f-legal">Pretino.ro afișează oferte din magazine partenere. Unele linkuri pot fi linkuri de afiliere (marcate sponsorizat), iar unele magazine ne oferă un cod de cupon pentru care putem primi comision; prețul pentru tine nu se schimbă. Unde apare „reducere afișată de magazin”, prețul vechi este cel de referință arătat de magazin, nu istoricul Pretino. Verifică mereu prețul final în magazin.</p></footer>`;
 
 const antet = (catActiva) => `<header class="antet"><div class="antet-in">
 <div class="rand1"><a class="logo" href="/" aria-label="${esc(SITE_NAME)} – prima pagină"><img class="l-noapte" src="/logo-dark-antet.svg" alt="${esc(SITE_NAME)}" width="190" height="35"><img class="l-lumina" src="/logo-antet.svg" alt="" width="190" height="35" aria-hidden="true"></a>
@@ -153,7 +153,7 @@ function navPagini(cale, p, n) {
 
 // Genereaza TOATE paginile unei liste (pagina 1 + /pagina-N/). Filtrarea completa ruleaza in browser (cauta.js) pe cauta-index.json,
 // dar fiecare pagina are in HTML produsele ei, titlu, H1, breadcrumb si canonical propriu.
-function listare({ mod, meta, cale, catSlug = null, magId = null, subId = null, lista, indexabil = true, ilustr = null, migaje = [], chips = "", subRute = [], schemaAcasa = false, brandId = null, extra = "" }) {
+function listare({ mod, meta, cale, catSlug = null, magId = null, subId = null, tipId = null, lista, indexabil = true, ilustr = null, migaje = [], chips = "", subRute = [], schemaAcasa = false, brandId = null, extra = "", dupa = "" }) {
   const pretMax = Math.max(10, ...lista.map((o) => o.pret));
   const pasMax = pretMax <= 500 ? Math.ceil(pretMax / 10) * 10 : pretMax <= 5000 ? Math.ceil(pretMax / 100) * 100 : Math.ceil(pretMax / 1000) * 1000;
   const magazineLista = [...new Set(lista.map((o) => o.magazin))].map((id) => ({ id, nume: numeMag(id), n: lista.filter((o) => o.magazin === id).length })).sort((a, b) => b.n - a.n);
@@ -162,7 +162,7 @@ function listare({ mod, meta, cale, catSlug = null, magId = null, subId = null, 
   for (let p = 1; p <= nPagini; p++) {
     const adr = adrPagina(cale, p), m = meta(p);
     const felie = lista.slice((p - 1) * PE_PAGINA, p * PE_PAGINA);
-    const date = JSON.stringify({ mod, cat: catSlug, mag: magId, brand: brandId, sub: subId, max: pasMax, pagina: p, pe: PE_PAGINA, total: lista.length, fin: Math.min(p * PE_PAGINA, lista.length), baza: cale, subRute }).replace(/</g, "\\u003c");
+    const date = JSON.stringify({ mod, cat: catSlug, mag: magId, brand: brandId, sub: subId, tip: tipId, max: pasMax, pagina: p, pe: PE_PAGINA, total: lista.length, fin: Math.min(p * PE_PAGINA, lista.length), baza: cale, subRute }).replace(/</g, "\\u003c");
     const trasa = [...migaje, { nume: mod === "acasa" ? "Acasă" : m.h1 }];
     const miez = mod === "acasa" ? `<span>Acasă</span>` : migaje.map((x) => `<a href="${x.cale}">${esc(x.nume)}</a><span aria-hidden="true">/</span>`).join("") + `<span id="migaja-curenta">${esc(m.migaja)}</span>`;
     const schema = [];
@@ -190,7 +190,7 @@ ${magId ? "" : `<details class="fsec" open><summary>Magazine ${icoana("sus")}</s
 <div class="grid" id="lista">${felie.map((o, i) => card(o, i)).join("")}</div>
 <div class="rez-gol" id="rez-gol" ${lista.length ? "hidden" : ""}><b>Nu am găsit oferte</b>Încearcă alte filtre sau o altă căutare.</div>
 <div id="compara" class="compara" hidden></div>
-<button id="mai" type="button" hidden>Arată mai multe</button>${navPagini(cale, p, nPagini)}</section></div><div class="vala" id="vala" hidden></div></main>`;
+<button id="mai" type="button" hidden>Arată mai multe</button>${navPagini(cale, p, nPagini)}</section></div>${p === 1 ? dupa : ""}<div class="vala" id="vala" hidden></div></main>`;
     out.push({ cale: adr, index: indexabil, html: pagina({ titlu: m.titlu, descriere: p > 1 ? `${m.descriere} Pagina ${p} din ${nPagini}.` : m.descriere, cale: adr, corp, noindex: !indexabil, catActiva: catSlug, schema }) });
   }
   return out;
@@ -209,13 +209,19 @@ const statisticiHome = () => {
   const t = [[oferte.length.toLocaleString("ro-RO"), "oferte în catalog"], [String(magCuOferte.length), magCuOferte.length === 1 ? "magazin" : "magazine"], ...(maxR ? [[`-${maxR}%`, "cea mai mare reducere"]] : [])];
   return `<ul class="hero-stat" aria-label="Pretino în cifre">${t.map(([n, e]) => `<li><b>${esc(n)}</b><span>${esc(e)}</span></li>`).join("")}</ul>`;
 };
+// pagini publicate (aceleasi praguri ca la generare): subcategorie / tip de produs
+const subPublicata = (cat, sub) => sortate.filter((o) => o.categorie === cat && o.sub === sub).length >= MIN_SUB_PAGINA;
+const tipPublicat = (cat, sub, tip) => subPublicata(cat, sub) && sortate.filter((o) => o.categorie === cat && o.sub === sub && o.tip === tip).length >= MIN_TIP_PAGINA;
+// acces compact din prima pagina spre categoriile comerciale principale (numai paginile care exista)
+const ACCES_HOME = [["electronice/laptopuri", "Laptopuri la ofertă"], ["electronice/componente", "Componente PC la ofertă"], ["electronice/monitoare-tv/monitoare", "Monitoare la ofertă"], ["electronice/periferice", "Periferice la reducere"]];
+const existaAcces = (c) => { const [cat, sub, tip] = c.split("/"); return tip ? tipPublicat(cat, sub, tip) : subPublicata(cat, sub); };
 // ---- blocul „Descopera”: legaturi interne catre ghiduri, topuri si marci (home si categorii) ----
 const linkuriDescopera = (cat = null) => {
   const g = GHIDURI.filter((x) => !cat || x.cat === cat || !x.cat);
   const t = cat ? [topDe(cat), ...topuri.filter((x) => x.cat.slug === cat && x.sub)].filter(Boolean).slice(0, 4) : topuri.filter((x) => !x.sub).slice(0, 5);
   const m = marciPagina.slice(0, cat ? 0 : 8);
   const grup = (eticheta, l) => (l.length ? `<span class="d-grup"><b>${eticheta}</b>${l.join("")}</span>` : "");
-  return `<nav class="descopera" aria-label="Descoperă"><details open><summary>Descoperă mai mult</summary>${grup("Top economii:", t.map((x) => `<a${x.sub || !cat ? "" : ' class="mare"'} href="${x.cale}">${esc(x.sub ? x.nume : cat ? "Toată categoria" : x.cat.nume)}</a>`))}${grup("Ghiduri:", g.slice(0, 3).map((x) => `<a href="/ghiduri/${x.slug}/">${esc(x.titlu)}</a>`).concat([`<a class="mare" href="/ghiduri/">Toate ghidurile</a>`]))}${grup("Branduri:", m.map((x) => `<a href="/brand/${x.id}/">${esc(x.nume)}</a>`).concat(m.length ? [`<a class="mare" href="/branduri/">Toate brandurile</a>`] : []))}</details></nav>`;
+  return `<nav class="descopera" aria-label="Descoperă"><details open><summary>Descoperă mai mult</summary>${cat ? "" : grup("Descoperă oferte:", ACCES_HOME.filter(([c]) => existaAcces(c)).map(([c, n]) => `<a href="/categorie/${c}/">${esc(n)}</a>`).concat(magCuOferte.some((m) => magIndexabil(m.id)) ? [`<a class="mare" href="/magazine/">Magazine cu oferte</a>`] : []))}${grup("Top economii:", t.map((x) => `<a${x.sub || !cat ? "" : ' class="mare"'} href="${x.cale}">${esc(x.sub ? x.nume : cat ? "Toată categoria" : x.cat.nume)}</a>`))}${grup("Ghiduri:", g.slice(0, 3).map((x) => `<a href="/ghiduri/${x.slug}/">${esc(x.titlu)}</a>`).concat([`<a class="mare" href="/ghiduri/">Toate ghidurile</a>`]))}${grup("Branduri:", m.map((x) => `<a href="/brand/${x.id}/">${esc(x.nume)}</a>`).concat(m.length ? [`<a class="mare" href="/branduri/">Toate brandurile</a>`] : []))}</details></nav>`;
 };
 const dataRo = (iso) => new Date(iso).toLocaleDateString("ro-RO", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const migajeHtml = (items) => `<nav class="migaje" aria-label="Navigare">${items.map((x, i) => (i < items.length - 1 ? `<a href="${x.cale}">${esc(x.nume)}</a><span aria-hidden="true">/</span>` : `<span id="migaja-curenta">${esc(x.nume)}</span>`)).join("")}</nav>`;
@@ -230,6 +236,7 @@ pagini.push(...listare({ mod: "acasa", meta: (p) => ({ ...metaAcasa(p), migaja: 
 
 // Categorii + subcategorii (pagini proprii pentru subcategoriile cu inventar suficient)
 const subPagini = []; // pentru sitemap / teste
+const tipPagini = []; // pagini pe tip de produs (ex. /categorie/electronice/periferice/mouse/)
 const numeSubDeMaiMulteOri = (() => { const c = {}; for (const cc of categorii) for (const s of subcategoriiDe(cc.slug)) if (sortate.filter((o) => o.categorie === cc.slug && o.sub === s.id).length >= MIN_SUB_PAGINA) c[s.nume] = (c[s.nume] ?? 0) + 1; return new Set(Object.keys(c).filter((k) => c[k] > 1)); })();
 for (const c of categorii) {
   const l = sortate.filter((o) => o.categorie === c.slug);
@@ -243,15 +250,36 @@ for (const c of categorii) {
     const caleS = `${cale}${s.id}/`;
     const chipuriSub = chipLink(cale, null, "Toate", false) + rutate.map((x) => chipLink(`${cale}${x.id}/`, x.icoana, x.nume, x === s)).join("");
     subPagini.push(caleS);
-    pagini.push(...listare({ mod: "categorie", meta: (p) => ({ ...metaSub(c, s, nrMag(s.lista), p, numeSubDeMaiMulteOri.has(s.nume)), migaja: s.nume }), cale: caleS, catSlug: c.slug, subId: s.id, lista: s.lista, ilustr: `scena-sub:${c.slug}:${s.id}`, migaje: [{ nume: "Acasă", cale: "/" }, { nume: c.nume, cale }], chips: chipuriSub }));
+    // tipuri de produs cu pagina proprie (doar cu inventar suficient); pagina subcategoriei ramane directorul cu toate ofertele
+    const tipuri = tipuriDe(c.slug, s.id).map((t) => ({ ...t, lista: s.lista.filter((o) => o.tip === t.id) })).filter((t) => t.lista.length >= MIN_TIP_PAGINA);
+    const extraTipuri = tipuri.length ? `<nav class="descopera" aria-label="Tipuri de produse"><details open><summary>Alege tipul de produs</summary><span class="d-grup"><b>Tipuri:</b>${tipuri.map((t) => `<a href="${caleS}${t.id}/">${esc(t.nume)} la ofertă</a>`).join("")}</span></details></nav>` : "";
+    const metaSubFinal = (p) => (c.slug === "electronice" && s.id === "componente" && tipuri.length ? { ...metaSub(c, s, nrMag(s.lista), p), ...metaComponente(tipuri, p), migaja: s.nume } : { ...metaSub(c, s, nrMag(s.lista), p, numeSubDeMaiMulteOri.has(s.nume)), migaja: s.nume });
+    pagini.push(...listare({ mod: "categorie", meta: metaSubFinal, cale: caleS, catSlug: c.slug, subId: s.id, lista: s.lista, ilustr: `scena-sub:${c.slug}:${s.id}`, migaje: [{ nume: "Acasă", cale: "/" }, { nume: c.nume, cale }], chips: chipuriSub, extra: extraTipuri }));
+    for (const t of tipuri) {
+      const caleT = `${caleS}${t.id}/`;
+      tipPagini.push(caleT);
+      const chipuriTip = chipLink(caleS, null, `Toate: ${s.nume}`, false) + tipuri.map((x) => chipLink(`${caleS}${x.id}/`, null, x.nume, x === t)).join("");
+      pagini.push(...listare({ mod: "categorie", meta: (p) => metaTip(c, s, t, nrMag(t.lista), t.lista.length, p), cale: caleT, catSlug: c.slug, subId: s.id, tipId: t.id, lista: t.lista, migaje: [{ nume: "Acasă", cale: "/" }, { nume: c.nume, cale }, { nume: s.nume, cale: caleS }], chips: chipuriTip }));
+    }
   }
 }
 // Magazine (pagina ramane accesibila si cu putine oferte, dar indexabila doar de la MIN_MAGAZIN_INDEX oferte)
 for (const m of magazine) {
   const l = sortate.filter((o) => o.magazin === m.id);
   if (!l.length) continue;
-  pagini.push(...listare({ mod: "magazin", meta: (p) => ({ ...metaMagazin(m, l.length, p), migaja: m.nume }), cale: `/magazin/${m.id}/`, magId: m.id, lista: l, indexabil: l.length >= MIN_MAGAZIN_INDEX, migaje: [{ nume: "Acasă", cale: "/" }] }));
+  // legaturi catre categoriile si brandurile prezente la acest magazin (doar pagini publicate, fara pagini automate pentru intersectii)
+  const subM = []; for (const cc of categorii) for (const ss of subcategoriiDe(cc.slug)) { const n = l.filter((o) => o.categorie === cc.slug && o.sub === ss.id).length; if (n >= 3 && subPublicata(cc.slug, ss.id)) subM.push({ cale: `/categorie/${cc.slug}/${ss.id}/`, nume: ss.nume, n }); }
+  const brM = marciPagina.map((b) => ({ ...b, n: l.filter((o) => o.marca?.id === b.id).length })).filter((b) => b.n >= 3).sort((a, b) => b.n - a.n).slice(0, 6);
+  const legM = [...subM.sort((a, b) => b.n - a.n).slice(0, 6).map((x) => `<a href="${x.cale}">${esc(x.nume)} la ofertă</a>`), ...brM.map((b) => `<a href="/brand/${b.id}/">Oferte ${esc(b.nume)}</a>`)];
+  const cuponM = m.cupon ? `<section class="cupon-info" id="cod-reducere"><h2>Cod de reducere ${esc(m.nume)}: cum îl folosești</h2><p>Codul afișat pe cardurile ${esc(m.nume)} este <b>${esc(m.cupon.cod)}</b> (${esc(m.cupon.text)}). Se introduce în coș, la finalizarea comenzii; prețul afișat în Pretino nu îl include.</p><p>Codul este disponibil de verificat în coș: ${esc(m.nume)} stabilește produsele eligibile, excluderile și dacă se poate cumula cu alte reduceri, așa că verifică în coș dacă se aplică produsului tău. Pretino nu garantează aplicarea lui la toate produsele. Putem primi un comision pentru comenzile făcute cu acest cod; prețul pentru tine nu se schimbă.</p></section>` : "";
+  const dupaM = `${legM.length ? `<nav class="descopera" aria-label="Categorii și branduri"><details open><summary>Ce găsești la ${esc(m.nume)}</summary><span class="d-grup">${legM.join("")}</span></details></nav>` : ""}${cuponM}`;
+  pagini.push(...listare({ mod: "magazin", meta: (p) => ({ ...metaMagazin(m, l.length, p), migaja: m.nume }), cale: `/magazin/${m.id}/`, magId: m.id, lista: l, indexabil: l.length >= MIN_MAGAZIN_INDEX, migaje: [{ nume: "Acasă", cale: "/" }], dupa: dupaM }));
 }
+
+// Director magazine: doar magazinele cu pagina indexabila (politica de utilitate: sub MIN_MAGAZIN_INDEX oferte pagina ramane accesibila, dar nepromovata)
+{ const mi = magCuOferte.filter((m) => magIndexabil(m.id));
+  if (mi.length) paginaEd({ cale: "/magazine/", titlu: `Magazine cu oferte – reduceri din magazine online | ${BRAND}`, descriere: "Magazinele din care Pretino adună oferte: alege un magazin și vezi reducerile lui actuale. Prețul final se verifică în magazin.", migaje: [{ nume: "Acasă", cale: "/" }, { nume: "Magazine", cale: "/magazine/" }],
+    corp: `<h1>Magazine cu oferte</h1><p class="intro">Pretino nu vinde produse: adună oferte din magazinele de mai jos și te trimite în magazin, unde verifici prețul final și condițiile.</p><ul class="lista-linkuri">${mi.map((m) => `<li><a href="/magazin/${m.id}/">Oferte ${esc(m.nume)}</a> <span>${sortate.filter((o) => o.magazin === m.id).length} oferte</span></li>`).join("")}</ul>` }); }
 
 // Marci: pagina proprie (cu filtre) pentru marcile cu destule oferte + pagina director
 for (const b of marciPagina) pagini.push(...listare({ mod: "brand", brandId: b.id, meta: (p) => ({ ...metaMarca(b.nume, b.lista.length, nrMag(b.lista), p), migaja: b.nume }), cale: `/brand/${b.id}/`, lista: b.lista, migaje: [{ nume: "Acasă", cale: "/" }, { nume: "Branduri", cale: "/branduri/" }] }));
@@ -282,6 +310,7 @@ const tabelGhid = (t) => `<div class="ghid-tabel"><table><caption>${esc(t.titlu)
 const calculatorHtml = `<section class="ghid-calc" id="calculator" data-calc><h2>Calculator: cât economisești de fapt</h2><p class="intro">Introdu prețul de referință, prețul afișat și costul transportului. Vezi reducerea reală, cu tot cu livrare.</p><div class="calc-camp"><label>Preț de referință (lei)<input type="number" inputmode="decimal" min="0" step="any" data-c="vechi" placeholder="ex. 1000"></label><label>Preț afișat (lei)<input type="number" inputmode="decimal" min="0" step="any" data-c="nou" placeholder="ex. 800"></label><label>Transport (lei)<input type="number" inputmode="decimal" min="0" step="any" data-c="transp" placeholder="0"></label></div><div class="calc-rez" data-rez role="status" aria-live="polite">Completează cele două prețuri ca să vezi rezultatul.</div></section>`;
 const checklistHtml = (c, slug) => `<section class="ghid-check" id="checklist" data-check="${esc(slug)}"><h2>${esc(c.titlu)}</h2><p class="check-prog" data-prog aria-live="polite">0 din ${c.pasi.length} bifate</p><ul>${c.pasi.map((x, i) => `<li><label><input type="checkbox" data-i="${i}"> <span>${esc(x)}</span></label></li>`).join("")}</ul></section>`;
 const faqHtml = (f) => `<section class="ghid-faq" id="intrebari"><h2>Întrebări frecvente</h2>${f.map((x) => `<details><summary>${esc(x.q)}</summary><p>${esc(x.a)}</p></details>`).join("")}</section>`;
+const LEG_GHID = { "cum-alegi-un-laptop-la-oferta": [["electronice/laptopuri", "Vezi laptopurile la ofertă"], ["electronice/componente/ssd", "SSD-uri la ofertă"]], "cum-alegi-un-monitor": [["electronice/monitoare-tv/monitoare", "Monitoare la ofertă"]], "cum-alegi-un-mouse-sau-o-tastatura-gaming": [["electronice/periferice/mouse", "Oferte la mouse-uri"], ["electronice/periferice/tastaturi", "Oferte la tastaturi"]] };
 for (const g of GHIDURI) {
   const ex = GHID_EXTRA[g.slug] ?? {}, toate = ofGhid(g), cale = `/ghiduri/${g.slug}/`;
   const inline = ex.oferteDupa !== undefined ? toate.slice(0, 3) : [], rel = toate.slice(inline.length, inline.length + 4);
@@ -300,6 +329,7 @@ ${ex.verdict ? `<aside class="caseta verdict"><b>Pe scurt</b><p>${esc(ex.verdict
 <div class="ghid-corp"><article class="ghid">${sectiuni}</article>
 ${ex.calculator ? calculatorHtml : ""}${ex.checklist ? checklistHtml(ex.checklist, g.slug) : ""}${ex.faq ? faqHtml(ex.faq) : ""}
 ${rel.length ? `<section id="oferte-acum"><h2>Oferte relevante acum</h2><p class="intro">Cele mai mari economii în lei din catalog${g.sub ? "" : ", la produsele resigilate sau refurbished"}. Verifică întotdeauna prețul final și condițiile în magazin.</p>${gridCards(rel)}<p class="legaturi">${caleSub ? `<a class="mare" href="${caleSub}">Vezi toate ofertele</a>` : ""}${t ? `<a href="${t.cale}">Top economii la ${esc(t.nume)}</a>` : ""}</p></section>` : ""}
+${(LEG_GHID[g.slug] ?? []).filter(([c]) => existaAcces(c)).length ? `<section><h2>Oferte pe tip de produs</h2>${g.slug === "cum-alegi-un-laptop-la-oferta" ? `<p>Dacă vrei să schimbi sau să adaugi stocare, verifică întâi ce tip de SSD acceptă laptopul tău (format și interfață); unele modele nu permit upgrade.</p>` : ""}<p class="legaturi">${LEG_GHID[g.slug].filter(([c]) => existaAcces(c)).map(([c, n]) => `<a class="mare" href="/categorie/${c}/">${esc(n)}</a>`).join("")}</p></section>` : ""}
 <section><h2>Alte ghiduri</h2><div class="ghid-surori">${surori.map((x) => `<a${x.cat ? ` data-cat="${esc(x.cat)}"` : ""} href="/ghiduri/${x.slug}/"><b>${esc(x.titlu)}</b><span>${minCitit(x)} min de citit</span></a>`).join("")}<a href="${CALE_GHID}"><b>Cum interpretăm reducerile pe Pretino</b><span>De unde vin prețurile</span></a></div></section></div></div>${ex.calculator || ex.checklist ? `<script src="/ghid.js?v=${VER_ASSET}" defer></script>` : ""}` });
 }
 paginaEd({ cale: "/ghiduri/", titlu: `Ghiduri de cumpărare – cum alegi și cum verifici o ofertă | ${BRAND}`, descriere: "Ghiduri scurte pentru cumpărături online: cum verifici o reducere, cum alegi un laptop, un monitor sau periferice și ce înseamnă produsele resigilate.", migaje: [{ nume: "Acasă", cale: "/" }, { nume: "Ghiduri", cale: "/ghiduri/" }],
@@ -315,7 +345,7 @@ mkdirSync("dist", { recursive: true });
 if (existsSync("public")) cpSync("public", "dist", { recursive: true });
 writeFileSync("dist/stil.css", CSS);
 // index de cautare (citit de /cauta.js doar cand e nevoie): campuri scurte, ordinea = ordinea listelor din HTML
-writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), k: Object.fromEntries(magazine.filter((x) => x.cupon).map((x) => [x.id, x.cupon])), o: sortate.map((o) => ({ id: o.id, t: o.titlu, m: o.magazin, c: o.categorie, s: o.sub ?? "", p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, x: conditie(o), b: o.marca?.id ?? "", u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "" })) }));
+writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), k: Object.fromEntries(magazine.filter((x) => x.cupon).map((x) => [x.id, x.cupon])), o: sortate.map((o) => ({ id: o.id, t: o.titlu, m: o.magazin, c: o.categorie, s: o.sub ?? "", g: o.tip ?? "", p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, x: conditie(o), b: o.marca?.id ?? "", u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "" })) }));
 for (const p of pagini) {
   const dir = "dist" + p.cale;
   mkdirSync(dir, { recursive: true });

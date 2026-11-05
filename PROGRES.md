@@ -267,3 +267,8 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 ## Poze PC Garage (ramura imagini-pcgarage)
 - Cardurile PC Garage cer varianta mare (fara /thumbnails/), cu revenire automata la miniatura daca nu exista (server `poza()` + client `card()`).
 - Neverificat din cloud: daca adresele mari exista pe CDN (de verificat in preview).
+
+## Audit SEO 2026-11-05 – stare (ramura audit-seo-20261105, v1.65, NEPUBLICAT, nepus pe main)
+- Făcut (P0 clasificare): reguli noi în scripts/lib/clasificare.js (accesorii/imprimante/rețelistică pe „cap” de titlu, subcategorii smartwatch, masini-de-spalat, trotinete=piese, supermarket->ingrijire), 18 teste de regresie în scripts/test-clasificare.js (rulate din test.js). `bun scripts/test.js` trece complet; build 344 pagini.
+- De făcut: imagini (ITGalaxy) și validare linkuri; pagini noi (GPU/CPU/SSD/RAM, monitoare/TV, mouse/tastaturi/căști…) doar după verificarea inventarului; /magazine/; linkuri interne în zona „Descoperă”; metadate din script; ghiduri (SSD, aspirator); Black Friday; Lighthouse; capturi desktop/mobil; raport clasificare neclară.
+- Trotinete complete: 0 în catalog (toate 88 sunt piese), pagina „trotinete-electrice” apare doar când există inventar.

@@ -1,5 +1,6 @@
 // Regresie clasificare (P0 audit 2026-11-05); rulat din scripts/test.js
 import { clasifica } from "./lib/clasificare.js";
+import * as fs from "node:fs";
 
 export function testeClasificare(ok) {
 const cazuri = [
@@ -26,4 +27,14 @@ for (const [titlu, cat, sub, asteptat] of cazuri) {
   const r = clasifica({ titlu, categorie: cat === "sport" ? "sport" : cat });
   ok((r.sub === sub) === asteptat, `clasificare: „${titlu.slice(0, 50)}” ${asteptat ? "in" : "nu in"} ${sub}`);
 }
+  // pagini noi (necesita dist/ generat de build)
+  const { existsSync, readFileSync } = fs;
+  if (existsSync("dist/index.html")) {
+    const citeste = (f) => readFileSync(f, "utf8");
+    ok(existsSync("dist/magazine/index.html") && /href="\/magazine\/"/.test(citeste("dist/index.html")), "seo: director /magazine/ exista si e legat din prima pagina");
+    ok(/Descoperă oferte:/.test(citeste("dist/index.html")) && /Laptopuri la ofertă/.test(citeste("dist/index.html")), "seo: prima pagina are acces compact la categoriile principale");
+    ok(!existsSync("dist/categorie/sport/trotinete-electrice/index.html") || !/piese/i.test(citeste("dist/categorie/sport/trotinete-electrice/index.html").match(/<h1[^>]*>[^<]*/)[0]), "clasificare: pagina trotinetelor electrice nu e a pieselor");
+    const sm = citeste("dist/sitemap.xml");
+    ok(["periferice/mouse", "periferice/tastaturi", "monitoare-tv/monitoare"].every((x) => existsSync(`dist/categorie/electronice/${x}/index.html`) === sm.includes(`/categorie/electronice/${x}/`)), "seo: paginile pe tip de produs sunt in sitemap exact cand exista");
+  }
 }

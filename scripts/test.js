@@ -100,6 +100,7 @@ ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"
   ok(!idx || (idx.k?.pcgarage?.cod === "GVYDBDQ9" && pag.length === 0 || /Cupon <b>GVYDBDQ9<\/b>/.test(readFileSync("dist/index.html", "utf8")) === idx.o.slice(0, 48).some((o) => o.m === "pcgarage")), "cupon PC Garage: codul e in index si pe cardurile PC Garage");
   ok(pag.every((f) => !/emag\.ro/i.test(readFileSync(f, "utf8"))), "eMAG interzis (regula Profitshare): niciun link emag.ro in paginile generate"); }
 { const { testePanou } = await import("./test-panou.js"); await testePanou(ok); }
+{ const { testeClasificare } = await import("./test-clasificare.js"); testeClasificare(ok); }
 { const { testeSeo } = await import("./test-seo.js"); testeSeo(ok); }
 { const { testeSeoMotoare } = await import("./test-seo-motoare.js"); await testeSeoMotoare(ok); }
 { const { testeCampanii } = await import("./test-campanii.js"); await testeCampanii(ok); }

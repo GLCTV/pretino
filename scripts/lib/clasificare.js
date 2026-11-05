@@ -6,17 +6,21 @@ const fara = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toL
 export const SUBCATEGORII = {
   electronice: [
     ["laptopuri", "Laptopuri", "laptop", /laptop|notebook|ultrabook|macbook/],
-    ["telefoane", "Telefoane și tablete", "telefon", /telefon|smartphone|iphone|tableta|\btab\b|ipad|smartwatch|bratara fitness|smart band|ceas inteligent|e-?book/],
-    ["componente", "Componente PC", "cip", /placa video|procesor|\bssd\b|\bhdd\b|hard ?disk|memorie|\bram\b|placa de baza|sursa|carcasa|cooler|ventilator pc|pasta termo|desktop|unitate|nvme|usb stick|stick usb|card de memorie|microsd|ups\b/],
+    // accesoriile de telefon/tableta (huse, folii, curele, baterii externe) sunt separate de dispozitive
+    ["accesorii", "Accesorii", "stecher", /\bhusa\b|\bhuse\b|folie (de )?(sticla |protectie)|folie sticla|bratara de schimb|curea (de schimb )?pentru|acumulator extern|baterie externa|power ?bank|incarcator|cablu|adaptor|hub\b|suport|docking|hdmi|display ?port|memorie usb|usb flash|flash drive|stick (usb|memorie)|usb stick|card de memorie|carduri de memorie|card memorie|microsd|\bsdxc?\b|cititor (de )?card/, "cap"],
+    ["smartwatch", "Smartwatch-uri", "ceas", /smartwatch|bratara fitness|smart band|ceas inteligent/],
+    ["telefoane", "Telefoane și tablete", "telefon", /telefon|smartphone|iphone|tableta|\btab\b|ipad|e-?book/],
+    ["retelistica", "Rețelistică", "wifi", /^(router|switch|access point|extender|repetor|modem|powerline|nas\b|sistem mesh)/, "cap"],
+    ["imprimante", "Imprimante și consumabile", "imprimanta", /imprimant|toner|cartus|scanner|\bmfp\b|multifunctional(a)? (laser|inkjet|ink jet|color|monocrom|cerneala)|consumabil/],
+    ["componente", "Componente PC", "cip", /placa video|procesor|\bssd\b|\bhdd\b|hard ?disk|memorie (ram|g\.?skill|ddr)|\bddr[345]\b|\bram\b|placa de baza|\bsursa\b|carcasa(?! (cheie|telecomanda|pentru (telefon|ceas|smartwatch|cheie)))|\btower\b|cooler|ventilator pc|pasta termo|desktop|mini pc|unitate|nvme|ups\b/],
     ["monitoare-tv", "Monitoare și TV", "monitor", /monitor|televizor|\btv\b|videoproiector|proiector|soundbar/],
     ["periferice", "Periferice", "mouse", /mouse|tastatur|casti|webcam|camera web|boxe|microfon|gamepad|joystick|volan|controller|mousepad|difuzor/],
     ["retelistica", "Rețelistică", "wifi", /router|switch|access point|retea|powerline|extender|repetor|wi-?fi|modem|\bnas\b/],
-    ["imprimante", "Imprimante", "imprimanta", /imprimant|toner|cartus|multifunction|scanner|consumabil/],
-    ["accesorii", "Accesorii", "stecher", /cablu|incarcator|adaptor|hub\b|baterie externa|power ?bank|husa|folie|suport|docking|\busb\b|hdmi|display ?port/],
   ],
   electrocasnice: [
     ["bucatarie", "Bucătărie", "cafea", /cafea|espresor|expresor|blender|mixer|friteuz|cuptor|plita|microunde|storcator|fierbator|prajitor|aragaz|hota|robot de bucatarie|tocator|gratar|vidat|multicooker|cappuccino|aparat de facut|sandwich/],
-    ["frigidere", "Frigidere și mașini de spălat", "frigider", /frigider|congelator|combina frigorifica|masina de spalat|uscator de rufe|uscator rufe|lada frigorifica|side-by-side/],
+    ["masini-de-spalat", "Mașini de spălat și uscătoare", "frigider", /^(?!kit |set |accesori)(mini )?(masina|masini) de spalat|^(?!kit )uscator (de )?rufe(?! de calorifer)/, "cap"],
+    ["frigidere", "Frigidere și congelatoare", "frigider", /frigider|congelator|combina frigorifica|lada frigorifica|side-by-side/],
     ["curatenie", "Curățenie", "aspirator", /aspirator|mop|curatat|abur|robot aspirator|perii rotative/],
     ["ingrijire", "Îngrijire personală", "uscator-par", /epilator|uscator de par|aparat de ras|trimmer|periuta|placa de par|placa de indreptat|ondulator|aparat de tuns|masaj|cantar|tensiometru|barbierit|ingrijire/],
     ["climatizare", "Climatizare", "ventilator", /aer conditionat|ventilator|radiator|aeroterma|dezumidific|umidific|purificator|convector|calorifer|incalzitor|aparat de incalzit/],
@@ -43,7 +47,8 @@ export const SUBCATEGORII = {
     ["accesorii-auto", "Accesorii auto", "volan", /husa|covoras|suport|organizator|portbagaj|volan|scaun|parasolar|cablu de pornire|compresor auto|cric|trusa|sufa/],
   ],
   sport: [
-    ["trotinete", "Trotinete", "trotineta", /trotinet|scuter/],
+    ["trotinete", "Piese și accesorii pentru trotinete", "cheie-fixa", /(pentru|de) (trotinet|scuter)|(trotinet|scuter)[a-z]* (electric[a-z]* )?(\w+ )?(piese|accesori)|\b(mansoane|furca|aparatoare|aripa|bascula|janta|anvelopa|cablaj|capac|levier|mecanism|arc amortizor|brat|surub)\b/],
+    ["trotinete-electrice", "Trotinete electrice", "trotineta", /trotinet|scuter/],
     ["biciclete", "Biciclete", "bicicleta", /bicicl|casca|ghidon|pedale|lant|sa pentru/],
     ["fitness", "Fitness", "gantera", /gantere|gantera|fitness|banda de alergare|saltea|yoga|bara|elastic|mingea|kettlebell|aparat de/],
     ["camping", "Camping și drumeții", "cort", /camping|cort|sac de dormit|rucsac|lanterna frontala|termos|drumet|turism|picnic/],
@@ -54,10 +59,10 @@ export const SUBCATEGORII = {
     ["bebelusi", "Bebeluși", "bebe", /bebe|biberon|carucior|scutec|suzeta|patut|scaun auto copii|premergator|balansoar|sterilizator|pompa de san|hranire|cadita/],
   ],
   supermarket: [
-    ["ingrijire", "Îngrijire personală", "picatura", /sampon|gel|crema|parfum|deodorant|periuta|pasta de dinti|sapun|cosmetic|igiena/],
+    ["animale", "Animale", "lab", /animal|hranitor|pisic|caine|caini|litiera|hrana pentru/],
+    ["ingrijire", "Îngrijire personală", "picatura", /balsam|fixativ|spray bifazic|tratament par|ceara pentru par|spuma pentru par|brici|curbator|apa de gura|sampon|gel|crema|parfum|deodorant|periuta|pasta de dinti|sapun|cosmetic|igiena/],
     ["curatenie", "Curățenie", "burete", /detergent|dezinfectant|burete|hartie|prosop|solutie|curatenie|dezinfect|sac\b|saci/],
-    ["alimente", "Alimente și băuturi", "sticla", /aliment|bautur|cafea|ceai|ciocolata|biscuit|paste|ulei|miere|suc\b|apa\b/],
-    ["animale", "Animale", "lab", /animal|pisic|caine|caini|litiera|hrana pentru/],
+    ["alimente", "Alimente și băuturi", "sticla", /aliment|bautur|cafea|ceai|ciocolata|biscuit|paste (alimentar|fainoas)|ulei|miere|suc\b|apa\b/],
   ],
 };
 
@@ -67,24 +72,28 @@ const AUTO_TOKEN = /(?<![\w-])auto(?![\w-])|automobil/;
 const AUTO_SPECIFIC = /\bvolvo\b|\bbmw\b|\baudi\b|mercedes|volkswagen|\bvw\b|\bopel\b|\brenault\b|\bdacia\b|\btoyota\b|\bskoda\b|\bseat\b|\bpeugeot\b|citroen|\bhyundai\b|\bkia\b|\bmazda\b|\bnissan\b|\bfiat\b|\bford\b|\bobd2?\b|\btpms\b|anvelop|senzori? de parcare|stergator(e)? parbriz|\bxenon\b|odorizant masina|\bcric\b/;
 const REGULI_CATEGORIE = [
   ["sport", /trotinet/],
+  ["casa-si-gradina", /robot de curatat piscina|robot piscina|uscator (de )?rufe de calorifer|uscator (de )?rufe (metalic|pliabil)/],
+  ["casa-si-gradina", /perna ortoped|perne ortoped|suporto|pernuta ergonomic|suport lombar/],
   ["copii", /scaun(e)? auto (pentru )?copii|scaun auto copii/],
   ["auto", { test: (t) => AUTO_TOKEN.test(t.slice(0, 50)) || AUTO_SPECIFIC.test(t.slice(0, 90)) }],
 ];
 
+const CAP = 45; // „cap” = primele caractere ale titlului (numele produsului), nu specificatiile
 const CAT_IMPLICIT = (slug) => SUBCATEGORII[slug] ?? [];
 
 export function clasifica(o) {
   const t = fara(`${o.titlu ?? ""}`);
   let categorie = o.categorie;
   for (const [slug, re] of REGULI_CATEGORIE) if (re.test(t)) { categorie = slug; break; }
-  const sub = CAT_IMPLICIT(categorie).find(([, , , re]) => re.test(t));
-  return { categorie, sub: sub ? sub[0] : null };
+  const sub = CAT_IMPLICIT(categorie).find(([, , , re, mod]) => re.test(mod === "cap" ? t.slice(0, CAP) : t));
+  return { categorie, sub: sub ? sub[0] : null, motivClasificare: sub ? `${categorie}/${sub[0]}: ${sub[3].source.slice(0, 40)}` : `${categorie}: fara subcategorie` };
 }
 
 // ordinea chipurilor de pe pagina (altfel decat prioritatea regulilor)
 const ORDINE = { "casa-si-gradina": ["bucatarie", "gradina", "iluminat", "scule", "decoratiuni", "casa-inteligenta"] };
 export const subcategoriiDe = (slug) => {
-  const l = CAT_IMPLICIT(slug).map(([id, nume, icoana]) => ({ id, nume, icoana }));
+  // un id poate avea mai multe reguli (ex. rețelistică: regulă pe „cap” + regulă generală); în listă apare o singură dată
+  const l = CAT_IMPLICIT(slug).map(([id, nume, icoana]) => ({ id, nume, icoana })).filter((x, i, a) => a.findIndex((y) => y.id === x.id) === i);
   const o = ORDINE[slug];
   return o ? [...l].sort((a, b) => o.indexOf(a.id) - o.indexOf(b.id)) : l;
 };

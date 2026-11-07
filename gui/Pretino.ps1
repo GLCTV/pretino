@@ -70,6 +70,10 @@ $script:Oprit = $false
           <TextBlock Grid.Row="2" Grid.Column="1" Text="Verific&#x103; dac&#x103; totul e &#xEE;n regul&#x103; &#xEE;nainte de publicare." Foreground="#cbd5e1" VerticalAlignment="Center" Margin="6,0,0,6"/>
           <Button Grid.Row="3" Name="BLive" Content="4. PUBLIC&#x102; LIVE" Style="{StaticResource BtnRosu}" Width="260" FontSize="15"/>
           <TextBlock Grid.Row="3" Grid.Column="1" Text="ATEN&#x21A;IE: pune pe pretino.ro versiunea de pe main. Se vede imediat pentru toat&#x103; lumea." Foreground="#fca5a5" FontWeight="SemiBold" VerticalAlignment="Center" TextWrapping="Wrap" Margin="6,0,0,6"/>
+          <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Margin="0,8,0,0">
+            <TextBlock Text="Actualizeaz&#x103; un singur magazin (celelalte r&#x103;m&#xE2;n neatinse):" Foreground="#94a3b8" Margin="0,0,0,6"/>
+            <WrapPanel Name="PanouMagazine"/>
+          </StackPanel>
         </Grid>
       </TabItem>
       <TabItem Header="2. Campanii PC Garage">
@@ -143,9 +147,9 @@ try {
   exit 1
 }
 
-$c = @{}; foreach ($n in 'Stare','StareBox','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SOpreste','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
+$c = @{}; foreach ($n in 'Stare','StareBox','PanouMagazine','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SOpreste','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
 
-function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram','STot','SVerifica','STrimite','SViteza') { $c[$n].IsEnabled = -not $busy }; $c.SOpreste.IsEnabled = $busy }
+function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram','STot','SVerifica','STrimite','SViteza') { $c[$n].IsEnabled = -not $busy }; $c.SOpreste.IsEnabled = $busy; foreach ($b in $c.PanouMagazine.Children) { $b.IsEnabled = -not $busy } }
 
 function Start-Task($nume, $comanda) {
   if ($script:Proc -and -not $script:Proc.HasExited) { return }
@@ -313,6 +317,14 @@ $campTimer.Start()
 Set-BusyC $false; $c.COpreste.IsEnabled = $false
 Load-Surse; Load-Campanii; Show-Progres
 
+# Un buton pentru fiecare magazin activ din data\magazine.json (se creeaza automat; magazin nou = buton nou)
+foreach ($m in (Read-Json (Join-Path $Root 'data\magazine.json'))) {
+  if (-not $m.activ -or -not $m.sursa) { continue }
+  $b = New-Object System.Windows.Controls.Button
+  $b.Content = "$($m.nume)"; $b.Style = $win.FindResource('BtnVerde'); $b.Tag = $m.id; $b.Padding = [System.Windows.Thickness]::new(12,6,12,6); $b.Margin = [System.Windows.Thickness]::new(0,0,8,6)
+  $b.Add_Click({ param($s, $e) $id = $s.Tag; Start-Task "actualizare-$id" "bun scripts/actualizare.js --magazin $id" })
+  [void]$c.PanouMagazine.Children.Add($b)
+}
 $c.CCauta.Add_Click({ Start-Camp '--campanii' })
 $c.CActualizeaza.Add_Click({ Start-Camp '--complet' })
 $c.CReia.Add_Click({ Start-Camp '--complet --reia' })

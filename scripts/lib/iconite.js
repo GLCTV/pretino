@@ -1,14 +1,14 @@
 // Iconite proprii Pretino (contur 24x24, stroke currentColor). Caile sunt desenate pentru Pretino; nu provin dintr-un pachet extern.
 const I = {
   // categorii
-  electronice: '<rect x="4.5" y="5" width="15" height="10.5" rx="1.6"/><path d="M2.5 18.5h19"/>',
-  electrocasnice: '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="13.5" r="4"/><path d="M8 6.5h.01M11 6.5h.01"/>',
-  "casa-si-gradina": '<path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>',
-  moda: '<path d="M9 4 3.5 7l2 4 2.5-1v10h8V10l2.5 1 2-4L15 4a3 3 0 0 1-6 0Z"/>',
-  auto: '<path d="M4 15.5v-3l1.7-4.3A2 2 0 0 1 7.6 7h8.8a2 2 0 0 1 1.9 1.2L20 12.5v3"/><path d="M3 15.5h18v2.5H3z"/><path d="M7 12h10"/><circle cx="7.5" cy="19.5" r="1.4"/><circle cx="16.5" cy="19.5" r="1.4"/>',
-  sport: '<circle cx="15.5" cy="4.8" r="1.8"/><path d="m11 21 2-5.5-3-2.5 1.5-4.5 4 1.5 2.5 3.5"/><path d="m10 8.5-3.5 1.5L5 13.5M13 15.5l3.5 5"/>',
+  electronice: '<rect x="4" y="4.5" width="16" height="11" rx="2"/><path d="M2.5 19h19"/><path d="M7.5 12.5 10 10l2 2 4.5-4.5"/><path d="M14 7.5h2.5V10"/>',
+  electrocasnice: '<rect x="4.5" y="2.5" width="15" height="19" rx="2.5"/><circle cx="12" cy="13.5" r="4.6"/><path class="f" d="M8.2 14.2a3.9 3.9 0 0 0 7.6 0c-1.3.8-2.5.8-3.8 0s-2.5-.8-3.8 0Z"/><path d="M7.5 6h.01M10.5 6h.01M15 6h2"/>',
+  "casa-si-gradina": '<path class="f" d="M5.5 10.5 12 4.8l6.5 5.7v9h-13Z"/><path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/><path d="M20.5 2.5c-2 0-3.2 1.3-3.2 3 2 0 3.2-1.3 3.2-3Z"/>',
+  moda: '<path class="f" d="M9 4 3.5 7l2 4 2.5-1v10h8V10l2.5 1 2-4L15 4a3 3 0 0 1-6 0Z"/><path d="M9 4 3.5 7l2 4 2.5-1v10h8V10l2.5 1 2-4L15 4a3 3 0 0 1-6 0Z"/><path d="M10 15h4"/>',
+  auto: '<path class="f" d="M5 15.5v-3l1.6-3.8A1.6 1.6 0 0 1 8.1 7.8h7.8a1.6 1.6 0 0 1 1.5.9l1.6 3.8v3Z"/><path d="M4 15.5v-3l1.7-4.3A2 2 0 0 1 7.6 7h8.8a2 2 0 0 1 1.9 1.2L20 12.5v3"/><path d="M3 15.5h18v2.5H3z"/><path d="M6 13h1.5M16.5 13H18"/><circle cx="7.5" cy="19.5" r="1.4"/><circle cx="16.5" cy="19.5" r="1.4"/>',
+  sport: '<circle cx="15.5" cy="4.8" r="1.9"/><path d="m11 21 2-5.5-3-2.5 1.5-4.5 4 1.5 2.5 3.5"/><path d="m10 8.5-3.5 1.5L5 13.5M13 15.5l3.5 5"/><path d="M2.5 16h3M3.5 19h2.5"/>',
   copii: '<circle cx="12" cy="13.5" r="6"/><circle cx="6.5" cy="7.5" r="2.5"/><circle cx="17.5" cy="7.5" r="2.5"/><path d="M10 13h.01M14 13h.01M11 16c.6.5 1.4.5 2 0"/>',
-  supermarket: '<path d="M3 4h2.5l2.2 10.2h10.1L20 7H6.4"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
+  supermarket: '<path class="f" d="M6.6 7h13.4l-2.2 7.2H8.1Z"/><path d="M3 4h2.5l2.2 10.2h10.1L20 7H6.4"/><circle cx="9.5" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/><path d="M11 10.5h5"/>',
   // subcategorii
   cos: '<path d="M4 9.5h16l-1.4 9a1.5 1.5 0 0 1-1.5 1.3H6.9a1.5 1.5 0 0 1-1.5-1.3Z"/><path d="M8 9.5 10 4.5M16 9.5l-2-5"/>',
   frunza: '<path d="M5 19C4 11 9 5 19 5c0 9-5 14-12 13"/><path d="M5 19 13 11"/>',

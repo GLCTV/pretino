@@ -658,3 +658,16 @@ h1{font-weight:800}
 .poza img,.prod-poza img,.zi-poza img{color:transparent}
 @media(max-width:760px){.card .minim-poza{font-size:10px;left:6px;bottom:6px}}
 .migaje a{white-space:nowrap}.migaje #migaja-curenta{min-width:0;flex:1 1 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ===== Pictograme v2: duoton + plăci colorate pentru categorii ===== */
+.ic rect,.ic circle{fill:currentColor;fill-opacity:.14}
+.ic .f{fill:currentColor;fill-opacity:.26;stroke:none}
+.cats a{gap:11px;border-radius:14px;padding:0 14px 0 6px}
+.cats .ic{width:38px;height:38px;padding:7px;border-radius:12px;stroke-width:1.6;background:linear-gradient(145deg,color-mix(in srgb,var(--c) 30%,transparent),color-mix(in srgb,var(--c) 6%,transparent));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 38%,transparent),0 6px 14px -8px var(--c);transition:transform .35s cubic-bezier(.3,1.6,.5,1),box-shadow .25s,background .25s}
+.cats a:hover{background:color-mix(in srgb,var(--c) 9%,transparent)}
+.cats a:hover .ic{transform:translateY(-2px) rotate(-6deg) scale(1.08);box-shadow:inset 0 0 0 1px var(--c),0 10px 20px -8px var(--c)}
+.cats a[aria-current=page] .ic{background:var(--c);color:#fff;box-shadow:0 8px 18px -8px var(--c)}
+:root[data-theme="light"] .cats a[aria-current=page] .ic{color:#fff}
+.cats a[aria-current=page] .ic rect,.cats a[aria-current=page] .ic circle,.cats a[aria-current=page] .ic .f{fill-opacity:.3}
+.chip .ic,.descopera .ic{stroke-width:1.8}
+.logo img{display:block}
+@media(max-width:760px){.cats .ic{width:32px;height:32px;padding:6px}}

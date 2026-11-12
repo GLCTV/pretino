@@ -92,6 +92,15 @@ const abs = (cale) => `${SITE_URL}${cale}`;
 // ---- liste si pagini derivate din catalog (ordine determinista: reducere desc, pret asc, id asc) ----
 const sortate = [...oferte].sort((a, b) => reducere(b) - reducere(a) || a.pret - b.pret || String(a.id).localeCompare(String(b.id)));
 const nrMag = (l) => new Set(l.map((o) => o.magazin)).size;
+// Pagina proprie pentru fiecare oferta: /produs/<titlu>-<cod>/ (adresa stabila cat timp oferta e in catalog)
+const caleProdus = new Map();
+{ const fol = new Set();
+  for (const o of sortate) {
+    const baza = fara(o.titlu).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 72).replace(/-[^-]*$/, "") || "produs";
+    let c = `/produs/${baza}-${String(o.id).replace(/[^a-z0-9]/gi, "").slice(-6).toLowerCase()}/`, k = 2;
+    while (fol.has(c)) c = c.replace(/\/$/, `-${k++}/`);
+    fol.add(c); caleProdus.set(o.id, c);
+  } }
 const numeMag = (id) => mag[id]?.nume ?? id;
 const magCuOferte = magazine.filter((m) => sortate.some((o) => o.magazin === m.id));
 const magIndexabil = (id) => sortate.filter((o) => o.magazin === id).length >= MIN_MAGAZIN_INDEX;
@@ -129,11 +138,11 @@ function preconectari(corp) {
   return gazde.slice(0, 2).map((h) => `<link rel="preconnect" href="https://${h}" crossorigin>`).join("");
 }
 
-function pagina({ titlu, descriere, cale, corp, noindex = false, catActiva = null, simplu = false, schema = [] }) {
+function pagina({ titlu, descriere, cale, corp, noindex = false, catActiva = null, simplu = false, schema = [], ogImg = null }) {
   const robots = noindex || DEMO ? '<meta name="robots" content="noindex">' : "";
   return `<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="profitshareid" content="7dd842fc7074c28872c609438ead55e6"><title>${esc(titlu)}</title><meta name="description" content="${esc(descriere)}">${robots}
-<meta property="og:type" content="website"><meta property="og:site_name" content="${esc(SITE_NAME)}"><meta property="og:locale" content="ro_RO"><meta property="og:title" content="${esc(titlu)}"><meta property="og:description" content="${esc(descriere)}"><meta property="og:url" content="${abs(cale)}"><meta property="og:image" content="${abs("/og.png")}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${esc(SITE_NAME)} – oferte și reduceri din magazinele din România"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(titlu)}"><meta name="twitter:description" content="${esc(descriere)}"><meta name="twitter:image" content="${abs("/og.png")}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="${esc(SITE_NAME)}"><meta property="og:locale" content="ro_RO"><meta property="og:title" content="${esc(titlu)}"><meta property="og:description" content="${esc(descriere)}"><meta property="og:url" content="${abs(cale)}">${ogImg ? `<meta property="og:image" content="${esc(ogImg)}">` : `<meta property="og:image" content="${abs("/og.png")}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${esc(SITE_NAME)} – oferte și reduceri din magazinele din România">`}<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(titlu)}"><meta name="twitter:description" content="${esc(descriere)}"><meta name="twitter:image" content="${ogImg ? esc(ogImg) : abs("/og.png")}">
 <link rel="canonical" href="${abs(cale)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#0a1916"><meta name="color-scheme" content="dark light"><link rel="preload" href="/fonts/montserrat-var-latin.woff" as="font" type="font/woff" crossorigin>${preconectari(corp)}<link rel="stylesheet" href="/stil.css?v=${VER_ASSET}">${TEMA_INIT}<script src="/cauta.js?v=${VER_ASSET}" defer></script>${DEMO ? "" : PROFITSHARE_SCRIPT}${schema.map(jsonld).join("")}</head><body${catActiva ? ` data-cat="${esc(catActiva)}"` : ""}>
 ${DEMO ? '<div class="demo">PREVIEW cu date DEMO – nu este conținut real și nu se publică</div>' : ""}
 ${antet(catActiva)}
@@ -145,7 +154,7 @@ ${FOOTER()}</body></html>`;
 const areImg = (o) => /^https:\/\//.test(o.imagine ?? "");
 // PC Garage serveaza in catalog miniaturi (/thumbnails/); cerem varianta mare, cu revenire automata la miniatura
 const imgMare = (u) => (/^https:\/\/\d\.grgs\.ro\/images\/products\/.+\/thumbnails\//.test(u) ? u.replace("/thumbnails/", "/") : u);
-const poza = (o, i) => { const mare = imgMare(o.imagine); const fb = mare !== o.imagine; return `<a class="poza${areImg(o) ? "" : " fara"}" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true">${areImg(o) ? `<img src="${esc(mare)}" alt="${esc(o.titlu)}" ${i < 4 ? (i === 0 ? 'fetchpriority="high" ' : "") : 'loading="lazy" '}decoding="async" referrerpolicy="no-referrer" width="275" height="167"${fb ? ` data-t="${esc(o.imagine)}"` : ""} onerror="${fb ? "if(this.dataset.t){this.src=this.dataset.t;delete this.dataset.t;return}" : ""}this.parentNode.classList.add('fara')">` : ""}</a>`; };
+const poza = (o, i, peste = "") => { const mare = imgMare(o.imagine); const fb = mare !== o.imagine; return `<a class="poza${areImg(o) ? "" : " fara"}" href="${caleProdus.get(o.id) ?? esc(o.url)}" tabindex="-1" aria-hidden="true">${areImg(o) ? `<img src="${esc(mare)}" alt="${esc(o.titlu)}" ${i < 4 ? (i === 0 ? 'fetchpriority="high" ' : "") : 'loading="lazy" '}decoding="async" referrerpolicy="no-referrer" width="275" height="206"${fb ? ` data-t="${esc(o.imagine)}"` : ""} onload="this.parentNode.classList.add('ok')" onerror="${fb ? "if(this.dataset.t){this.src=this.dataset.t;delete this.dataset.t;return}" : ""}this.parentNode.classList.add('fara')">` : ""}${peste}</a>`; };
 // cupon al magazinului (ex. PC Garage): afisat pe card, se introduce in cos; butonul copiaza codul (cauta.js). Pretul afisat NU include cuponul.
 const cupon = (c) => c ? `<div class="cupon"><span>Cupon <b>${esc(c.cod)}</b> (${esc(c.text)}) în coș · prețul afișat nu îl include</span><button type="button" class="copiaza" data-cod="${esc(c.cod)}">Copiază</button></div>` : "";
 // specificatii citite LITERAL din titlu (diagonala, memorie/stocare), doar la electronice; nu se deduce nimic
@@ -156,14 +165,15 @@ const specuri = (titlu, cat) => {
   for (const m of titlu.matchAll(/(?<![\d.,])(\d{1,4})\s?(GB|TB)\b/gi)) { const t = `${m[1]} ${m[2].toUpperCase()}`; if (!r.includes(t)) r.push(t); }
   return r.slice(0, 3);
 };
+const cuponMic = (c) => c ? `<div class="cupon"><span>Cupon <b>${esc(c.cod)}</b> (${esc(c.text)}) în coș</span><button type="button" class="copiaza" data-cod="${esc(c.cod)}">Copiază</button></div>` : "";
 const card = (o, i = 99) => {
-  const r = reducere(o), c = conditie(o);
-  return `<article class="card">${poza(o, i)}<span class="badge ${r >= 50 ? "t3" : r >= 30 ? "t2" : "t1"}">-${r}%</span><button class="fav" type="button" data-id="${esc(o.id)}" data-p="${o.pret}" aria-pressed="false" aria-label="Adaugă la favorite">${icoana("inima")}</button>
-<a class="titlu" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">${esc(o.titlu)}</a>${(() => { const sp = specuri(o.titlu, o.categorie); return sp.length ? `<span class="specs">${sp.map((x) => `<i>${esc(x)}</i>`).join("")}</span>` : ""; })()}<span class="magazin"><a href="/magazin/${esc(o.magazin)}/">${esc(numeMag(o.magazin))}</a>${c ? `<span class="cond">${COND[c]}</span>` : ""}</span>
-<div class="pretrand"><span class="pret">${lei(o.pret)}</span><span class="vechi"${o.referintaMagazin ? ' title="Preț de referință afișat de magazin"' : ""}>${lei(o.pretVechi)}</span><span class="econ">Economisești<b>${lei(o.pretVechi - o.pret)}</b></span></div>
-<div class="econ-bara" aria-hidden="true"><i style="width:${Math.min(r, 95)}%"></i></div>${(() => { const pt = puncte(o), mi = minim(o); const sp = sparkSvg(pt.map((x) => x.p)); return mi || sp ? `<div class="istoric"${sp ? ` title="Evoluția prețului în Pretino: ${pt.map((x) => `${x.d.slice(8)}.${x.d.slice(5, 7)} ${lei(x.p)}`).join(" → ")}"` : ""}>${mi ? `<span class="minim" title="${esc(eticMinim)}">${icoana("jos-pret")}${esc(eticScurt)}</span>` : ""}${sp ? `<span class="spark-w"><span class="sr">Evoluția prețului: </span>${sp}</span>` : ""}</div>` : ""; })()}
-${cupon(mag[o.magazin]?.cupon)}<a class="btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" aria-label="Vezi oferta la ${esc(numeMag(o.magazin))} (se deschide în magazin, fereastră nouă)" title="Se deschide în magazin">Vezi la ${esc(numeMag(o.magazin))} ${icoana("extern")}</a></article>`;
+  const r = reducere(o), c = conditie(o), pp = caleProdus.get(o.id) ?? o.url;
+  return `<article class="card">${poza(o, i, minim(o) ? `<span class="minim-poza" title="${esc(eticMinim)}">${icoana("jos-pret")}${esc(eticScurt)}</span>` : "")}<span class="badge">-${r}%</span><button class="fav" type="button" data-id="${esc(o.id)}" data-p="${o.pret}" aria-pressed="false" aria-label="Adaugă la favorite">${icoana("inima")}</button>
+<a class="titlu" href="${esc(pp)}">${esc(o.titlu)}</a><span class="magazin"><a href="/magazin/${esc(o.magazin)}/">${esc(numeMag(o.magazin))}</a>${c ? `<span class="cond">${COND[c]}</span>` : ""}</span>
+<div class="pretrand"><span class="pret">${lei(o.pret)}</span><span class="vechi"${o.referintaMagazin ? ' title="Preț de referință afișat de magazin"' : ""}>${lei(o.pretVechi)}</span></div><span class="econ-txt">Economisești ${lei(o.pretVechi - o.pret)}</span>
+${cuponMic(mag[o.magazin]?.cupon)}<a class="btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" aria-label="Vezi oferta la ${esc(numeMag(o.magazin))} (se deschide în magazin, fereastră nouă)" title="Se deschide în magazin">Vezi la ${esc(numeMag(o.magazin))} ${icoana("extern")}</a></article>`;
 };
+
 
 // ilustratia din dreapta titlului: placa cu pictograma categoriei (desenata de noi)
 const ilustratie = (slug) => (/^scena-sub:/.test(slug) ? ((c, sb) => (areScenaSub(c, sb) ? `<div class="hero-poza hero-scena" aria-hidden="true">${scenaSub(c, sb)}</div>` : ilustratie(c)))(...slug.slice(10).split(":")) : areScena(slug) ? `<div class="hero-poza hero-scena" aria-hidden="true">${scena(slug)}</div>` : ilustratieIcon(slug.replace(/^tile:/, "")));
@@ -256,8 +266,8 @@ const dataRo = (iso) => new Date(iso).toLocaleDateString("ro-RO", { day: "numeri
 const migajeHtml = (items) => `<nav class="migaje" aria-label="Navigare">${items.map((x, i) => (i < items.length - 1 ? `<a href="${x.cale}">${esc(x.nume)}</a><span aria-hidden="true">/</span>` : `<span id="migaja-curenta">${esc(x.nume)}</span>`)).join("")}</nav>`;
 const schemaMigaje = (items) => ({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: items.map((x, i) => ({ "@type": "ListItem", position: i + 1, name: x.nume, item: abs(x.cale) })) });
 const gridCards = (l) => `<div class="grid">${l.map((o, i) => card(o, i)).join("")}</div>`;
-function paginaEd({ cale, titlu, descriere, migaje, corp, schema = [], catActiva = null }) {
-  pagini.push({ cale, index: true, html: pagina({ titlu, descriere, cale, catActiva, schema: [schemaMigaje(migaje), ...schema], corp: `<main class="continut">${migajeHtml(migaje)}${corp}</main>` }) });
+function paginaEd({ cale, titlu, descriere, migaje, corp, schema = [], catActiva = null, ogImg = null }) {
+  pagini.push({ cale, index: true, html: pagina({ titlu, descriere, cale, catActiva, ogImg, schema: [schemaMigaje(migaje), ...schema], corp: `<main class="continut">${migajeHtml(migaje)}${corp}</main>` }) });
 }
 
 // text de prezentare generat din catalogul real (cifre, magazine, cea mai mare economie), pus sub lista paginii 1
@@ -329,6 +339,57 @@ for (const m of magazine) {
   const cuponM = m.cupon ? `<section class="cupon-info" id="cod-reducere"><h2>Cod de reducere ${esc(m.nume)}: cum îl folosești</h2><p>Codul afișat pe cardurile ${esc(m.nume)} este <b>${esc(m.cupon.cod)}</b> (${esc(m.cupon.text)}). Se introduce în coș, la finalizarea comenzii; prețul afișat în Pretino nu îl include.</p><p>Codul este disponibil de verificat în coș: ${esc(m.nume)} stabilește produsele eligibile, excluderile și dacă se poate cumula cu alte reduceri, așa că verifică în coș dacă se aplică produsului tău. Pretino nu garantează aplicarea lui la toate produsele. Putem primi un comision pentru comenzile făcute cu acest cod; prețul pentru tine nu se schimbă.</p></section>` : "";
   const dupaM = `${legM.length ? `<nav class="descopera" aria-label="Categorii și branduri"><details open><summary>Ce găsești la ${esc(m.nume)}</summary><span class="d-grup">${legM.join("")}</span></details></nav>` : ""}${cuponM}`;
   pagini.push(...listare({ mod: "magazin", meta: (p) => ({ ...metaMagazin(m, l.length, p), migaja: m.nume }), cale: `/magazin/${m.id}/`, magId: m.id, lista: l, indexabil: l.length >= MIN_MAGAZIN_INDEX, migaje: [{ nume: "Acasă", cale: "/" }], dupa: dupaM }));
+}
+
+// Pagini de produs: poza mare, pret, istoricul pretului, acelasi produs la alte magazine, oferte similare, partajare.
+// Fara schema Product/Offer (Pretino nu e vanzator); doar BreadcrumbList.
+const dataScurta = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString("ro-RO", { day: "numeric", month: "short", timeZone: "UTC" });
+const graficPret = (pt, pretAcum) => {
+  const v = pt.map((x) => x.p); if (v.length < 2) return "";
+  const W = 640, H = 200, L = 70, R = 16, T = 16, B = 34, mn = Math.min(...v), mx = Math.max(...v), span = mx - mn || 1;
+  const x = (i) => L + (i * (W - L - R)) / (v.length - 1), y = (p) => T + (1 - (p - mn) / span) * (H - T - B);
+  const linie = v.map((p, i) => `${x(i).toFixed(1)},${y(p).toFixed(1)}`).join(" ");
+  const arie = `${L},${H - B} ${linie} ${x(v.length - 1).toFixed(1)},${H - B}`;
+  return `<svg class="grafic" viewBox="0 0 ${W} ${H}" role="img" aria-label="Evoluția prețului: ${pt.map((e) => `${dataScurta(e.d)} ${lei(e.p)}`).join(", ")}"><defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".28"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+<line x1="${L}" y1="${y(mx)}" x2="${W - R}" y2="${y(mx)}" class="g-ax"/><line x1="${L}" y1="${y(mn)}" x2="${W - R}" y2="${y(mn)}" class="g-ax"/><text x="${L - 8}" y="${y(mx) + 4}" text-anchor="end">${esc(lei(mx))}</text>${mx !== mn ? `<text x="${L - 8}" y="${y(mn) + 4}" text-anchor="end">${esc(lei(mn))}</text>` : ""}
+<polygon points="${arie}" fill="url(#ga)"/><polyline points="${linie}" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${v.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p).toFixed(1)}" r="${i === v.length - 1 ? 6 : 3.5}" fill="currentColor"/>`).join("")}
+<text x="${L}" y="${H - 10}">${esc(dataScurta(pt[0].d))}</text><text x="${W - R}" y="${H - 10}" text-anchor="end">${esc(dataScurta(pt[pt.length - 1].d))}</text></svg>`;
+};
+// acelasi produs la alte magazine: cod de model comun (cuvant cu litere si cifre, minim 5 caractere), aceeasi categorie
+const coduri = (t) => new Set((String(t).toUpperCase().match(/[A-Z0-9][A-Z0-9-]{4,}/g) ?? []).filter((w) => /\d/.test(w) && /[A-Z]/.test(w) && !/^\d+(GB|TB|MHZ|GHZ|HZ|MM|CM|W|MAH|MP)$/.test(w)));
+const dupaCod = new Map();
+for (const o of sortate) for (const c of coduri(o.titlu)) { const l = dupaCod.get(c) ?? []; l.push(o); dupaCod.set(c, l); }
+const altele = (o) => { const r = new Map(); for (const c of coduri(o.titlu)) for (const x of dupaCod.get(c) ?? []) if (x.magazin !== o.magazin && x.categorie === o.categorie && !r.has(x.id)) r.set(x.id, x); return [...r.values()].sort((a, b) => a.pret - b.pret).slice(0, 6); };
+const titluriProdus = new Set();
+const share = (url, text) => { const u = encodeURIComponent(url), t = encodeURIComponent(text); return `<div class="share" aria-label="Distribuie"><span>Trimite unui prieten:</span><a href="https://wa.me/?text=${t}%20${u}" target="_blank" rel="noopener">WhatsApp</a><a href="https://t.me/share/url?url=${u}&amp;text=${t}" target="_blank" rel="noopener">Telegram</a><a href="https://www.facebook.com/sharer/sharer.php?u=${u}" target="_blank" rel="noopener">Facebook</a><button type="button" class="copiaza-link" data-url="${esc(url)}">Copiază linkul</button></div>`; };
+for (const o of sortate) {
+  const cale = caleProdus.get(o.id), r = reducere(o), m = mag[o.magazin], pt = puncte(o), mi = minim(o), c = cat[o.categorie];
+  const subO = o.sub ? subcategoriiDe(o.categorie).find((x) => x.id === o.sub) : null, caleCat = `/categorie/${o.categorie}/`, caleSub = subO && subPagini.includes(`${caleCat}${subO.id}/`) ? `${caleCat}${subO.id}/` : null;
+  const migaje = [{ nume: "Acasă", cale: "/" }, ...(c ? [{ nume: c.nume, cale: caleCat }] : []), ...(caleSub ? [{ nume: subO.nume, cale: caleSub }] : []), { nume: o.titlu.length > 60 ? o.titlu.slice(0, 57).trimEnd() + "…" : o.titlu, cale }];
+  const taie = (t, n) => (t.length <= n ? t : t.slice(0, n - 1).replace(/[\s,.(–-]+\S*$/, "") + "…");
+  const coada = ` – ${lei(o.pret)} la ${numeMag(o.magazin)} | ${BRAND}`, sf = ` | ${BRAND}`, cod = String(o.id).replace(/[^a-z0-9]/gi, "").slice(-6).toUpperCase();
+  const variante = [taie(o.titlu, 75 - coada.length) + coada, taie(o.titlu, 75 - sf.length) + sf, "…" + o.titlu.slice(-(75 - sf.length - 1)).replace(/^\S*\s/, "") + sf, taie(o.titlu, 75 - sf.length - 9) + ` (#${cod})` + sf];
+  const titlu = variante.find((t) => !titluriProdus.has(t)) ?? variante[3];
+  titluriProdus.add(titlu);
+  const descriere = `${o.titlu.length > 110 ? o.titlu.slice(0, 107).trimEnd() + "…" : o.titlu}: ${lei(o.pret)} la ${numeMag(o.magazin)}, cu ${r}% sub prețul de referință de ${lei(o.pretVechi)}. Vezi istoricul prețului și alte magazine.`;
+  const alt = altele(o), sim = sortate.filter((x) => x.id !== o.id && x.categorie === o.categorie && (o.sub ? x.sub === o.sub : true) && (o.tip ? x.tip === o.tip : true)).sort((a, b) => Math.abs(a.pret - o.pret) - Math.abs(b.pret - o.pret)).slice(0, 8);
+  const btn = (cls) => `<a class="btn ${cls}" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" title="Se deschide în magazin">Vezi oferta la ${esc(numeMag(o.magazin))} ${icoana("extern")}</a>`;
+  const vMin = pt.length ? Math.min(...pt.map((x) => x.p)) : o.pret, vMax = pt.length ? Math.max(...pt.map((x) => x.p)) : o.pret;
+  const corp = `<div class="prod">
+<div class="prod-poza${areImg(o) ? "" : " fara"}">${areImg(o) ? `<img src="${esc(imgMare(o.imagine))}" alt="${esc(o.titlu)}" fetchpriority="high" decoding="async" referrerpolicy="no-referrer" width="560" height="420"${imgMare(o.imagine) !== o.imagine ? ` data-t="${esc(o.imagine)}"` : ""} onload="this.parentNode.classList.add('ok')" onerror="${imgMare(o.imagine) !== o.imagine ? "if(this.dataset.t){this.src=this.dataset.t;delete this.dataset.t;return}" : ""}this.parentNode.classList.add('fara')">` : ""}<span class="badge">-${r}%</span></div>
+<div class="prod-info"><h1>${esc(o.titlu)}</h1><p class="prod-mag">Ofertă la <a href="/magazin/${esc(o.magazin)}/">${esc(numeMag(o.magazin))}</a>${conditie(o) ? ` · <span class="cond">${COND[conditie(o)]}</span>` : ""}${o.marca && marciPagina.some((b) => b.id === o.marca.id) ? ` · <a href="/brand/${esc(o.marca.id)}/">${esc(o.marca.nume)}</a>` : ""}</p>
+<div class="prod-pret"><b>${lei(o.pret)}</b><s${o.referintaMagazin ? ' title="Preț de referință afișat de magazin"' : ""}>${lei(o.pretVechi)}</s></div>
+<p class="prod-ec">Economisești <b>${lei(o.pretVechi - o.pret)}</b> (${r}%)</p>
+${mi ? `<p class="minim"><span>${icoana("jos-pret")}${esc(eticMinim)}</span></p>` : ""}
+${cuponMic(m?.cupon)}${btn("prod-btn")}
+${actualizatText ? `<p class="prod-nota">${esc(actualizatText)}. Prețul se poate schimba; verifică prețul final, stocul și livrarea în magazin.</p>` : ""}
+${share(abs(cale), `${o.titlu.slice(0, 80)} – ${lei(o.pret)} (-${r}%)`)}</div></div>
+<section class="prod-sec"><h2>Istoricul prețului</h2>${pt.length >= 2 ? `<div class="grafic-w">${graficPret(pt, o.pret)}</div><p>Pretino urmărește prețul acestui produs din ${dataRo(pt[0].d + "T12:00:00Z")}. Cel mai mic preț văzut: <b>${lei(vMin)}</b>, cel mai mare: <b>${lei(vMax)}</b>.${mi ? " Prețul de acum este cel mai mic din istoricul nostru." : ""}</p>` : `<p>Urmărim prețul acestui produs${pt[0] ? ` din ${dataRo(pt[0].d + "T12:00:00Z")}` : ""} și încă nu s-a schimbat. Graficul apare după prima modificare de preț. Adaugă produsul la favorite (inima) ca să vezi pe Pretino când scade.</p>`}</section>
+${alt.length ? `<section class="prod-sec"><h2>Produse asemănătoare la alte magazine</h2><p class="intro">Am găsit produse cu același cod de model în alte magazine. Verifică specificațiile: varianta poate diferi.</p><div class="compara-tab">${alt.map((x) => `<div class="cmp-r"><a href="${caleProdus.get(x.id)}">${esc(x.titlu)}</a><span>${esc(numeMag(x.magazin))}</span><b>${lei(x.pret)}</b>${x.pret < o.pret ? `<i class="mai-ieftin">cu ${lei(o.pret - x.pret)} mai ieftin</i>` : "<i></i>"}<a class="btn" href="${esc(x.url)}" rel="sponsored nofollow noopener" target="_blank">Vezi ${icoana("extern")}</a></div>`).join("")}</div></section>` : ""}
+<section class="prod-sec text-seo"><h2>Despre această ofertă</h2><p>${esc(o.titlu)} costă acum ${lei(o.pret)} la ${esc(numeMag(o.magazin))}, cu ${r}% (${lei(o.pretVechi - o.pret)}) mai puțin decât prețul de referință de ${lei(o.pretVechi)} afișat de magazin. Pretino nu vinde produsul: butonul te duce în pagina magazinului, unde vezi stocul, livrarea, garanția și condițiile de retur.${m?.cupon ? ` La ${esc(numeMag(o.magazin))} poți folosi și codul ${esc(m.cupon.cod)} în coș (${esc(m.cupon.text)}).` : ""} <a href="${CALE_GHID}">Cum interpretăm reducerile</a>.</p></section>
+${sim.length ? `<section class="prod-sec"><h2>Oferte similare</h2>${gridCards(sim)}<p class="legaturi">${caleSub ? `<a class="mare" href="${caleSub}">Toate ofertele la ${esc(jos(subO.nume))}</a>` : ""}${c ? `<a href="${caleCat}">Oferte ${esc(jos(c.nume))}</a>` : ""}</p></section>` : ""}
+<div class="bara-cumpara"><span><b>${lei(o.pret)}</b><s>${lei(o.pretVechi)}</s></span>${btn("")}</div>`;
+  paginaEd({ cale, titlu, descriere, migaje, catActiva: o.categorie, corp, ogImg: areImg(o) ? imgMare(o.imagine) : null });
 }
 
 // Director magazine: doar magazinele cu pagina indexabila (politica de utilitate: sub MIN_MAGAZIN_INDEX oferte pagina ramane accesibila, dar nepromovata)
@@ -422,7 +483,7 @@ mkdirSync("dist", { recursive: true });
 if (existsSync("public")) cpSync("public", "dist", { recursive: true });
 writeFileSync("dist/stil.css", CSS);
 // index de cautare (citit de /cauta.js doar cand e nevoie): campuri scurte, ordinea = ordinea listelor din HTML
-writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), k: Object.fromEntries(magazine.filter((x) => x.cupon).map((x) => [x.id, x.cupon])), o: sortate.map((o) => ({ id: o.id, t: o.titlu, m: o.magazin, c: o.categorie, s: o.sub ?? "", g: o.tip ?? "", p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, x: conditie(o), b: o.marca?.id ?? "", u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "", ...(minim(o) ? { n: 1 } : {}), ...((pt) => (pt.length >= 2 ? { h: pt.map((x) => x.p) } : {}))(puncte(o)) })), en: eticMinim, es: eticScurt }));
+writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), k: Object.fromEntries(magazine.filter((x) => x.cupon).map((x) => [x.id, x.cupon])), o: sortate.map((o) => ({ id: o.id, t: o.titlu, m: o.magazin, c: o.categorie, s: o.sub ?? "", g: o.tip ?? "", p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, x: conditie(o), b: o.marca?.id ?? "", u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "", l: caleProdus.get(o.id), ...(minim(o) ? { n: 1 } : {}) })), en: eticMinim, es: eticScurt }));
 for (const p of pagini) {
   const dir = "dist" + p.cale;
   mkdirSync(dir, { recursive: true });

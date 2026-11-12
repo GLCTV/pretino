@@ -284,3 +284,9 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Carduri: poză mai mare (4:3), banderolă reducere, bară de reducere, grafic mic al prețului din istoric (≥2 zile), insignă „Preț minim urmărit” (devine „Minim 30 de zile” când istoricul are ≥30 zile). Aceeași formă și în cauta.js (filtre/căutare).
 - Program: buton „5. Imagini pentru partajare” → scripts/imagini-partajare.js (PNG 1080x1350 + texte.txt în rapoarte/partajare/<zi>/).
 - Teste: aceleași 4 eșecuri vechi ca pe main (ghiduri/campanii); testul de paginare numără acum doar lista paginată, nu vitrina.
+
+## 2026-11-12 – Pretino v3 „premium” (pe main, la cererea lui Laur, fără preview separat)
+- Pagini de produs /produs/<titlu>-<cod>/ pentru fiecare ofertă (1283): poză mare, preț, economie, preț minim urmărit, grafic istoric preț, același cod de model la alte magazine, oferte similare, text unic, butoane de partajare (WhatsApp/Telegram/Facebook/copiere), bară fixă „Vezi oferta” pe mobil, og:image = poza produsului. În sitemap. Fără schema Product (regula proiectului).
+- Carduri simplificate: titlul și poza duc la pagina produsului, butonul rămâne linkul de afiliere; insigna „Preț minim urmărit” pe poză; un singur accent (roșu doar la reducere, verde la economie).
+- Design: antet sticlă mată care se compactează la derulare, umbre moi, schelet animat la încărcarea pozelor, zoom la hover, apariție la derulare (CSS, respectă prefers-reduced-motion), poze pe fundal alb uniform cu umbră.
+- Teste: aceleași 4 eșecuri vechi; testul „topuri” citește noua etichetă econ-txt.

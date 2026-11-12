@@ -123,7 +123,7 @@ export function testeSeo(ok) {
   ok(ghiduri.length >= 4 && ghiduri.every((c) => /"@type":"Article"/.test(P.get(c).html) && /"datePublished":"\d{4}-\d{2}-\d{2}"/.test(P.get(c).html) && sitemap.includes(`<loc>${SITE_URL}${c}</loc>`)), "seo: ghidurile au Article + data publicarii reala si sunt in sitemap");
   ok(P.has("/ghiduri/") && sitemap.includes(`${SITE_URL}/ghiduri/`) && home.html.includes('href="/ghiduri/"'), "seo: pagina Ghiduri exista, e in sitemap si legata din site");
   const topuri = cai.filter((c) => /^\/top-oferte\/[^/]+\/(?:[^/]+\/)?$/.test(c));
-  const ec = (h) => [...h.matchAll(/<span class="econ">Economisești<b>([\d.,]+) lei<\/b>/g)].map((x) => Number(x[1].replace(/\./g, "").replace(",", ".")));
+  const ec = (h) => [...h.matchAll(/<span class="econ-txt">Economisești ([\d.,]+) lei<\/span>/g)].map((x) => Number(x[1].replace(/\./g, "").replace(",", ".")));
   ok(topuri.length >= 3 && topuri.every((c) => { const e = ec(P.get(c).html); return e.length >= 8 && e.length <= 24 && e.every((x, i) => !i || e[i - 1] >= x); }), `seo: topurile de economii au 8-24 oferte ordonate dupa economia in lei (${topuri.length} pagini)`);
   ok(P.has("/top-oferte/") && home.html.includes('href="/top-oferte/"'), "seo: pagina Top economii exista si e legata din site");
   const marci = cai.filter((c) => /^\/brand\/[^/]+\/$/.test(c));

@@ -96,31 +96,20 @@
   // PC Garage: miniatura -> varianta mare (cu revenire la miniatura daca nu exista)
   function imgMare(u) { return /^https:\/\/\d\.grgs\.ro\/images\/products\/.+\/thumbnails\//.test(u) ? u.replace("/thumbnails/", "/") : u; }
   function card(o, i) {
-    var poza = '<a class="poza' + (o.i ? "" : " fara") + '" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true">' +
-      (o.i ? '<img src="' + esc(imgMare(o.i)) + '" alt="' + esc(o.t) + '" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="167"' + (imgMare(o.i) !== o.i ? ' data-t="' + esc(o.i) + '"' : "") + ' onerror="' + (imgMare(o.i) !== o.i ? "if(this.dataset.t){this.src=this.dataset.t;delete this.dataset.t;return}" : "") + 'this.parentNode.classList.add(\'fara\')">' : "") + "</a>";
-    var k = data.k && data.k[o.m], sp = specuri(o.t, o.c), mn = data.m[o.m] || o.m;
-    var cupon = k ? '<div class="cupon"><span>Cupon <b>' + esc(k.cod) + "</b> (" + esc(k.text) + ') în coș · prețul afișat nu îl include</span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
-    return '<article class="card">' + poza + '<span class="badge ' + (o.r2 >= 50 ? "t3" : o.r2 >= 30 ? "t2" : "t1") + '">-' + o.r2 + '%</span>' +
+    var pp = o.l || o.u, mare = o.i ? imgMare(o.i) : "";
+    var poza = '<a class="poza' + (o.i ? "" : " fara") + '" href="' + esc(pp) + '" tabindex="-1" aria-hidden="true">' +
+      (o.i ? '<img src="' + esc(mare) + '" alt="' + esc(o.t) + '" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="206"' + (mare !== o.i ? ' data-t="' + esc(o.i) + '"' : "") + ' onload="this.parentNode.classList.add(\'ok\')" onerror="' + (mare !== o.i ? "if(this.dataset.t){this.src=this.dataset.t;delete this.dataset.t;return}" : "") + 'this.parentNode.classList.add(\'fara\')">' : "") + (o.n ? '<span class="minim-poza" title="' + esc(data.en || "") + '">' + ICON_JOS + esc(data.es || "Preț minim urmărit") + "</span>" : "") + "</a>";
+    var k = data.k && data.k[o.m], mn = data.m[o.m] || o.m;
+    var cupon = k ? '<div class="cupon"><span>Cupon <b>' + esc(k.cod) + "</b> (" + esc(k.text) + ') în coș</span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
+    return '<article class="card">' + poza + '<span class="badge">-' + o.r2 + '%</span>' +
       '<button class="fav" type="button" data-id="' + esc(o.id) + '" data-p="' + o.p + '" aria-pressed="false" aria-label="Adaugă la favorite">' + ICON_INIMA + "</button>" +
-      '<a class="titlu" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank">' + esc(o.t) + "</a>" + (sp.length ? '<span class="specs">' + sp.map(function (x) { return "<i>" + esc(x) + "</i>"; }).join("") + "</span>" : "") +
-      '<span class="magazin"><a href="/magazin/' + esc(o.m) + '/">' + esc(data.m[o.m] || o.m) + "</a>" + (o.x ? '<span class="cond">' + COND[o.x] + "</span>" : "") + "</span>" +
-      '<div class="pretrand"><span class="pret">' + lei(o.p) + '</span><span class="vechi"' + (o.r ? ' title="Preț de referință afișat de magazin"' : "") + ">" + lei(o.v) + '</span><span class="econ">Economisești<b>' + lei(o.v - o.p) + "</b></span></div>" +
-      '<div class="econ-bara" aria-hidden="true"><i style="width:' + Math.min(o.r2, 95) + '%"></i></div>' + istoricHtml(o) +
+      '<a class="titlu" href="' + esc(pp) + '">' + esc(o.t) + "</a>" +
+      '<span class="magazin"><a href="/magazin/' + esc(o.m) + '/">' + esc(mn) + "</a>" + (o.x ? '<span class="cond">' + COND[o.x] + "</span>" : "") + "</span>" +
+      '<div class="pretrand"><span class="pret">' + lei(o.p) + '</span><span class="vechi"' + (o.r ? ' title="Preț de referință afișat de magazin"' : "") + ">" + lei(o.v) + "</span></div>" +
+      '<span class="econ-txt">Economisești ' + lei(o.v - o.p) + "</span>" +
       cupon + '<a class="btn" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank" aria-label="Vezi oferta la ' + esc(mn) + ' (se deschide în magazin, fereastră nouă)" title="Se deschide în magazin">Vezi la ' + esc(mn) + " " + ICON_EXTERN + "</a></article>";
   }
-  // istoric pret (din cauta-index.json: n = cel mai mic pret urmarit, h = preturile pe zile) - aceeasi forma ca in HTML-ul generat
-  function sparkSvg(v) {
-    if (!v || v.length < 2) return "";
-    var mn = Math.min.apply(null, v), mx = Math.max.apply(null, v), w = 84, h = 22, dx = w / (v.length - 1);
-    var y = function (x) { return mx === mn ? h / 2 : 3 + (1 - (x - mn) / (mx - mn)) * (h - 6); };
-    var pts = v.map(function (x, i) { return (i * dx).toFixed(1) + "," + y(x).toFixed(1); }).join(" ");
-    return '<svg class="spark' + (v[v.length - 1] < v[0] ? " jos" : "") + '" viewBox="-2 0 ' + (w + 4) + " " + h + '" width="' + (w + 4) + '" height="' + h + '" aria-hidden="true"><polyline points="' + pts + '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="' + ((v.length - 1) * dx).toFixed(1) + '" cy="' + y(v[v.length - 1]).toFixed(1) + '" r="2.6" fill="currentColor"/></svg>';
-  }
-  function istoricHtml(o) {
-    var sp = sparkSvg(o.h);
-    if (!o.n && !sp) return "";
-    return '<div class="istoric">' + (o.n ? '<span class="minim" title="' + esc(data.en || "") + '">' + ICON_JOS + esc(data.es || "Preț minim urmărit") + "</span>" : "") + (sp ? '<span class="spark-w"><span class="sr">Evoluția prețului: </span>' + sp + "</span>" : "") + "</div>";
-  }
+
   var svg = function (p) { return '<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + p + "</svg>"; };
   var ICON_INIMA = svg('<path d="M12 20.500s-7.500-4.600-7.500-10.200A4.300 4.300 0 0 1 12 7.500a4.300 4.300 0 0 1 7.500 2.800c0 5.600-7.500 10.200-7.500 10.200Z"/>');
   var ICON_EXTERN = svg('<path d="M7 17 17 7M9 7h8v8"/>');
@@ -182,6 +171,16 @@
 
   /* ---------- liste: filtre, sortare, „Arata mai multe” ---------- */
   var main = document.querySelector("main[data-lista]");
+  // antet compact la derulare
+  var antetMic = function () { document.documentElement.classList.toggle("derulat", window.scrollY > 120); };
+  addEventListener("scroll", antetMic, { passive: true }); antetMic();
+  // pagina produsului: copiere link pentru partajare
+  document.addEventListener("click", function (ev) {
+    var b = ev.target && ev.target.closest ? ev.target.closest(".copiaza-link") : null; if (!b) return;
+    var u = b.getAttribute("data-url"), gata = function () { b.textContent = "Link copiat ✓"; setTimeout(function () { b.textContent = "Copiază linkul"; }, 2000); };
+    if (navigator.share && matchMedia("(pointer:coarse)").matches) { navigator.share({ url: u, title: document.title }).catch(function () {}); return; }
+    try { navigator.clipboard.writeText(u).then(gata, gata); } catch (e) { gata(); }
+  });
   // vitrina prima pagina: butoanele caruselului „Ofertele zilei” si numaratoarea pana la Black Friday
   document.querySelectorAll(".car-b").forEach(function (b) {
     b.addEventListener("click", function () { var sir = b.closest("section").querySelector("[data-carusel]"); if (sir) sir.scrollBy({ left: Number(b.getAttribute("data-dir")) * sir.clientWidth * 0.9, behavior: "smooth" }); });

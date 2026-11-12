@@ -61,7 +61,7 @@ $script:Oprit = $false
       <TabItem Header="1. Site: de la oferte la publicare">
         <Grid>
           <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
           <Button Name="BActualizare" Content="1. Actualizeaz&#x103; oferte" Style="{StaticResource BtnVerde}" Width="260"/>
           <TextBlock Grid.Column="1" Text="Cite&#x219;te ofertele din magazine (Profitshare, evoMAG, PC Garage) &#x219;i le salveaz&#x103;. Nu schimb&#x103; site-ul public." Foreground="#cbd5e1" VerticalAlignment="Center" TextWrapping="Wrap" Margin="6,0,0,6"/>
           <StackPanel Grid.Row="1" Orientation="Horizontal"><Button Name="BPreview" Content="2. Porne&#x219;te previzualizarea" Style="{StaticResource BtnAlbastru}" Width="190"/><Button Name="BOprestePreview" Content="Opre&#x219;te" Style="{StaticResource BtnGri}" Width="62"/></StackPanel>
@@ -70,7 +70,9 @@ $script:Oprit = $false
           <TextBlock Grid.Row="2" Grid.Column="1" Text="Verific&#x103; dac&#x103; totul e &#xEE;n regul&#x103; &#xEE;nainte de publicare." Foreground="#cbd5e1" VerticalAlignment="Center" Margin="6,0,0,6"/>
           <Button Grid.Row="3" Name="BLive" Content="4. PUBLIC&#x102; LIVE" Style="{StaticResource BtnRosu}" Width="260" FontSize="15"/>
           <TextBlock Grid.Row="3" Grid.Column="1" Text="ATEN&#x21A;IE: pune pe pretino.ro versiunea de pe main. Se vede imediat pentru toat&#x103; lumea." Foreground="#fca5a5" FontWeight="SemiBold" VerticalAlignment="Center" TextWrapping="Wrap" Margin="6,0,0,6"/>
-          <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Margin="0,8,0,0">
+          <Button Grid.Row="4" Name="BPartajare" Content="5. Imagini pentru partajare" Style="{StaticResource BtnAlbastru}" Width="260"/>
+          <TextBlock Grid.Row="4" Grid.Column="1" Text="Face poze cu ofertele zilei (Telegram, TikTok, Instagram) + textele de postare, &#xEE;n rapoarte\partajare. Nu posteaz&#x103; nimic." Foreground="#cbd5e1" VerticalAlignment="Center" TextWrapping="Wrap" Margin="6,0,0,6"/>
+          <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Margin="0,8,0,0">
             <TextBlock Text="Actualizeaz&#x103; un singur magazin (celelalte r&#x103;m&#xE2;n neatinse):" Foreground="#94a3b8" Margin="0,0,0,6"/>
             <WrapPanel Name="PanouMagazine"/>
           </StackPanel>
@@ -147,9 +149,9 @@ try {
   exit 1
 }
 
-$c = @{}; foreach ($n in 'Stare','StareBox','PanouMagazine','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SOpreste','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
+$c = @{}; foreach ($n in 'Stare','StareBox','PanouMagazine','Demo','BPreview','BOprestePreview','BActualizare','BTeste','BPartajare','BLive','BProgram','Jurnal','CMagazin','CCauta','CActualizeaza','COpreste','CReia','CRaport','CVerifica','CProgres','CSurse','CCampanii','CUrl','CTitlu','CAdauga','CManual','CComuta','CSterge','CDeschide','CDetalii','STot','SVerifica','STrimite','SViteza','SOpreste','SGSitemap','SGInspect','SGPerf','SRich','SBing','SPageSpeed') { $c[$n] = $win.FindName($n) }
 
-function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BLive','BProgram','STot','SVerifica','STrimite','SViteza') { $c[$n].IsEnabled = -not $busy }; $c.SOpreste.IsEnabled = $busy; foreach ($b in $c.PanouMagazine.Children) { $b.IsEnabled = -not $busy } }
+function Set-Busy($busy) { foreach ($n in 'BPreview','BActualizare','BTeste','BPartajare','BLive','BProgram','STot','SVerifica','STrimite','SViteza') { $c[$n].IsEnabled = -not $busy }; $c.SOpreste.IsEnabled = $busy; foreach ($b in $c.PanouMagazine.Children) { $b.IsEnabled = -not $busy } }
 
 function Start-Task($nume, $comanda) {
   if ($script:Proc -and -not $script:Proc.HasExited) { return }
@@ -213,6 +215,7 @@ $c.BOprestePreview.Add_Click({
 $c.BProgram.Add_Click({ $script:DupaProgram = $true; Start-Task 'actualizare-program' 'git pull --rebase --autostash' })
 $c.BActualizare.Add_Click({ Start-Task 'actualizare' 'bun scripts/actualizare.js' })
 $c.BTeste.Add_Click({ Start-Task 'teste' 'bun scripts/test.js' })
+$c.BPartajare.Add_Click({ Start-Task 'imagini-partajare' 'bun scripts/build.js && bun scripts/imagini-partajare.js --n 10' })
 $c.BLive.Add_Click({
   $r = [System.Windows.MessageBox]::Show('Publici LIVE pe pretino.ro versiunea de pe main?', 'PUBLICA LIVE', 'YesNo', 'Warning')
   if ($r -eq 'Yes') { Start-Task 'publica-live' 'bun scripts/publica.js --live' }

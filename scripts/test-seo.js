@@ -51,7 +51,7 @@ export function testeSeo(ok) {
     for (let p = 1; p <= n; p++) {
       const c = p === 1 ? b : `${b}pagina-${p}/`, v = P.get(c);
       if (!v) { totalOk = false; detalii = `lipseste ${c}`; break; }
-      const idp = [...v.html.matchAll(/class="fav" type="button" data-id="([^"]*)"/g)].map((x) => x[1]);
+      const idp = [...v.html.slice(v.html.indexOf('id="lista"')).matchAll(/class="fav" type="button" data-id="([^"]*)"/g)].map((x) => x[1]);
       ids.push(...idp);
       if (idp.length > PE_PAGINA || (p < n && idp.length !== PE_PAGINA)) { totalOk = false; detalii = `${c} are ${idp.length} produse`; }
       if (p < n && !v.html.includes(`<a rel="next" href="${b}pagina-${p + 1}/"`)) { linkOk = false; detalii = `${c} fara link catre pagina ${p + 1}`; }

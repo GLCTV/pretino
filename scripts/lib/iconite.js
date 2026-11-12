@@ -58,6 +58,7 @@ const I = {
   sus: '<path d="m6 14.500 6-6 6 6"/>',
   reset: '<path d="M4 12a8 8 0 1 0 2.500-5.800M4 4v4.500h4.500"/>',
   extern: '<path d="M7 17 17 7M9 7h8v8"/>',
+  "jos-pret": '<path d="M12 5v14M6 13l6 6 6-6"/>',
   x: '<path d="m6 6 12 12M18 6 6 18"/>',
 };
 export const icoana = (nume, cls = "ic") => `<svg class="${cls}" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${I[nume] ?? I.cos}</svg>`;

@@ -11,6 +11,7 @@
     "preview:demo": "bun scripts/build.js --demo && bun scripts/serve.js",
     "actualizare": "bun scripts/actualizare.js",
     "test": "bun scripts/test.js",
-    "publica": "bun scripts/publica.js"
+    "publica": "bun scripts/publica.js",
+    "partajare": "bun scripts/imagini-partajare.js"
   }
 }

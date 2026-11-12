@@ -48,6 +48,33 @@ const dataActualizarii = (() => {
 })();
 const actualizatText = dataActualizarii && !DEMO ? `Prețuri actualizate: ${dataActualizarii.toLocaleString("ro-RO", { timeZone: "Europe/Bucharest", day: "numeric", month: "long", year: "numeric", ...(fataOra ? {} : { hour: "2-digit", minute: "2-digit" }) })}` : "";
 const cat = Object.fromEntries(categorii.map((c) => [c.slug, c]));
+// Istoricul preturilor (data/istoric-preturi.json): un punct pe zi (ultimul pret al zilei). Un id cu mai multe preturi diferite in aceeasi zi = istoric amestecat, ignorat.
+const ISTORIC = (() => { try { return citeste("istoric-preturi.json"); } catch { return {}; } })();
+const ULTIMA_ZI = Object.values(ISTORIC).flat().map((e) => e.d).sort().pop() ?? null;
+const ZILE_ISTORIC = (() => { const z = Object.values(ISTORIC).flat().map((e) => e.d).sort(); return z.length ? Math.round((Date.parse(z[z.length - 1]) - Date.parse(z[0])) / 864e5) : 0; })();
+const puncte = (o) => {
+  if (DEMO) return [];
+  const l = ISTORIC[o.id]; if (!l?.length) return [];
+  const pe = new Map(); for (const e of l) { const s = pe.get(e.d) ?? new Set(); s.add(e.p); pe.set(e.d, s); }
+  if ([...pe.values()].some((x) => x.size > 2)) return [];
+  const zile = new Map(); for (const e of l) zile.set(e.d, e.p);
+  return [...zile.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([d, p]) => ({ d, p }));
+};
+// „cel mai mic pret”: pretul actual = minimul din istoric, iar inainte a fost mai mare (scadere reala, nu doar o singura citire)
+const eticScurt = ZILE_ISTORIC >= 30 ? "Minim 30 de zile" : "Preț minim urmărit";
+const eticMinim = ZILE_ISTORIC >= 30 ? "Cel mai mic preț din ultimele 30 de zile" : "Cel mai mic preț urmărit de Pretino";
+const minim = (o) => { const pt = puncte(o).filter((x) => ZILE_ISTORIC < 30 || Date.now() - Date.parse(x.d) <= 30 * 864e5); return pt.length >= 2 && Math.abs(pt[pt.length - 1].p - o.pret) < 0.01 && Math.min(...pt.map((x) => x.p)) >= o.pret - 0.01 && pt.some((x) => x.p > o.pret + 0.01); };
+// scadere la ultima actualizare: ultimul punct e din ultima zi a istoricului si e mai mic decat precedentul
+const scadere = (o) => { const pt = puncte(o); return pt.length >= 2 && pt[pt.length - 1].d === ULTIMA_ZI && pt[pt.length - 2].p > pt[pt.length - 1].p + 0.01 ? pt[pt.length - 2].p - pt[pt.length - 1].p : 0; };
+// grafic mic al pretului (SVG), doar cand avem cel putin 2 zile diferite
+const sparkSvg = (vals) => {
+  if (vals.length < 2) return "";
+  const mn = Math.min(...vals), mx = Math.max(...vals), w = 84, h = 22, dx = w / (vals.length - 1);
+  const y = (v) => (mx === mn ? h / 2 : 3 + (1 - (v - mn) / (mx - mn)) * (h - 6));
+  const pts = vals.map((v, i) => `${(i * dx).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const jos2 = vals[vals.length - 1] < vals[0];
+  return `<svg class="spark${jos2 ? " jos" : ""}" viewBox="-2 0 ${w + 4} ${h}" width="${w + 4}" height="${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${((vals.length - 1) * dx).toFixed(1)}" cy="${y(vals[vals.length - 1]).toFixed(1)}" r="2.6" fill="currentColor"/></svg>`;
+};
 const lei = (n) => `${Number(n).toLocaleString("ro-RO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} lei`;
 
 const CSS = readFileSync(new URL("../src/stil.css", import.meta.url), "utf8");
@@ -134,6 +161,7 @@ const card = (o, i = 99) => {
   return `<article class="card">${poza(o, i)}<span class="badge ${r >= 50 ? "t3" : r >= 30 ? "t2" : "t1"}">-${r}%</span><button class="fav" type="button" data-id="${esc(o.id)}" data-p="${o.pret}" aria-pressed="false" aria-label="Adaugă la favorite">${icoana("inima")}</button>
 <a class="titlu" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">${esc(o.titlu)}</a>${(() => { const sp = specuri(o.titlu, o.categorie); return sp.length ? `<span class="specs">${sp.map((x) => `<i>${esc(x)}</i>`).join("")}</span>` : ""; })()}<span class="magazin"><a href="/magazin/${esc(o.magazin)}/">${esc(numeMag(o.magazin))}</a>${c ? `<span class="cond">${COND[c]}</span>` : ""}</span>
 <div class="pretrand"><span class="pret">${lei(o.pret)}</span><span class="vechi"${o.referintaMagazin ? ' title="Preț de referință afișat de magazin"' : ""}>${lei(o.pretVechi)}</span><span class="econ">Economisești<b>${lei(o.pretVechi - o.pret)}</b></span></div>
+<div class="econ-bara" aria-hidden="true"><i style="width:${Math.min(r, 95)}%"></i></div>${(() => { const pt = puncte(o), mi = minim(o); const sp = sparkSvg(pt.map((x) => x.p)); return mi || sp ? `<div class="istoric"${sp ? ` title="Evoluția prețului în Pretino: ${pt.map((x) => `${x.d.slice(8)}.${x.d.slice(5, 7)} ${lei(x.p)}`).join(" → ")}"` : ""}>${mi ? `<span class="minim" title="${esc(eticMinim)}">${icoana("jos-pret")}${esc(eticScurt)}</span>` : ""}${sp ? `<span class="spark-w"><span class="sr">Evoluția prețului: </span>${sp}</span>` : ""}</div>` : ""; })()}
 ${cupon(mag[o.magazin]?.cupon)}<a class="btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" aria-label="Vezi oferta la ${esc(numeMag(o.magazin))} (se deschide în magazin, fereastră nouă)" title="Se deschide în magazin">Vezi la ${esc(numeMag(o.magazin))} ${icoana("extern")}</a></article>`;
 };
 
@@ -154,7 +182,7 @@ function navPagini(cale, p, n) {
 
 // Genereaza TOATE paginile unei liste (pagina 1 + /pagina-N/). Filtrarea completa ruleaza in browser (cauta.js) pe cauta-index.json,
 // dar fiecare pagina are in HTML produsele ei, titlu, H1, breadcrumb si canonical propriu.
-function listare({ mod, meta, cale, catSlug = null, magId = null, subId = null, tipId = null, lista, indexabil = true, ilustr = null, migaje = [], chips = "", subRute = [], schemaAcasa = false, brandId = null, extra = "", dupa = "" }) {
+function listare({ mod, meta, cale, catSlug = null, magId = null, subId = null, tipId = null, lista, indexabil = true, ilustr = null, migaje = [], chips = "", subRute = [], schemaAcasa = false, brandId = null, extra = "", extra1 = "", dupa = "" }) {
   const pretMax = Math.max(10, ...lista.map((o) => o.pret));
   const pasMax = pretMax <= 500 ? Math.ceil(pretMax / 10) * 10 : pretMax <= 5000 ? Math.ceil(pretMax / 100) * 100 : Math.ceil(pretMax / 1000) * 1000;
   const magazineLista = [...new Set(lista.map((o) => o.magazin))].map((id) => ({ id, nume: numeMag(id), n: lista.filter((o) => o.magazin === id).length })).sort((a, b) => b.n - a.n);
@@ -175,7 +203,7 @@ function listare({ mod, meta, cale, catSlug = null, magId = null, subId = null, 
     const corp = `<main data-lista='${date}'>
 <nav class="migaje" aria-label="Navigare">${miez}</nav>
 <div class="hero${mod === "acasa" ? " hero-acasa" : ""}"><div><h1 id="h1">${esc(m.h1)}</h1>${p === 1 && m.intro ? `<p class="intro" id="sub-titlu">${esc(m.intro)}</p>` : '<p class="intro" id="sub-titlu"></p>'}${actualizatText ? `<details class="actualizat info-pret"><summary><time datetime="${dataActualizarii.toISOString()}">${esc(actualizatText)}</time><span class="i" aria-hidden="true">i</span><span class="sr"> – detalii</span></summary><p>Prețurile se pot schimba în magazin; verifică prețul final pe pagina magazinului. <a href="${CALE_GHID}">Cum interpretăm reducerile</a></p></details>` : ""}</div>${ilustr ? ilustratie(ilustr) : mod === "acasa" ? statisticiHome() : ""}</div>
-${chips ? `<div class="subcats" role="group" aria-label="Subcategorii">${chips}</div>` : '<div class="subcats-gol"></div>'}${extra}
+${chips ? `<div class="subcats" role="group" aria-label="Subcategorii">${chips}</div>` : '<div class="subcats-gol"></div>'}${p === 1 ? extra1 : ""}${extra}
 <div class="cont">
 <aside class="filtre" id="filtre" aria-label="Filtre"><button class="filtre-x" type="button" id="filtre-x" aria-label="Închide filtrele">${icoana("x")}</button>
 <h2 class="filtre-cap">${icoana("filtre")}Filtre</h2>
@@ -239,8 +267,25 @@ const textOferte = (nume, l, legaturi = "") => {
   const mags = [...new Set(l.map((o) => o.magazin))].map((id) => ({ id, n: l.filter((o) => o.magazin === id).length })).sort((a, b) => b.n - a.n).slice(0, 4).map((x) => numeMag(x.id));
   return `<section class="text-seo"><h2>Despre ofertele la ${esc(nume)}</h2><p>În catalogul Pretino sunt acum <b>${l.length.toLocaleString("ro-RO")}</b> oferte la ${esc(nume)}, din ${nrMag(l)} ${nrMag(l) === 1 ? "magazin" : "magazine"}${mags.length ? ` (în special ${mags.map(esc).join(", ")})` : ""}. Reducerea medie este de ${medie}%, iar cea mai mare economie în lei este de ${lei(ec(mx))}, la „${esc(mx.titlu)}” de la ${esc(numeMag(mx.magazin))}.</p><p>Fiecare ofertă arată prețul de referință tăiat și prețul actual, ca să vezi diferența dintr-o privire. Prețul de referință vine de la magazin, nu din istoricul nostru, așa că verifică întotdeauna prețul final, stocul și costul livrării pe pagina magazinului înainte să comanzi. <a href="${CALE_GHID}">Cum interpretăm reducerile</a>.${legaturi}</p></section>`;
 };
+// Vitrina primei pagini: banner Black Friday cu numaratoare, carusel „Oferta zilei”, randuri orizontale (doar din catalogul real)
+const BF_START = Date.parse("2026-11-27T00:00:00+02:00"), BF_STOP = Date.parse("2026-12-01T00:00:00+02:00");
+const vitrina = (() => {
+  if (!sortate.length) return "";
+  const cuPoza = sortate.filter(areImg);
+  const acum = Date.now();
+  const zileBf = Math.max(0, Math.ceil((BF_START - acum) / 864e5));
+  const banner = BF_ON && acum < BF_STOP ? `<a class="bf-banner" href="/black-friday/"><span class="bf-et">Black Friday 2026</span><b class="bf-tit">${acum < BF_START ? "Ofertele încep să apară. Fii pregătit." : "Black Friday a început!"}</b><span class="bf-num" data-bf="${new Date(BF_START).toISOString()}" data-stop="${new Date(BF_STOP).toISOString()}">${acum < BF_START ? `<span><b>${zileBf}</b>zile</span>` : "<span><b>LIVE</b>acum</span>"}</span><span class="bf-cta">Vezi ofertele →</span></a>` : "";
+  const peMag = {}, zi = sortEc(cuPoza.filter((o) => o.pret >= 150 && reducere(o) >= 15)).filter((o) => (peMag[o.magazin] = (peMag[o.magazin] ?? 0) + 1) <= 2).slice(0, 8);
+  const ziId = new Set(zi.map((o) => o.id)), utile = cuPoza.filter((o) => o.pret >= 40 && !ziId.has(o.id));
+  const slide = (o) => { const r = reducere(o); return `<article class="zi-slide"><a class="zi-poza" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" tabindex="-1" aria-hidden="true"><img src="${esc(imgMare(o.imagine))}" alt="${esc(o.titlu)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" width="320" height="240" onerror="this.parentNode.classList.add('fara')"></a><div class="zi-info"><span class="zi-red">-${r}%</span><a class="zi-tit" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">${esc(o.titlu)}</a><span class="zi-mag">la ${esc(numeMag(o.magazin))}</span><span class="zi-pret"><b>${lei(o.pret)}</b><s>${lei(o.pretVechi)}</s></span><span class="zi-ec">Economisești ${lei(ec(o))}</span><a class="btn zi-btn" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank">Vezi oferta ${icoana("extern")}</a></div></article>`; };
+  const carusel = zi.length >= 3 ? `<section class="zi" aria-label="Ofertele zilei"><div class="rand-cap"><h2>Ofertele zilei</h2><span class="car-nav"><button type="button" class="car-b" data-dir="-1" aria-label="Înapoi">‹</button><button type="button" class="car-b" data-dir="1" aria-label="Înainte">›</button></span></div><div class="zi-sir" data-carusel>${zi.map(slide).join("")}</div></section>` : "";
+  const rand = (titlu, l, link) => (l.length >= 4 ? `<section class="rand" aria-label="${esc(titlu)}"><div class="rand-cap"><h2>${esc(titlu)}</h2>${link ? `<a class="rand-tot" href="${link}">Vezi toate →</a>` : ""}</div><div class="rand-sir">${l.slice(0, 12).map((o) => card(o)).join("")}</div></section>` : "");
+  const scaderi = utile.map((o) => ({ o, s: scadere(o) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s).map((x) => x.o);
+  const lap = cuPoza.filter((o) => o.categorie === "electronice" && o.sub === "laptopuri"), comp = cuPoza.filter((o) => o.categorie === "electronice" && o.sub === "componente");
+  return `<div class="vitrina">${banner}${carusel}${rand("Cele mai mari reduceri", utile, "/top-oferte/")}${rand("Prețuri scăzute la ultima actualizare", scaderi, null)}${rand("Laptopuri la ofertă", lap, subPublicata("electronice", "laptopuri") ? "/categorie/electronice/laptopuri/" : null)}${rand("Componente PC la ofertă", comp, subPublicata("electronice", "componente") ? "/categorie/electronice/componente/" : null)}<h2 class="vitrina-toate">Toate ofertele</h2></div>`;
+})();
 // Acasa
-pagini.push(...listare({ mod: "acasa", meta: (p) => ({ ...metaAcasa(p), migaja: "Acasă" }), cale: "/", lista: sortate, indexabil: oferte.length > 0, extra: linkuriDescopera(), dupa: textOferte("electronice, electrocasnice și alte categorii", sortate, BF_ON ? ` Pregătești cumpărăturile mari? Vezi <a href="/black-friday/">ofertele de Black Friday 2026</a>.` : "") }));
+pagini.push(...listare({ mod: "acasa", meta: (p) => ({ ...metaAcasa(p), migaja: "Acasă" }), cale: "/", lista: sortate, indexabil: oferte.length > 0, extra: linkuriDescopera(), extra1: vitrina, dupa: textOferte("electronice, electrocasnice și alte categorii", sortate, BF_ON ? ` Pregătești cumpărăturile mari? Vezi <a href="/black-friday/">ofertele de Black Friday 2026</a>.` : "") }));
 
 // Categorii + subcategorii (pagini proprii pentru subcategoriile cu inventar suficient)
 const TIP_GHID = { monitoare: "cum-alegi-un-monitor", mouse: "cum-alegi-un-mouse-sau-o-tastatura-gaming", tastaturi: "cum-alegi-un-mouse-sau-o-tastatura-gaming", ssd: "cum-alegi-un-ssd", aspiratoare: "cum-alegi-un-aspirator" };
@@ -377,7 +422,7 @@ mkdirSync("dist", { recursive: true });
 if (existsSync("public")) cpSync("public", "dist", { recursive: true });
 writeFileSync("dist/stil.css", CSS);
 // index de cautare (citit de /cauta.js doar cand e nevoie): campuri scurte, ordinea = ordinea listelor din HTML
-writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), k: Object.fromEntries(magazine.filter((x) => x.cupon).map((x) => [x.id, x.cupon])), o: sortate.map((o) => ({ id: o.id, t: o.titlu, m: o.magazin, c: o.categorie, s: o.sub ?? "", g: o.tip ?? "", p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, x: conditie(o), b: o.marca?.id ?? "", u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "" })) }));
+writeFileSync("dist/cauta-index.json", JSON.stringify({ m: Object.fromEntries(magazine.map((x) => [x.id, x.nume])), c: Object.fromEntries(categorii.map((x) => [x.slug, x.nume])), k: Object.fromEntries(magazine.filter((x) => x.cupon).map((x) => [x.id, x.cupon])), o: sortate.map((o) => ({ id: o.id, t: o.titlu, m: o.magazin, c: o.categorie, s: o.sub ?? "", g: o.tip ?? "", p: o.pret, v: o.pretVechi > o.pret ? o.pretVechi : 0, r: o.referintaMagazin ? 1 : 0, x: conditie(o), b: o.marca?.id ?? "", u: o.url, i: /^https:\/\//.test(o.imagine ?? "") ? o.imagine : "", ...(minim(o) ? { n: 1 } : {}), ...((pt) => (pt.length >= 2 ? { h: pt.map((x) => x.p) } : {}))(puncte(o)) })), en: eticMinim, es: eticScurt }));
 for (const p of pagini) {
   const dir = "dist" + p.cale;
   mkdirSync(dir, { recursive: true });

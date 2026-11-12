@@ -278,3 +278,9 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Text de prezentare generat din catalog pe prima pagină și pe paginile de categorie (sub listă).
 - Verificat: build OK (163 pagini). 4 teste eșuează și pe main fără aceste modificări (ghiduri/campanii) – de investigat separat.
 - Urmează: preview local, OK de la Laur, apoi main și PUBLICĂ LIVE.
+
+## 2026-11-12 – ramura grafica-v2 (program v1.68), neintegrata în main
+- Prima pagină: banner Black Friday cu numărătoare inversă, carusel „Ofertele zilei” (economie mare în lei, preț ≥150, max 2/magazin), rânduri orizontale (Cele mai mari reduceri, Prețuri scăzute la ultima actualizare, Laptopuri, Componente PC). Doar pe pagina 1.
+- Carduri: poză mai mare (4:3), banderolă reducere, bară de reducere, grafic mic al prețului din istoric (≥2 zile), insignă „Preț minim urmărit” (devine „Minim 30 de zile” când istoricul are ≥30 zile). Aceeași formă și în cauta.js (filtre/căutare).
+- Program: buton „5. Imagini pentru partajare” → scripts/imagini-partajare.js (PNG 1080x1350 + texte.txt în rapoarte/partajare/<zi>/).
+- Teste: aceleași 4 eșecuri vechi ca pe main (ghiduri/campanii); testul de paginare numără acum doar lista paginată, nu vitrina.

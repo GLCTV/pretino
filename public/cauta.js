@@ -105,11 +105,26 @@
       '<a class="titlu" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank">' + esc(o.t) + "</a>" + (sp.length ? '<span class="specs">' + sp.map(function (x) { return "<i>" + esc(x) + "</i>"; }).join("") + "</span>" : "") +
       '<span class="magazin"><a href="/magazin/' + esc(o.m) + '/">' + esc(data.m[o.m] || o.m) + "</a>" + (o.x ? '<span class="cond">' + COND[o.x] + "</span>" : "") + "</span>" +
       '<div class="pretrand"><span class="pret">' + lei(o.p) + '</span><span class="vechi"' + (o.r ? ' title="Preț de referință afișat de magazin"' : "") + ">" + lei(o.v) + '</span><span class="econ">Economisești<b>' + lei(o.v - o.p) + "</b></span></div>" +
+      '<div class="econ-bara" aria-hidden="true"><i style="width:' + Math.min(o.r2, 95) + '%"></i></div>' + istoricHtml(o) +
       cupon + '<a class="btn" href="' + esc(o.u) + '" rel="sponsored nofollow noopener" target="_blank" aria-label="Vezi oferta la ' + esc(mn) + ' (se deschide în magazin, fereastră nouă)" title="Se deschide în magazin">Vezi la ' + esc(mn) + " " + ICON_EXTERN + "</a></article>";
+  }
+  // istoric pret (din cauta-index.json: n = cel mai mic pret urmarit, h = preturile pe zile) - aceeasi forma ca in HTML-ul generat
+  function sparkSvg(v) {
+    if (!v || v.length < 2) return "";
+    var mn = Math.min.apply(null, v), mx = Math.max.apply(null, v), w = 84, h = 22, dx = w / (v.length - 1);
+    var y = function (x) { return mx === mn ? h / 2 : 3 + (1 - (x - mn) / (mx - mn)) * (h - 6); };
+    var pts = v.map(function (x, i) { return (i * dx).toFixed(1) + "," + y(x).toFixed(1); }).join(" ");
+    return '<svg class="spark' + (v[v.length - 1] < v[0] ? " jos" : "") + '" viewBox="-2 0 ' + (w + 4) + " " + h + '" width="' + (w + 4) + '" height="' + h + '" aria-hidden="true"><polyline points="' + pts + '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="' + ((v.length - 1) * dx).toFixed(1) + '" cy="' + y(v[v.length - 1]).toFixed(1) + '" r="2.6" fill="currentColor"/></svg>';
+  }
+  function istoricHtml(o) {
+    var sp = sparkSvg(o.h);
+    if (!o.n && !sp) return "";
+    return '<div class="istoric">' + (o.n ? '<span class="minim" title="' + esc(data.en || "") + '">' + ICON_JOS + esc(data.es || "Preț minim urmărit") + "</span>" : "") + (sp ? '<span class="spark-w"><span class="sr">Evoluția prețului: </span>' + sp + "</span>" : "") + "</div>";
   }
   var svg = function (p) { return '<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + p + "</svg>"; };
   var ICON_INIMA = svg('<path d="M12 20.500s-7.500-4.600-7.500-10.200A4.300 4.300 0 0 1 12 7.500a4.300 4.300 0 0 1 7.500 2.800c0 5.600-7.500 10.200-7.500 10.200Z"/>');
   var ICON_EXTERN = svg('<path d="M7 17 17 7M9 7h8v8"/>');
+  var ICON_JOS = svg('<path d="M12 5v14M6 13l6 6 6-6"/>');
 
   /* ---------- cautare cu sugestii (antet) ---------- */
   var form = $("cautare");
@@ -167,6 +182,22 @@
 
   /* ---------- liste: filtre, sortare, „Arata mai multe” ---------- */
   var main = document.querySelector("main[data-lista]");
+  // vitrina prima pagina: butoanele caruselului „Ofertele zilei” si numaratoarea pana la Black Friday
+  document.querySelectorAll(".car-b").forEach(function (b) {
+    b.addEventListener("click", function () { var sir = b.closest("section").querySelector("[data-carusel]"); if (sir) sir.scrollBy({ left: Number(b.getAttribute("data-dir")) * sir.clientWidth * 0.9, behavior: "smooth" }); });
+  });
+  var bf = document.querySelector("[data-bf]");
+  if (bf) {
+    var t0 = Date.parse(bf.getAttribute("data-bf")), t1 = Date.parse(bf.getAttribute("data-stop"));
+    var bucata = function (n, e) { return "<span><b>" + n + "</b>" + e + "</span>"; };
+    var tic = function () {
+      var r = t0 - Date.now();
+      if (r <= 0) { bf.innerHTML = Date.now() < t1 ? bucata("LIVE", "acum") : ""; return; }
+      var z = Math.floor(r / 864e5), o = Math.floor(r % 864e5 / 36e5), m = Math.floor(r % 36e5 / 6e4);
+      bf.innerHTML = bucata(z, z === 1 ? "zi" : "zile") + bucata(o, "ore") + bucata(m, "min");
+    };
+    tic(); setInterval(tic, 30000);
+  }
   if (!main) return;
   var cfg = JSON.parse(main.getAttribute("data-lista"));
   var lista = $("lista"), mai = $("mai"), gol = $("rez-gol"), nrRez = $("nr-rez"), PAS = cfg.pe || 48;

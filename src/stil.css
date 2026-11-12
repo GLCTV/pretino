@@ -732,3 +732,7 @@ h1{font-weight:800}
 .mega{background:var(--panel);backdrop-filter:none;-webkit-backdrop-filter:none}
 .mo-img img{color:transparent}
 @media(max-width:760px){.cats a[aria-current=page]{box-shadow:none}.subcats:has(.tile)>.chip:not(.tile){flex:none;padding:0 20px;min-height:66px}}
+/* voal peste pagină cât timp e deschis mega-meniul: blur + întunecare ușoară, focus pe meniu */
+body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opacity:0;background:rgba(5,12,11,.32);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:opacity .22s ease}
+:root[data-theme="light"] body::after{background:rgba(16,33,31,.18)}
+.mega-deschis body::after{opacity:1}

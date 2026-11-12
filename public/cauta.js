@@ -199,16 +199,16 @@
       activ = slug; if (!w) return;
       var gasit = false;
       Array.prototype.forEach.call(w.children, function (m) { var ok = m.getAttribute("data-cat") === slug; m.hidden = !ok; if (ok) gasit = true; });
-      w.hidden = !gasit;
+      w.hidden = !gasit; document.documentElement.classList.toggle("mega-deschis", gasit);
       Array.prototype.forEach.call(cats.querySelectorAll("a[data-cat]"), function (a) { a.classList.toggle("mega-on", gasit && a.getAttribute("data-cat") === slug); });
     };
-    var inchide = function () { clearTimeout(tDesch); tInch = setTimeout(function () { activ = ""; if (w) w.hidden = true; Array.prototype.forEach.call(cats.querySelectorAll(".mega-on"), function (a) { a.classList.remove("mega-on"); }); }, 180); };
+    var inchide = function () { clearTimeout(tDesch); tInch = setTimeout(function () { activ = ""; if (w) w.hidden = true; document.documentElement.classList.remove("mega-deschis"); Array.prototype.forEach.call(cats.querySelectorAll(".mega-on"), function (a) { a.classList.remove("mega-on"); }); }, 180); };
     Array.prototype.forEach.call(cats.querySelectorAll("a[data-cat]"), function (a) {
       a.addEventListener("mouseenter", function () { pregateste(); clearTimeout(tInch); clearTimeout(tDesch); var sl = a.getAttribute("data-cat"); tDesch = setTimeout(function () { arata(sl); }, w && !w.hidden ? 0 : 140); });
       a.addEventListener("mouseleave", inchide);
     });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && w) { w.hidden = true; } });
-    addEventListener("scroll", function () { if (w && !w.hidden && window.scrollY > 120) w.hidden = true; }, { passive: true });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && w) { w.hidden = true; document.documentElement.classList.remove("mega-deschis"); } });
+    addEventListener("scroll", function () { if (w && !w.hidden && window.scrollY > 120) { w.hidden = true; document.documentElement.classList.remove("mega-deschis"); } }, { passive: true });
   })();
   // antet compact la derulare
   var antetMic = function () { document.documentElement.classList.toggle("derulat", window.scrollY > 120); };

@@ -203,7 +203,7 @@ const specuri = (titlu, cat) => {
   for (const m of titlu.matchAll(/(?<![\d.,])(\d{1,4})\s?(GB|TB)\b/gi)) { const t = `${m[1]} ${m[2].toUpperCase()}`; if (!r.includes(t)) r.push(t); }
   return r.slice(0, 3);
 };
-const cuponMic = (c) => c ? `<div class="cupon"><span>Cupon <b>${esc(c.cod)}</b> (${esc(c.text)}) în coș</span><button type="button" class="copiaza" data-cod="${esc(c.cod)}">Copiază</button></div>` : "";
+const cuponMic = (c) => c ? `<div class="cupon" title="Introdu codul în coș. Prețul afișat nu îl include."><span class="cupon-et">Cupon <b>${esc(c.cod)}</b><small>${esc(c.text)} în coș</small></span><button type="button" class="copiaza" data-cod="${esc(c.cod)}">Copiază</button></div>` : "";
 const card = (o, i = 99) => {
   const r = reducere(o), c = conditie(o), pp = caleProdus.get(o.id) ?? o.url;
   return `<article class="card">${poza(o, i, minim(o) ? `<span class="minim-poza" title="${esc(eticMinim)}">${icoana("jos-pret")}${esc(eticScurt)}</span>` : "")}<span class="badge">-${r}%</span><button class="fav" type="button" data-id="${esc(o.id)}" data-p="${o.pret}" aria-pressed="false" aria-label="Adaugă la favorite">${icoana("inima")}</button>

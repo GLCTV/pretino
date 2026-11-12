@@ -100,7 +100,7 @@
     var poza = '<a class="poza' + (o.i ? "" : " fara") + '" href="' + esc(pp) + '" tabindex="-1" aria-hidden="true">' +
       (o.i ? '<img src="' + esc(mare) + '" alt="' + esc(o.t) + '" ' + (i < 4 ? "" : 'loading="lazy" ') + 'decoding="async" referrerpolicy="no-referrer" width="275" height="206"' + (mare !== o.i ? ' data-t="' + esc(o.i) + '"' : "") + ' onload="this.parentNode.classList.add(\'ok\')" onerror="' + (mare !== o.i ? "if(this.dataset.t){this.src=this.dataset.t;delete this.dataset.t;return}" : "") + 'this.parentNode.classList.add(\'fara\')">' : "") + (o.n ? '<span class="minim-poza" title="' + esc(data.en || "") + '">' + ICON_JOS + esc(data.es || "Preț minim urmărit") + "</span>" : "") + "</a>";
     var k = data.k && data.k[o.m], mn = data.m[o.m] || o.m;
-    var cupon = k ? '<div class="cupon"><span>Cupon <b>' + esc(k.cod) + "</b> (" + esc(k.text) + ') în coș</span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
+    var cupon = k ? '<div class="cupon" title="Introdu codul în coș. Prețul afișat nu îl include."><span class="cupon-et">Cupon <b>' + esc(k.cod) + "</b><small>" + esc(k.text) + ' în coș</small></span><button type="button" class="copiaza" data-cod="' + esc(k.cod) + '">Copiază</button></div>' : "";
     return '<article class="card">' + poza + '<span class="badge">-' + o.r2 + '%</span>' +
       '<button class="fav" type="button" data-id="' + esc(o.id) + '" data-p="' + o.p + '" aria-pressed="false" aria-label="Adaugă la favorite">' + ICON_INIMA + "</button>" +
       '<a class="titlu" href="' + esc(pp) + '">' + esc(o.t) + "</a>" +

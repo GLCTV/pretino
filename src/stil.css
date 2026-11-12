@@ -528,3 +528,5 @@ a,button,select,summary,label,input{touch-action:manipulation}
 .info-pret[open] p{animation:fade-in var(--t-2) linear}
 @media(max-width:960px){.filtre{transition:transform var(--t-3) var(--ease),visibility 0s linear var(--t-3)}.filtre.deschis{transition:transform var(--t-3) var(--ease),visibility 0s}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;transition-delay:0s!important;animation-duration:.01ms!important;animation-iteration-count:1!important}.card:hover{transform:none}.btn:active,.btn-link:active,.ach:active,.chip:active,.cats a:active,.descopera a:active,.continut .legaturi a:active,#mai:active,.reset:active,.btn-filtre:active,.copiaza:active,.sus:active,.aplica:active,.cauta button:active,.fav:active,.ibtn:active,.ghid-surori a:active{transform:none}}
+
+.text-seo{margin:28px 11px 8px;max-width:860px;color:var(--fg2);line-height:1.7}.text-seo h2{margin:0 0 8px;font-size:20px;color:var(--fg)}.text-seo a{color:var(--acc-txt)}.text-seo ul{padding-left:20px}.continut h2{margin:26px 11px 10px}

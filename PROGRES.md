@@ -272,3 +272,9 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Făcut: (1) clasificare corectată (reguli pe „cap” de titlu, subcategorii smartwatch / mașini de spălat / piese trotinete, supermarket); (2) pagini pe tip de produs din `TIPURI` (clasificare.js), publicate la ≥15 oferte (MIN_TIP_PAGINA): mouse, tastaturi, căști, monitoare, televizoare, SSD, aspiratoare; plăci video, procesoare, RAM, friteuze și espressoare apar automat când ajung la 15 oferte; (3) /magazine/, acces compact în prima pagină, linkuri ghid↔categorie, categorii/branduri pe paginile de magazin, secțiune „Cod de reducere PC Garage” (fără promisiuni); (4) ghiduri noi: SSD, aspirator; (5) titlul Componente PC enumeră doar tipurile publicate; (6) teste de regresie în scripts/test-clasificare.js, rulate din test.js.
 - Nefăcut / de verificat de Laur: imaginile ITGalaxy (cauza nu poate fi reprodusă din cloud: shell-ul nu poate accesa magazinele; imaginile au deja referrerpolicy=no-referrer, fetchpriority și fallback onerror); validarea destinațiilor linkurilor de afiliere; Black Friday (fără sursă oficială confirmată); Lighthouse/CrUX; Search Console; autor/responsabil editorial pe ghiduri (decizie Laur).
 - Trotinete complete: 0 în catalog (toate sunt piese); pagina „trotinete-electrice” apare doar cu inventar.
+
+## 2026-11-12 – ramura bf-continut (neintegrata în main)
+- Pagină nouă /black-friday/ (date reale din catalog, FAQ cu schema, sfaturi), link în subsol și în „Descoperă” pe prima pagină, în sitemap.
+- Text de prezentare generat din catalog pe prima pagină și pe paginile de categorie (sub listă).
+- Verificat: build OK (163 pagini). 4 teste eșuează și pe main fără aceste modificări (ghiduri/campanii) – de investigat separat.
+- Urmează: preview local, OK de la Laur, apoi main și PUBLICĂ LIVE.

@@ -7,7 +7,7 @@ import { PAGINI_LEGALE } from "./lib/legal.js";
 import { esc, reducere } from "./lib/html.js";
 import { clasifica, subcategoriiDe, tipuriDe } from "./lib/clasificare.js";
 import { icoana } from "./lib/iconite.js";
-import { PE_PAGINA, MIN_SUB_PAGINA, MIN_TIP_PAGINA, MIN_MAGAZIN_INDEX, ZILE_DATE_VECHI, BRAND, jos, metaAcasa, metaCategorie, metaSub, metaTip, metaComponente, metaMagazin, metaMarca, metaTop } from "../src/seo.js";
+import { PE_PAGINA, MIN_SUB_PAGINA, MIN_TIP_PAGINA, MIN_MAGAZIN_INDEX, ZILE_DATE_VECHI, BRAND, BF_DATA, jos, metaAcasa, metaCategorie, metaSub, metaTip, metaComponente, metaMagazin, metaMarca, metaTop } from "../src/seo.js";
 import { paginaGhid, CALE_GHID } from "./lib/ghid.js";
 import { areScena, scena, areScenaSub, scenaSub } from "./lib/ilustratii.js";
 import { GHIDURI, GHID_EXTRA, MIN_TOP, N_TOP, MIN_BRAND, marcaOfertei } from "./lib/continut.js";
@@ -83,8 +83,9 @@ for (const c of categorii) {
 }
 for (const t of topuri) if (t.sub && topuri.filter((x) => x.nume === t.nume).length > 1) t.nume = `${t.nume} (${jos(t.cat.nume)})`;
 const topDe = (cat, sub = null) => topuri.find((t) => t.cat.slug === cat && (t.sub?.id ?? null) === sub);
+const BF_ON = sortate.length >= 20; // pagina Black Friday exista doar cu un catalog real suficient
 
-const FOOTER = () => `<footer><div class="f-marca"><a class="logo" href="/" aria-label="${esc(SITE_NAME)} – prima pagină"><img class="l-noapte" src="/logo-dark-antet.svg" alt="" width="190" height="35" loading="lazy"><img class="l-lumina" src="/logo-antet.svg" alt="" width="190" height="35" loading="lazy" aria-hidden="true"></a><p>Oferte și reduceri din magazinele din România, într-un singur loc.</p></div><nav class="legal" aria-label="Informații">${[...PAGINI_LEGALE.map((p) => ({ cale: p.cale, nume: p.nume })), { cale: CALE_GHID, nume: "Cum interpretăm reducerile" }, { cale: "/ghiduri/", nume: "Ghiduri" }, ...(topuri.length ? [{ cale: "/top-oferte/", nume: "Top economii" }] : []), ...(marciPagina.length ? [{ cale: "/branduri/", nume: "Branduri" }] : [])].map((p) => `<a href="${p.cale}">${esc(p.nume)}</a>`).join("")}</nav>
+const FOOTER = () => `<footer><div class="f-marca"><a class="logo" href="/" aria-label="${esc(SITE_NAME)} – prima pagină"><img class="l-noapte" src="/logo-dark-antet.svg" alt="" width="190" height="35" loading="lazy"><img class="l-lumina" src="/logo-antet.svg" alt="" width="190" height="35" loading="lazy" aria-hidden="true"></a><p>Oferte și reduceri din magazinele din România, într-un singur loc.</p></div><nav class="legal" aria-label="Informații">${[...(BF_ON ? [{ cale: "/black-friday/", nume: "Black Friday 2026" }] : []), ...PAGINI_LEGALE.map((p) => ({ cale: p.cale, nume: p.nume })), { cale: CALE_GHID, nume: "Cum interpretăm reducerile" }, { cale: "/ghiduri/", nume: "Ghiduri" }, ...(topuri.length ? [{ cale: "/top-oferte/", nume: "Top economii" }] : []), ...(marciPagina.length ? [{ cale: "/branduri/", nume: "Branduri" }] : [])].map((p) => `<a href="${p.cale}">${esc(p.nume)}</a>`).join("")}</nav>
 ${magCuOferte.filter((m) => magIndexabil(m.id)).length ? `<nav class="magazine-f" aria-label="Magazine"><b>Magazine:</b>${magCuOferte.filter((m) => magIndexabil(m.id)).map((m) => `<a href="/magazin/${m.id}/">${esc(m.nume)}</a>`).join("")}<a href="/magazine/">Toate magazinele</a></nav>` : ""}<p class="f-legal">Pretino.ro afișează oferte din magazine partenere. Unele linkuri pot fi linkuri de afiliere (marcate sponsorizat), iar unele magazine ne oferă un cod de cupon pentru care putem primi comision; prețul pentru tine nu se schimbă. Unde apare „reducere afișată de magazin”, prețul vechi este cel de referință arătat de magazin, nu istoricul Pretino. Verifică mereu prețul final în magazin.</p></footer>`;
 
 const antet = (catActiva) => `<header class="antet"><div class="antet-in">
@@ -221,7 +222,7 @@ const linkuriDescopera = (cat = null) => {
   const t = cat ? [topDe(cat), ...topuri.filter((x) => x.cat.slug === cat && x.sub)].filter(Boolean).slice(0, 4) : topuri.filter((x) => !x.sub).slice(0, 5);
   const m = marciPagina.slice(0, cat ? 0 : 8);
   const grup = (eticheta, l) => (l.length ? `<span class="d-grup"><b>${eticheta}</b>${l.join("")}</span>` : "");
-  return `<nav class="descopera" aria-label="Descoperă"><details open><summary>Descoperă mai mult</summary>${cat ? "" : grup("Descoperă oferte:", ACCES_HOME.filter(([c]) => existaAcces(c)).map(([c, n]) => `<a href="/categorie/${c}/">${esc(n)}</a>`).concat(magCuOferte.some((m) => magIndexabil(m.id)) ? [`<a class="mare" href="/magazine/">Magazine cu oferte</a>`] : []))}${grup("Top economii:", t.map((x) => `<a${x.sub || !cat ? "" : ' class="mare"'} href="${x.cale}">${esc(x.sub ? x.nume : cat ? "Toată categoria" : x.cat.nume)}</a>`))}${grup("Ghiduri:", g.slice(0, 3).map((x) => `<a href="/ghiduri/${x.slug}/">${esc(x.titlu)}</a>`).concat([`<a class="mare" href="/ghiduri/">Toate ghidurile</a>`]))}${grup("Branduri:", m.map((x) => `<a href="/brand/${x.id}/">${esc(x.nume)}</a>`).concat(m.length ? [`<a class="mare" href="/branduri/">Toate brandurile</a>`] : []))}</details></nav>`;
+  return `<nav class="descopera" aria-label="Descoperă"><details open><summary>Descoperă mai mult</summary>${cat || !BF_ON ? "" : grup("Campanie:", [`<a class="mare" href="/black-friday/">Black Friday 2026</a>`])}${cat ? "" : grup("Descoperă oferte:", ACCES_HOME.filter(([c]) => existaAcces(c)).map(([c, n]) => `<a href="/categorie/${c}/">${esc(n)}</a>`).concat(magCuOferte.some((m) => magIndexabil(m.id)) ? [`<a class="mare" href="/magazine/">Magazine cu oferte</a>`] : []))}${grup("Top economii:", t.map((x) => `<a${x.sub || !cat ? "" : ' class="mare"'} href="${x.cale}">${esc(x.sub ? x.nume : cat ? "Toată categoria" : x.cat.nume)}</a>`))}${grup("Ghiduri:", g.slice(0, 3).map((x) => `<a href="/ghiduri/${x.slug}/">${esc(x.titlu)}</a>`).concat([`<a class="mare" href="/ghiduri/">Toate ghidurile</a>`]))}${grup("Branduri:", m.map((x) => `<a href="/brand/${x.id}/">${esc(x.nume)}</a>`).concat(m.length ? [`<a class="mare" href="/branduri/">Toate brandurile</a>`] : []))}</details></nav>`;
 };
 const dataRo = (iso) => new Date(iso).toLocaleDateString("ro-RO", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const migajeHtml = (items) => `<nav class="migaje" aria-label="Navigare">${items.map((x, i) => (i < items.length - 1 ? `<a href="${x.cale}">${esc(x.nume)}</a><span aria-hidden="true">/</span>` : `<span id="migaja-curenta">${esc(x.nume)}</span>`)).join("")}</nav>`;
@@ -231,8 +232,15 @@ function paginaEd({ cale, titlu, descriere, migaje, corp, schema = [], catActiva
   pagini.push({ cale, index: true, html: pagina({ titlu, descriere, cale, catActiva, schema: [schemaMigaje(migaje), ...schema], corp: `<main class="continut">${migajeHtml(migaje)}${corp}</main>` }) });
 }
 
+// text de prezentare generat din catalogul real (cifre, magazine, cea mai mare economie), pus sub lista paginii 1
+const textOferte = (nume, l, legaturi = "") => {
+  if (!l.length) return "";
+  const medie = Math.round(l.reduce((a, o) => a + reducere(o), 0) / l.length), mx = sortEc(l)[0];
+  const mags = [...new Set(l.map((o) => o.magazin))].map((id) => ({ id, n: l.filter((o) => o.magazin === id).length })).sort((a, b) => b.n - a.n).slice(0, 4).map((x) => numeMag(x.id));
+  return `<section class="text-seo"><h2>Despre ofertele la ${esc(nume)}</h2><p>În catalogul Pretino sunt acum <b>${l.length.toLocaleString("ro-RO")}</b> oferte la ${esc(nume)}, din ${nrMag(l)} ${nrMag(l) === 1 ? "magazin" : "magazine"}${mags.length ? ` (în special ${mags.map(esc).join(", ")})` : ""}. Reducerea medie este de ${medie}%, iar cea mai mare economie în lei este de ${lei(ec(mx))}, la „${esc(mx.titlu)}” de la ${esc(numeMag(mx.magazin))}.</p><p>Fiecare ofertă arată prețul de referință tăiat și prețul actual, ca să vezi diferența dintr-o privire. Prețul de referință vine de la magazin, nu din istoricul nostru, așa că verifică întotdeauna prețul final, stocul și costul livrării pe pagina magazinului înainte să comanzi. <a href="${CALE_GHID}">Cum interpretăm reducerile</a>.${legaturi}</p></section>`;
+};
 // Acasa
-pagini.push(...listare({ mod: "acasa", meta: (p) => ({ ...metaAcasa(p), migaja: "Acasă" }), cale: "/", lista: sortate, indexabil: oferte.length > 0, extra: linkuriDescopera() }));
+pagini.push(...listare({ mod: "acasa", meta: (p) => ({ ...metaAcasa(p), migaja: "Acasă" }), cale: "/", lista: sortate, indexabil: oferte.length > 0, extra: linkuriDescopera(), dupa: textOferte("electronice, electrocasnice și alte categorii", sortate, BF_ON ? ` Pregătești cumpărăturile mari? Vezi <a href="/black-friday/">ofertele de Black Friday 2026</a>.` : "") }));
 
 // Categorii + subcategorii (pagini proprii pentru subcategoriile cu inventar suficient)
 const TIP_GHID = { monitoare: "cum-alegi-un-monitor", mouse: "cum-alegi-un-mouse-sau-o-tastatura-gaming", tastaturi: "cum-alegi-un-mouse-sau-o-tastatura-gaming", ssd: "cum-alegi-un-ssd", aspiratoare: "cum-alegi-un-aspirator" };
@@ -246,7 +254,7 @@ for (const c of categorii) {
   const subs = subcategoriiDe(c.slug).map((s) => ({ ...s, lista: l.filter((o) => o.sub === s.id) })).filter((s) => s.lista.length > 0);
   const rutate = subs.filter((s) => s.lista.length >= MIN_SUB_PAGINA);
   const chipuriParinte = subs.length ? chipLink(cale, null, "Toate", true, ' data-sub=""') + subs.map((s) => (rutate.includes(s) ? chipLink(`${cale}${s.id}/`, s.icoana, s.nume, false) : chipLink(`${cale}?sub=${s.id}`, s.icoana, s.nume, false, ` data-sub="${s.id}" rel="nofollow"`))).join("") : "";
-  pagini.push(...listare({ mod: "categorie", meta: (p) => ({ ...metaCategorie(c, nrMag(l), p), migaja: c.nume }), cale, catSlug: c.slug, lista: l, ilustr: c.slug, migaje: [{ nume: "Acasă", cale: "/" }], chips: chipuriParinte, subRute: rutate.map((s) => s.id), extra: linkuriDescopera(c.slug) }));
+  pagini.push(...listare({ mod: "categorie", meta: (p) => ({ ...metaCategorie(c, nrMag(l), p), migaja: c.nume }), cale, catSlug: c.slug, lista: l, ilustr: c.slug, migaje: [{ nume: "Acasă", cale: "/" }], chips: chipuriParinte, subRute: rutate.map((s) => s.id), extra: linkuriDescopera(c.slug), dupa: textOferte(jos(c.nume), l, topDe(c.slug) ? ` Pentru economii în lei, vezi și <a href="${topDe(c.slug).cale}">topul economiilor la ${esc(jos(c.nume))}</a>.` : "") }));
   for (const s of rutate) {
     const caleS = `${cale}${s.id}/`;
     const chipuriSub = chipLink(cale, null, "Toate", false) + rutate.map((x) => chipLink(`${cale}${x.id}/`, x.icoana, x.nume, x === s)).join("");
@@ -313,6 +321,28 @@ const calculatorHtml = `<section class="ghid-calc" id="calculator" data-calc><h2
 const checklistHtml = (c, slug) => `<section class="ghid-check" id="checklist" data-check="${esc(slug)}"><h2>${esc(c.titlu)}</h2><p class="check-prog" data-prog aria-live="polite">0 din ${c.pasi.length} bifate</p><ul>${c.pasi.map((x, i) => `<li><label><input type="checkbox" data-i="${i}"> <span>${esc(x)}</span></label></li>`).join("")}</ul></section>`;
 const faqHtml = (f) => `<section class="ghid-faq" id="intrebari"><h2>Întrebări frecvente</h2>${f.map((x) => `<details><summary>${esc(x.q)}</summary><p>${esc(x.a)}</p></details>`).join("")}</section>`;
 const LEG_GHID = { "cum-alegi-un-laptop-la-oferta": [["electronice/laptopuri", "Vezi laptopurile la ofertă"], ["electronice/componente/ssd", "SSD-uri la ofertă"]], "cum-alegi-un-monitor": [["electronice/monitoare-tv/monitoare", "Monitoare la ofertă"]], "cum-alegi-un-mouse-sau-o-tastatura-gaming": [["electronice/periferice/mouse", "Oferte la mouse-uri"], ["electronice/periferice/tastaturi", "Oferte la tastaturi"]] };
+// Black Friday: pagina de campanie construita din catalogul real (fara oferte sau preturi inventate)
+if (BF_ON) {
+  const cale = "/black-friday/", maxR = Math.max(...sortate.map(reducere)), topEc = sortEc(sortate), medieBf = Math.round(sortate.reduce((a, o) => a + reducere(o), 0) / sortate.length);
+  const mBf = magCuOferte.filter((m) => magIndexabil(m.id)).map((m) => ({ m, n: sortate.filter((o) => o.magazin === m.id).length })).sort((a, b) => b.n - a.n);
+  const faqBf = [
+    { q: "Când este Black Friday 2026?", a: `Black Friday 2026 este vineri, ${BF_DATA}. Multe magazine încep însă campaniile cu zile sau chiar săptămâni înainte, așa că ofertele apar de obicei mai devreme.` },
+    { q: "Cum știu dacă reducerea de Black Friday este reală?", a: "Compară prețul afișat cu prețul de dinainte de campanie, nu doar cu prețul tăiat din pagină. Pe Pretino vezi prețul de referință al magazinului și, unde avem istoric, evoluția prețului. Reducerile foarte mari (peste 50–60%) merită verificate cu atenție în magazin." },
+    { q: "Pretino vinde produse?", a: "Nu. Pretino adună ofertele magazinelor din România și te trimite în magazin, unde verifici prețul final, stocul și condițiile de livrare și retur." },
+    { q: "Cât de des se actualizează ofertele?", a: `Catalogul este reactualizat periodic din magazinele partenere. ${actualizatText ? actualizatText + "." : "Data ultimei actualizări apare în partea de sus a paginilor cu oferte."} Prețurile se pot schimba rapid în campanii, deci verifică prețul în magazin înainte de comandă.` },
+  ];
+  const sfaturi = ["Fă-ți o listă cu produsele dorite și prețul la care le-ai cumpăra, înainte de începerea campaniilor.", "Compară același produs în mai multe magazine: reducerea cea mai mare nu înseamnă mereu prețul cel mai mic.", "Adaugă în calcul transportul, comisioanele și termenul de retur; un preț mic cu livrare scumpă poate ieși mai prost.", "Verifică garanția și vânzătorul, mai ales la produsele resigilate sau refurbished (le marcăm clar pe card).", "Nu te grăbi la stocuri limitate fără să compari; ofertele serioase se repetă adesea pe parcursul campaniei."];
+  paginaEd({ cale, titlu: `Black Friday 2026 – oferte și reduceri din magazinele din România | ${BRAND}`, descriere: `Ofertele de Black Friday ${BF_DATA.split(" ").pop()} din ${nrMag(sortate)} magazine din România: ${sortate.length.toLocaleString("ro-RO")} produse cu reducere, cele mai mari economii și sfaturi ca să verifici o ofertă reală.`, migaje: [{ nume: "Acasă", cale: "/" }, { nume: "Black Friday 2026", cale }],
+    schema: [{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqBf.map((x) => ({ "@type": "Question", name: x.q, acceptedAnswer: { "@type": "Answer", text: x.a } })) }],
+    corp: `<h1>Black Friday 2026: oferte și reduceri</h1><p class="intro">Black Friday 2026 este pe ${esc(BF_DATA)}. Aici găsești produsele cu cele mai mari reduceri din magazinele pe care le urmărim, ca să compari înainte să cumperi. Pretino nu vinde produse: te trimite în magazin, unde verifici prețul final.</p>
+${actualizatText ? `<p class="actualizat">${esc(actualizatText)}</p>` : ""}<p class="stat-linie"><b>${sortate.length.toLocaleString("ro-RO")}</b> oferte din <b>${nrMag(sortate)}</b> magazine · reducere medie <b>${medieBf}%</b> · cea mai mare reducere <b>-${maxR}%</b> · cea mai mare economie <b>${lei(ec(topEc[0]))}</b></p>
+<h2>Cele mai mari reduceri (în procente)</h2>${gridCards(sortate.slice(0, 24))}
+<h2>Cele mai mari economii (în lei)</h2><p class="intro">Reducerea în procente poate păcăli la produsele ieftine; aici sunt ofertele la care economisești cel mai mult în bani.</p>${gridCards(topEc.slice(0, 12))}
+${mBf.length ? `<h2>Oferte pe magazine</h2><ul class="lista-linkuri">${mBf.map((x) => `<li><a href="/magazin/${x.m.id}/">Oferte ${esc(x.m.nume)}</a> <span>${x.n} oferte</span></li>`).join("")}</ul>` : ""}
+${topuri.filter((t) => !t.sub).length ? `<h2>Top economii pe categorii</h2><ul class="lista-linkuri">${topuri.filter((t) => !t.sub).map((t) => `<li><a href="${t.cale}">Top ${esc(t.nume)}</a> <span>${t.lista.length} oferte</span></li>`).join("")}</ul>` : ""}
+<section class="text-seo"><h2>Cum verifici o ofertă de Black Friday</h2><ul>${sfaturi.map((x) => `<li>${esc(x)}</li>`).join("")}</ul><p>Citește și <a href="${CALE_GHID}">cum interpretăm reducerile pe Pretino</a> și <a href="/ghiduri/">ghidurile de cumpărare</a>.</p></section>
+${faqHtml(faqBf)}` });
+}
 for (const g of GHIDURI) {
   const ex = GHID_EXTRA[g.slug] ?? {}, toate = ofGhid(g), cale = `/ghiduri/${g.slug}/`;
   const inline = ex.oferteDupa !== undefined ? toate.slice(0, 3) : [], rel = toate.slice(inline.length, inline.length + 4);

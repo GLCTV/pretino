@@ -16,7 +16,7 @@ function fisiere(d, acc = []) {
   return acc;
 }
 const toate = fisiere(".").map((f) => f.replace(/\\/g, "/")); // căi cu / și pe Windows
-const DATE_GENERATE = /(^|\/)data\/(oferte|istoric-preturi)\.json$/; // catalog generat din feed-urile magazinelor (linkurile de afiliere ale contului de afiliat apar legitim in el)
+const DATE_GENERATE = /(^|\/)data\/(oferte|istoric-preturi|produse-arhiva)\.json$/; // catalog generat din feed-urile magazinelor (linkurile de afiliere ale contului de afiliat apar legitim in el)
 const cod = toate.filter((f) => /\.(js|ps1|bat|yml|json|html|css)$/.test(f) && !f.endsWith("scripts/test.js") && !DATE_GENERATE.test(f));
 
 // 1. Independență: codul nu citește/folosește resurse ale altui proiect

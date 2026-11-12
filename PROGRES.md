@@ -297,3 +297,9 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Pagini /oferte/<slug>/ pentru căutări populare (preț maxim, marcă, reducere ≥30%, specificații din titlu: inch, Hz, RTX, SSD TB, wireless etc.), minim 10 oferte; hub /oferte/; în sitemap, subsol, mega-meniu și caseta de căutare („Căutări populare”).
 - Liste: filtre rapide (Sub X lei, -30%, -50%, Doar noi), schema ItemList, FAQ (cu schema) + „Căutări populare și categorii înrudite” pe categorii/subcategorii.
 - Telefon: categorii ca bule (stories), filtrele ca panou de jos.
+
+## 2026-11-12 – Pagini permanente + sezon + zilnic (pe main)
+- Paginile de produs nu mai dau 404: ofertele încheiate (data/produse-arhiva.json, scris de actualizare.js, 60 de zile; indexabile 30 de zile, fără sitemap) și cele ascunse temporar (magazin oprit / date vechi) au pagină „Ofertă încheiată / Momentan indisponibil” cu ultimul preț, istoric, același model la alte magazine, oferte similare. Hub noindex /oferte-incheiate/. publica.js comite și produse-arhiva.json.
+- Sezon: /cadouri/ (Crăciun sub 100/200/500 lei, pentru gameri, pentru copii) și /cyber-monday/ (30 nov 2026), din catalogul real, cu FAQ.
+- Zilnic: /preturi-scazute-azi/ (scăderi la ultima actualizare + produse noi la reducere).
+- Legături: subsol, „Descoperă” (Campanii), rândul de pe prima pagină.

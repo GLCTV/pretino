@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { incarcaSecrete } from "./lib/secrete.js";
 import { actualizeazaIstoric } from "./lib/istoric.js";
 import { areReducereReala } from "./lib/oferta.js";
+import { actualizeazaArhiva } from "./lib/arhiva.js";
 
 const f = (n) => new URL(`../data/${n}`, import.meta.url);
 const citesteJson = (n) => JSON.parse(readFileSync(f(n), "utf8"));
@@ -56,6 +57,10 @@ if (!surse.length) raport.push("Nicio sursa activa (data/magazine.json). Catalog
 if (schimbat) {
   writeFileSync(f("oferte.json"), JSON.stringify(rezultat, null, 1) + "\n");
   writeFileSync(f("istoric-preturi.json"), JSON.stringify(actualizeazaIstoric(citesteJson("istoric-preturi.json"), rezultat)) + "\n");
+  { let arh = {}; try { arh = citesteJson("produse-arhiva.json"); } catch {} // oferte incheiate: paginile lor raman ZILE_ARHIVA zile
+    const arhNoua = actualizeazaArhiva(arh, precedente, rezultat, new Set(magazine.filter((m) => m.activ === false).map((m) => m.id)));
+    writeFileSync(f("produse-arhiva.json"), JSON.stringify(arhNoua) + "\n");
+    raport.push(`Arhiva oferte incheiate: ${Object.keys(arhNoua).length} pagini pastrate`); }
   actualizat.la = new Date().toISOString();
   writeFileSync(f("actualizat.json"), JSON.stringify(actualizat) + "\n"); // afisat pe site: „Preturi actualizate la ...”
 }

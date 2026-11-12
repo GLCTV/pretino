@@ -290,3 +290,10 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Carduri simplificate: titlul și poza duc la pagina produsului, butonul rămâne linkul de afiliere; insigna „Preț minim urmărit” pe poză; un singur accent (roșu doar la reducere, verde la economie).
 - Design: antet sticlă mată care se compactează la derulare, umbre moi, schelet animat la încărcarea pozelor, zoom la hover, apariție la derulare (CSS, respectă prefers-reduced-motion), poze pe fundal alb uniform cu umbră.
 - Teste: aceleași 4 eșecuri vechi; testul „topuri” citește noua etichetă econ-txt.
+
+## 2026-11-12 – Navigare v2 (pe main)
+- Mega-meniu la categorii (desktop, hover): subcategorii cu nr. oferte, căutări populare, top 3 reduceri; fragment unic dist/mega-meniu.txt încărcat la prima trecere.
+- Pagina categoriei: plăci vizuale pentru subcategorii (poză, nr. oferte, reducere maximă).
+- Pagini /oferte/<slug>/ pentru căutări populare (preț maxim, marcă, reducere ≥30%, specificații din titlu: inch, Hz, RTX, SSD TB, wireless etc.), minim 10 oferte; hub /oferte/; în sitemap, subsol, mega-meniu și caseta de căutare („Căutări populare”).
+- Liste: filtre rapide (Sub X lei, -30%, -50%, Doar noi), schema ItemList, FAQ (cu schema) + „Căutări populare și categorii înrudite” pe categorii/subcategorii.
+- Telefon: categorii ca bule (stories), filtrele ca panou de jos.

@@ -135,7 +135,16 @@
       }).catch(inchide);
     };
     inp.addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(sugestii, 120); });
-    inp.addEventListener("focus", function () { load().catch(function () {}); });
+    var populare = function () {
+      if (inp.value.trim()) return;
+      load().then(function () {
+        if (inp.value.trim() || !data.pop || !data.pop.length) return;
+        box.innerHTML = '<div class="sug-cap">Căutări populare</div>' + data.pop.map(function (x) { return '<a class="sug-pop" href="' + esc(x.u) + '"><span>' + esc(x.n) + "</span></a>"; }).join("");
+        box.hidden = false;
+      }).catch(function () {});
+    };
+    inp.addEventListener("focus", populare);
+    inp.addEventListener("input", function () { if (!inp.value.trim()) populare(); });
     inp.addEventListener("keydown", function (e) { if (e.key === "Escape") inchide(); });
     document.addEventListener("click", function (e) { if (!form.contains(e.target)) inchide(); });
   }
@@ -171,6 +180,36 @@
 
   /* ---------- liste: filtre, sortare, „Arata mai multe” ---------- */
   var main = document.querySelector("main[data-lista]");
+  // mega-meniu la categorii (doar pe ecrane cu mouse): fragmentul /mega.html se incarca la prima trecere peste categorii
+  (function () {
+    var cats = document.querySelector(".antet .cats"); if (!cats || !matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+    var w = null, cerut = false, tDesch = null, tInch = null, activ = "";
+    var pregateste = function () {
+      if (cerut) return; cerut = true;
+      fetch("/mega-meniu.txt?v=" + (document.querySelector('link[href^="/stil.css"]') || {}).href.split("v=")[1]).then(function (r) { return r.ok ? r.text() : ""; }).then(function (h) {
+        if (!h) return;
+        w = document.createElement("div"); w.className = "mega-w"; w.innerHTML = h; w.hidden = true;
+        document.querySelector(".antet").appendChild(w);
+        w.addEventListener("mouseenter", function () { clearTimeout(tInch); });
+        w.addEventListener("mouseleave", inchide);
+        if (activ) arata(activ);
+      }).catch(function () {});
+    };
+    var arata = function (slug) {
+      activ = slug; if (!w) return;
+      var gasit = false;
+      Array.prototype.forEach.call(w.children, function (m) { var ok = m.getAttribute("data-cat") === slug; m.hidden = !ok; if (ok) gasit = true; });
+      w.hidden = !gasit;
+      Array.prototype.forEach.call(cats.querySelectorAll("a[data-cat]"), function (a) { a.classList.toggle("mega-on", gasit && a.getAttribute("data-cat") === slug); });
+    };
+    var inchide = function () { clearTimeout(tDesch); tInch = setTimeout(function () { activ = ""; if (w) w.hidden = true; Array.prototype.forEach.call(cats.querySelectorAll(".mega-on"), function (a) { a.classList.remove("mega-on"); }); }, 180); };
+    Array.prototype.forEach.call(cats.querySelectorAll("a[data-cat]"), function (a) {
+      a.addEventListener("mouseenter", function () { pregateste(); clearTimeout(tInch); clearTimeout(tDesch); var sl = a.getAttribute("data-cat"); tDesch = setTimeout(function () { arata(sl); }, w && !w.hidden ? 0 : 140); });
+      a.addEventListener("mouseleave", inchide);
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && w) { w.hidden = true; } });
+    addEventListener("scroll", function () { if (w && !w.hidden && window.scrollY > 120) w.hidden = true; }, { passive: true });
+  })();
   // antet compact la derulare
   var antetMic = function () { document.documentElement.classList.toggle("derulat", window.scrollY > 120); };
   addEventListener("scroll", antetMic, { passive: true }); antetMic();
@@ -441,6 +480,25 @@
   rMin.addEventListener("input", function () { sincronizeazaPret("rmin"); pretAplica(); });
   rMax.addEventListener("input", function () { sincronizeazaPret("rmax"); pretAplica(); });
   $("reset").addEventListener("click", reseteaza);
+  // filtre rapide: un click aplica (sau scoate) filtrul; butoanele arata ce e activ
+  var rapide = document.querySelectorAll("[data-rapid]");
+  var marcheazaRapide = function () {
+    for (var i = 0; i < rapide.length; i++) {
+      var v = rapide[i].getAttribute("data-rapid").split(":"), on = v[0] === "max" ? state.max === Number(v[1]) : v[0] === "red" ? state.red === Number(v[1]) : state.nou;
+      rapide[i].setAttribute("aria-pressed", on ? "true" : "false");
+    }
+  };
+  for (var ri = 0; ri < rapide.length; ri++) rapide[ri].addEventListener("click", function () {
+    var b = this, v = b.getAttribute("data-rapid").split(":"), on = b.getAttribute("aria-pressed") === "true";
+    cuDate(function () {
+      if (v[0] === "max") { state.min = 0; state.max = on ? null : Number(v[1]); }
+      else if (v[0] === "red") state.red = on ? 0 : Number(v[1]);
+      else state.nou = !on;
+      seteazaControale(); aplica(); marcheazaRapide();
+    });
+  });
+  ft.addEventListener("change", function () { setTimeout(marcheazaRapide, 0); });
+  $("reset").addEventListener("click", function () { setTimeout(marcheazaRapide, 0); });
   document.addEventListener("click", function (e) {
     var t = e.target.closest && e.target.closest("button");
     if (!t) return;

@@ -26,7 +26,9 @@ const act = (() => { try { return citeste("actualizat.json"); } catch { return {
 // politica „date prea vechi”: ofertele unei surse neverificate cu succes de mai mult de ZILE_DATE_VECHI zile nu se afiseaza (doar cand exista data verificarii sursei)
 const dataSursa = (sursa) => (act.surse?.[sursa] ? new Date(act.surse[sursa]) : null);
 const prea_veche = (o) => { if (DEMO) return false; const d = dataSursa(o.sursa); return Boolean(d) && (Date.now() - d.getTime()) / 864e5 > ZILE_DATE_VECHI; };
-const brut = citeste(DEMO ? "demo-oferte.json" : "oferte.json").filter((o) => o.pretVechi > o.pret && reala(o));
+// magazinele oprite din program (data/magazine.json → activ: false) nu apar pe site; ofertele lor raman in catalog pentru repornire
+const oprite = new Set(magazine.filter((m) => m.activ === false).map((m) => m.id));
+const brut = citeste(DEMO ? "demo-oferte.json" : "oferte.json").filter((o) => o.pretVechi > o.pret && reala(o) && !oprite.has(o.magazin));
 const ascunse_vechi = brut.filter(prea_veche).length;
 // duplicate certe: acelasi magazin, acelasi titlu si aceleasi preturi
 const vazutDup = new Set();

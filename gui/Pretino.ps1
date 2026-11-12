@@ -73,7 +73,7 @@ $script:Oprit = $false
           <Button Grid.Row="4" Name="BPartajare" Content="5. Imagini pentru partajare" Style="{StaticResource BtnAlbastru}" Width="260"/>
           <TextBlock Grid.Row="4" Grid.Column="1" Text="Face poze cu ofertele zilei (Telegram, TikTok, Instagram) + textele de postare, &#xEE;n rapoarte\partajare. Nu posteaz&#x103; nimic." Foreground="#cbd5e1" VerticalAlignment="Center" TextWrapping="Wrap" Margin="6,0,0,6"/>
           <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Margin="0,8,0,0">
-            <TextBlock Text="Actualizeaz&#x103; un singur magazin (celelalte r&#x103;m&#xE2;n neatinse):" Foreground="#94a3b8" Margin="0,0,0,6"/>
+            <TextBlock Text="Magazine: actualizeaz&#x103; unul singur (verde) sau opre&#x219;te-l / porne&#x219;te-l temporar (se vede pe site dup&#x103; PUBLIC&#x102; LIVE):" Foreground="#94a3b8" Margin="0,0,0,6"/>
             <WrapPanel Name="PanouMagazine"/>
           </StackPanel>
         </Grid>
@@ -320,14 +320,39 @@ $campTimer.Start()
 Set-BusyC $false; $c.COpreste.IsEnabled = $false
 Load-Surse; Load-Campanii; Show-Progres
 
-# Un buton pentru fiecare magazin activ din data\magazine.json (se creeaza automat; magazin nou = buton nou)
-foreach ($m in (Read-Json (Join-Path $Root 'data\magazine.json'))) {
-  if (-not $m.activ -or -not $m.sursa) { continue }
-  $b = New-Object System.Windows.Controls.Button
-  $b.Content = "$($m.nume)"; $b.Style = $win.FindResource('BtnVerde'); $b.Tag = $m.id; $b.Padding = [System.Windows.Thickness]::new(12,6,12,6); $b.Margin = [System.Windows.Thickness]::new(0,0,8,6)
-  $b.Add_Click({ param($s, $e) $id = $s.Tag; Start-Task "actualizare-$id" "bun scripts/actualizare.js --magazin $id" })
-  [void]$c.PanouMagazine.Children.Add($b)
+# Pentru fiecare magazin din data\magazine.json: buton de actualizare (doar daca e pornit) + comutator Opreste / Porneste
+function Load-PanouMagazine {
+  $c.PanouMagazine.Children.Clear()
+  foreach ($m in (Read-Json (Join-Path $Root 'data\magazine.json'))) {
+    if (-not $m.sursa) { continue }
+    $g = New-Object System.Windows.Controls.StackPanel; $g.Orientation = 'Horizontal'; $g.Margin = [System.Windows.Thickness]::new(0,0,14,6)
+    $b = New-Object System.Windows.Controls.Button
+    $b.Content = if ($m.activ) { "$($m.nume)" } else { "$($m.nume) (oprit)" }
+    $b.Style = if ($m.activ) { $win.FindResource('BtnVerde') } else { $win.FindResource('BtnGri') }
+    $b.Tag = $m.id; $b.IsEnabled = [bool]$m.activ; $b.ToolTip = "Actualizeaza doar ofertele $($m.nume)"
+    $b.Padding = [System.Windows.Thickness]::new(12,6,12,6); $b.Margin = [System.Windows.Thickness]::new(0,0,3,0)
+    $b.Add_Click({ param($s, $e) $id = $s.Tag; Start-Task "actualizare-$id" "bun scripts/actualizare.js --magazin $id" })
+    $t = New-Object System.Windows.Controls.Button
+    $t.Content = if ($m.activ) { 'Opreste' } else { 'Porneste' }
+    $t.Style = if ($m.activ) { $win.FindResource('BtnPortocaliu') } else { $win.FindResource('BtnAlbastru') }
+    $t.Tag = @($m.id, $(if ($m.activ) { 'off' } else { 'on' }), $m.nume); $t.Padding = [System.Windows.Thickness]::new(9,6,9,6); $t.Margin = [System.Windows.Thickness]::new(0)
+    $t.ToolTip = if ($m.activ) { "Scoate temporar $($m.nume) de pe site (la urmatoarea publicare)" } else { "Readuce $($m.nume) pe site (la urmatoarea publicare)" }
+    $t.Add_Click({ param($s, $e)
+      $v = $s.Tag
+      $msg = if ($v[1] -eq 'off') { "Opresti temporar $($v[2])? Ofertele lui dispar de pe site dupa urmatoarea PUBLICA LIVE si nu mai sunt citite la actualizare. Il poti porni oricand." } else { "Pornesti din nou $($v[2])? Ofertele lui revin pe site dupa urmatoarea PUBLICA LIVE." }
+      $r = [System.Windows.MessageBox]::Show($msg, 'Magazin', 'YesNo', 'Question')
+      if ($r -ne 'Yes') { return }
+      Push-Location $Root
+      try { $o = (& bun scripts/magazin.js $v[0] $v[1] 2>&1 | Out-String).Trim() } catch { $o = "$_" }
+      Pop-Location
+      $c.Stare.Text = "$o  Apasa PUBLICA LIVE ca sa se vada pe site."
+      Load-PanouMagazine
+    })
+    [void]$g.Children.Add($b); [void]$g.Children.Add($t)
+    [void]$c.PanouMagazine.Children.Add($g)
+  }
 }
+Load-PanouMagazine
 $c.CCauta.Add_Click({ Start-Camp '--campanii' })
 $c.CActualizeaza.Add_Click({ Start-Camp '--complet' })
 $c.CReia.Add_Click({ Start-Camp '--complet --reia' })

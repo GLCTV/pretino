@@ -12,7 +12,7 @@ if (!process.argv.includes("--live")) stop("lipsește --live (publicarea se porn
 if (sh("git rev-parse --abbrev-ref HEAD") !== "main") stop("nu ești pe ramura main.");
 // Catalogul generat de „Actualizează oferte” (data/oferte.json, istoric-preturi.json) e urmarit de git: daca e SINGURA modificare, se comite aici
 // (pornirea manuala a publicarii = aprobarea ta) si se urca pe main, ca publicarea sa ruleze pe cod curat.
-const CATALOG = ["data/oferte.json", "data/istoric-preturi.json", "data/actualizat.json"];
+const CATALOG = ["data/oferte.json", "data/istoric-preturi.json", "data/actualizat.json", "data/magazine.json"]; // magazine.json: pornire/oprire magazin din program
 const modificate = sh("git status --porcelain --untracked-files=no").split("\n").map((l) => l.trim()).filter(Boolean);
 if (modificate.length && modificate.every((l) => /^M\s/.test(l) && CATALOG.includes(l.slice(2).trim()))) {
   sh(`git add ${CATALOG.join(" ")}`);

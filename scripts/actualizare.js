@@ -20,7 +20,8 @@ const ales = ia > 0 ? process.argv[ia + 1] : null;
 const tinta = ales ? magazine.find((m) => m.id === ales) : null;
 if (ales && !(tinta && tinta.activ && tinta.sursa)) { console.log(`Magazin necunoscut sau inactiv: ${ales}`); process.exit(1); }
 const surse = ales ? [tinta.sursa] : [...new Set(magazine.filter((m) => m.activ && m.sursa).map((m) => m.sursa))];
-let rezultat = ales ? precedente.filter((o) => !(o.sursa === tinta.sursa && o.magazin === ales)) : [];
+const opriteIds = new Set(magazine.filter((m) => m.activ === false).map((m) => m.id));
+let rezultat = ales ? precedente.filter((o) => !(o.sursa === tinta.sursa && o.magazin === ales)) : precedente.filter((o) => opriteIds.has(o.magazin)); // magazinele oprite: ofertele raman in catalog (ascunse pe site)
 let schimbat = false;
 // data ultimei verificari REUSITE a fiecarei surse (data/actualizat.json -> surse): la o eroare ramane data veche
 let actualizat = { la: null, surse: {} };

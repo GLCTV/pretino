@@ -303,3 +303,11 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Sezon: /cadouri/ (Crăciun sub 100/200/500 lei, pentru gameri, pentru copii) și /cyber-monday/ (30 nov 2026), din catalogul real, cu FAQ.
 - Zilnic: /preturi-scazute-azi/ (scăderi la ultima actualizare + produse noi la reducere).
 - Legături: subsol, „Descoperă” (Campanii), rândul de pe prima pagină.
+
+## 2026-11-15 – program v1.72: magazine noi 2Performant (în așteptarea aprobării)
+- Aplicat (2Performant, contul lui Laur) la gsmnet.ro, libris.ro, noriel.ro, answear.ro, otter.ro. Aprobare în 30–90 zile. Fără farmacii / medicamente (decizie Laur, motive legale).
+- `data/magazine.json`: cele 5 magazine adăugate **oprite** (`activ: false`, sursa `2performant`, plafon reducere 60% / 70% la modă). Apar în program cu buton de actualizare propriu (dezactivat până le pornești). Nimic nou pe site până atunci.
+- Reguli per magazin: `faraBrandInSeo` (GSMnet, Libris): pagina magazinului noindex, fără sitemap/liste, fără numele magazinului în titlul și descrierea meta ale paginilor de produs; nu apar în ghidul „Cum interpretăm reducerile”. Restricții din programele lor: fără cuvinte-cheie de brand; gsmnet comisionează doar cupoane dedicate; noriel/answear fără Google/Facebook Ads (answear și TikTok); libris nu permite activarea simultană în mai multe platforme.
+- Teste noi în `scripts/test.js` (+ `tests/fixtures/2performant-noi.csv`); verificat build cu gsmnet activ într-o copie temporară (pagină noindex, titluri fără brand). Site-ul generat actual: identic cu înainte.
+- 4 teste eșuau deja înainte (seo ghid x2, campanii x2) – nelegate de această modificare, de verificat separat.
+- DE FĂCUT după aprobare: în 2Performant luat `unique` per campanie (în `data/magazine.json` → afiliere.unique, dacă feed-ul nu dă link) și feed-ul CSV al fiecărui magazin → `PRETINO_TWOPERF_FEEDS` în `%LOCALAPPDATA%\Pretino\secrete.env`; verificat adaptorul pe date reale (coloane, categorii); apoi „Pornește” magazinul din program, preview, OK → main → PUBLICĂ LIVE.

@@ -67,6 +67,19 @@ ok(i.x.length === 2 && i.x[1].p === 8, "istoric: preț schimbat adaugă intrare"
   let eroare = false; try { await ps.citeste(magazine, {}); } catch { eroare = true; }
   ok(eroare, "profitshare: fara feed in secrete.env da eroare clara");
 }
+{ // magazine 2Performant adaugate 2026-11-15 (in asteptarea aprobarii): oprite, dar adaptorul le citeste corect cand sunt pornite
+  const { parseCsv } = await import("./lib/csv.js");
+  const { areReducereReala } = await import("./lib/oferta.js");
+  const tp = await import("./surse/2performant.js");
+  const mg = JSON.parse(readFileSync("data/magazine.json", "utf8"));
+  const noi = ["gsmnet", "libris", "noriel", "answear", "otter"];
+  ok(noi.every((id) => { const m = mg.find((x) => x.id === id); return m && m.activ === false && m.sursa === "2performant" && m.domeniu === `${id}.ro` && m.reducereMaxProcent > 0; }), "magazine noi (gsmnet, libris, noriel, answear, otter): oprite pana la aprobare, sursa 2performant");
+  ok(["gsmnet", "libris"].every((id) => mg.find((x) => x.id === id).faraBrandInSeo === true) && !mg.some((x) => noi.slice(2).includes(x.id) && x.faraBrandInSeo), "gsmnet si libris: fara brand in SEO (regula afiliere)");
+  ok(!mg.some((x) => /farm|drmax|petmax|medic/i.test(x.id + x.domeniu)), "farmaciile / magazinele cu medicamente nu sunt in lista de magazine");
+  const r = parseCsv(readFileSync("tests/fixtures/2performant-noi.csv", "utf8")).map((x) => tp.dinRand(x, mg, "AFF"));
+  ok(noi.every((id, i) => r[i].oferta?.magazin === id && areReducereReala(r[i].oferta) && r[i].oferta.afiliat === true), "2performant: cate o oferta cu reducere reala si link afiliat pentru fiecare magazin nou");
+  ok(r[5].omis === "fara stoc", "2performant: produs epuizat omis (magazin nou)");
+}
 ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"), "CLAUDE.md, README.md, PROGRES.md există");
 { const { PAGINI_LEGALE } = await import("./lib/legal.js");
   ok(PAGINI_LEGALE.length === 5 && PAGINI_LEGALE.every((p) => p.corp().includes("<h1>")), "pagini legale: despre, contact, confidentialitate, cookies, termeni");

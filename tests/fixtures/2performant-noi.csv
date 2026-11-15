@@ -1,0 +1,7 @@
+product_title,brand,category,availability,sale_price,old_price,product_url,marketer_link,image_urls
+Husa telefon Test,Acme,Accesorii telefoane,in_stock,49.90,79.90,https://www.gsmnet.ro/husa-test,https://event.2performant.com/g1,https://img/g.jpg
+Carte Test Autor,Editura X,Carti,in_stock,39.99,59.99,https://www.libris.ro/carte-test,https://event.2performant.com/l1,https://img/l.jpg
+Puzzle Test 1000,Noriel Puzzle,Jocuri si jucarii,in_stock,59.90,89.90,https://www.noriel.ro/puzzle-test,https://event.2performant.com/n1,https://img/n.jpg
+Rochie Test,Acme,Imbracaminte,in_stock,149.00,299.00,https://answear.ro/p/rochie-test,https://event.2performant.com/a1,https://img/a.jpg
+Pantofi Test,Acme,Incaltaminte,in_stock,199.00,349.00,https://www.otter.ro/pantofi-test,https://event.2performant.com/o1,https://img/o.jpg
+Pantofi Epuizati,Acme,Incaltaminte,out_of_stock,199.00,349.00,https://www.otter.ro/pantofi-epuizati,https://event.2performant.com/o2,https://img/o2.jpg

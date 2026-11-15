@@ -106,7 +106,9 @@ const caleNoua = (o) => {
 for (const o of sortate) caleProdus.set(o.id, caleNoua(o));
 const numeMag = (id) => mag[id]?.nume ?? id;
 const magCuOferte = magazine.filter((m) => sortate.some((o) => o.magazin === m.id));
-const magIndexabil = (id) => sortate.filter((o) => o.magazin === id).length >= MIN_MAGAZIN_INDEX;
+// magazinele cu „faraBrandInSeo” (ex. GSMnet, Libris: regula programului de afiliere interzice targetarea pe brand) nu au pagina de magazin indexabila/in liste, iar numele lor nu apare in titlul si descrierea meta ale paginilor de produs
+const magIndexabil = (id) => !mag[id]?.faraBrandInSeo && sortate.filter((o) => o.magazin === id).length >= MIN_MAGAZIN_INDEX;
+const numeMagSeo = (id) => (mag[id]?.faraBrandInSeo ? "" : ` la ${numeMag(id)}`);
 
 // ---- pagini editoriale: marci, topuri de economii, ghiduri (decise inainte de generare, ca sa existe linkurile din subsol si din liste) ----
 const ec = (o) => o.pretVechi - o.pret;
@@ -401,7 +403,7 @@ for (const m of magazine) {
   const legM = [...subM.sort((a, b) => b.n - a.n).slice(0, 6).map((x) => `<a href="${x.cale}">${esc(x.nume)} la ofertă</a>`), ...brM.map((b) => `<a href="/brand/${b.id}/">Oferte ${esc(b.nume)}</a>`)];
   const cuponM = m.cupon ? `<section class="cupon-info" id="cod-reducere"><h2>Cod de reducere ${esc(m.nume)}: cum îl folosești</h2><p>Codul afișat pe cardurile ${esc(m.nume)} este <b>${esc(m.cupon.cod)}</b> (${esc(m.cupon.text)}). Se introduce în coș, la finalizarea comenzii; prețul afișat în Pretino nu îl include.</p><p>Codul este disponibil de verificat în coș: ${esc(m.nume)} stabilește produsele eligibile, excluderile și dacă se poate cumula cu alte reduceri, așa că verifică în coș dacă se aplică produsului tău. Pretino nu garantează aplicarea lui la toate produsele. Putem primi un comision pentru comenzile făcute cu acest cod; prețul pentru tine nu se schimbă.</p></section>` : "";
   const dupaM = `${legM.length ? `<nav class="descopera" aria-label="Categorii și branduri"><details open><summary>Ce găsești la ${esc(m.nume)}</summary><span class="d-grup">${legM.join("")}</span></details></nav>` : ""}${cuponM}`;
-  pagini.push(...listare({ mod: "magazin", meta: (p) => ({ ...metaMagazin(m, l.length, p), migaja: m.nume }), cale: `/magazin/${m.id}/`, magId: m.id, lista: l, indexabil: l.length >= MIN_MAGAZIN_INDEX, migaje: [{ nume: "Acasă", cale: "/" }], dupa: dupaM }));
+  pagini.push(...listare({ mod: "magazin", meta: (p) => ({ ...metaMagazin(m, l.length, p), migaja: m.nume }), cale: `/magazin/${m.id}/`, magId: m.id, lista: l, indexabil: magIndexabil(m.id), migaje: [{ nume: "Acasă", cale: "/" }], dupa: dupaM }));
 }
 
 // Pagini de produs: poza mare, pret, istoricul pretului, acelasi produs la alte magazine, oferte similare, partajare.
@@ -430,11 +432,11 @@ for (const o of sortate) {
   const subO = o.sub ? subcategoriiDe(o.categorie).find((x) => x.id === o.sub) : null, caleCat = `/categorie/${o.categorie}/`, caleSub = subO && subPagini.includes(`${caleCat}${subO.id}/`) ? `${caleCat}${subO.id}/` : null;
   const migaje = [{ nume: "Acasă", cale: "/" }, ...(c ? [{ nume: c.nume, cale: caleCat }] : []), ...(caleSub ? [{ nume: subO.nume, cale: caleSub }] : []), { nume: o.titlu.length > 60 ? o.titlu.slice(0, 57).trimEnd() + "…" : o.titlu, cale }];
   const taie = (t, n) => (t.length <= n ? t : t.slice(0, n - 1).replace(/[\s,.(–-]+\S*$/, "") + "…");
-  const coada = ` – ${lei(o.pret)} la ${numeMag(o.magazin)} | ${BRAND}`, sf = ` | ${BRAND}`, cod = String(o.id).replace(/[^a-z0-9]/gi, "").slice(-6).toUpperCase();
+  const coada = ` – ${lei(o.pret)}${numeMagSeo(o.magazin)} | ${BRAND}`, sf = ` | ${BRAND}`, cod = String(o.id).replace(/[^a-z0-9]/gi, "").slice(-6).toUpperCase();
   const variante = [taie(o.titlu, 75 - coada.length) + coada, taie(o.titlu, 75 - sf.length) + sf, "…" + o.titlu.slice(-(75 - sf.length - 1)).replace(/^\S*\s/, "") + sf, taie(o.titlu, 75 - sf.length - 9) + ` (#${cod})` + sf];
   const titlu = variante.find((t) => !titluriProdus.has(t)) ?? variante[3];
   titluriProdus.add(titlu);
-  const descriere = `${o.titlu.length > 110 ? o.titlu.slice(0, 107).trimEnd() + "…" : o.titlu}: ${lei(o.pret)} la ${numeMag(o.magazin)}, cu ${r}% sub prețul de referință de ${lei(o.pretVechi)}. Vezi istoricul prețului și alte magazine.`;
+  const descriere = `${o.titlu.length > 110 ? o.titlu.slice(0, 107).trimEnd() + "…" : o.titlu}: ${lei(o.pret)}${numeMagSeo(o.magazin)}, cu ${r}% sub prețul de referință de ${lei(o.pretVechi)}. Vezi istoricul prețului și alte magazine.`;
   const alt = altele(o), sim = sortate.filter((x) => x.id !== o.id && x.categorie === o.categorie && (o.sub ? x.sub === o.sub : true) && (o.tip ? x.tip === o.tip : true)).sort((a, b) => Math.abs(a.pret - o.pret) - Math.abs(b.pret - o.pret)).slice(0, 8);
   const btn = (cls) => `<a class="btn ${cls}" href="${esc(o.url)}" rel="sponsored nofollow noopener" target="_blank" title="Se deschide în magazin">Vezi oferta la ${esc(numeMag(o.magazin))} ${icoana("extern")}</a>`;
   const vMin = pt.length ? Math.min(...pt.map((x) => x.p)) : o.pret, vMax = pt.length ? Math.max(...pt.map((x) => x.p)) : o.pret;
@@ -623,7 +625,7 @@ paginaEd({ cale: "/ghiduri/", titlu: `Ghiduri de cumpărare – cum alegi și cu
 pagini.push(...utilitar({ mod: "cauta", cale: "/cauta/", titlu: `Căutare | ${BRAND}`, h1: "Căutare", intro: "Pentru căutare este nevoie de JavaScript activat.", descriere: "Caută oferte în catalogul Pretino.ro." }));
 pagini.push(...utilitar({ mod: "favorite", cale: "/favorite/", titlu: `Favorite | ${BRAND}`, h1: "Favorite", intro: "Ofertele pe care le-ai salvat în acest browser.", descriere: "Ofertele salvate de tine la favorite." }));
 for (const p of PAGINI_LEGALE) pagini.push({ cale: p.cale, index: true, html: pagina({ titlu: `${p.titlu} | ${BRAND}`, descriere: p.descriere, cale: p.cale, corp: p.corp(), simplu: true }) });
-{ const g = paginaGhid({ magazine, maxRed, pcgMax: PCG_MAX, pcgZile: PCG_ZILE, zileVechi: ZILE_DATE_VECHI, cupoane: magazine.filter((m) => m.cupon && sortate.some((o) => o.magazin === m.id)).map((m) => ({ magazin: m.nume, ...m.cupon })) });
+{ const g = paginaGhid({ magazine, maxRed: Object.fromEntries(Object.entries(maxRed).filter(([id]) => sortate.some((o) => o.magazin === id) && !mag[id]?.faraBrandInSeo)), pcgMax: PCG_MAX, pcgZile: PCG_ZILE, zileVechi: ZILE_DATE_VECHI, cupoane: magazine.filter((m) => m.cupon && sortate.some((o) => o.magazin === m.id)).map((m) => ({ magazin: m.nume, ...m.cupon })) });
   pagini.push({ cale: g.cale, index: true, html: pagina({ titlu: `${g.titlu} | ${BRAND}`, descriere: g.descriere, cale: g.cale, corp: g.corp(), simplu: true }) }); }
 
 rmSync("dist", { recursive: true, force: true });

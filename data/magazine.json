@@ -94,5 +94,67 @@
     "afiliere": {
       "retea": null
     }
+  },
+  {
+    "id": "gsmnet",
+    "nume": "GSMnet",
+    "domeniu": "gsmnet.ro",
+    "activ": false,
+    "sursa": "2performant",
+    "afiliere": {
+      "retea": "2performant"
+    },
+    "reducereMaxProcent": 60,
+    "faraBrandInSeo": true,
+    "nota": "2Performant, aplicat 2026-11-15. Fara cuvinte-cheie de brand; doar cupoane dedicate sunt comisionate; fara bannere proprii."
+  },
+  {
+    "id": "libris",
+    "nume": "Libris",
+    "domeniu": "libris.ro",
+    "activ": false,
+    "sursa": "2performant",
+    "afiliere": {
+      "retea": "2performant"
+    },
+    "reducereMaxProcent": 60,
+    "faraBrandInSeo": true,
+    "nota": "2Performant, aplicat 2026-11-15. Fara cuvinte-cheie de brand; nu activ in mai multe platforme de afiliere simultan."
+  },
+  {
+    "id": "noriel",
+    "nume": "Noriel",
+    "domeniu": "noriel.ro",
+    "activ": false,
+    "sursa": "2performant",
+    "afiliere": {
+      "retea": "2performant"
+    },
+    "reducereMaxProcent": 60,
+    "nota": "2Performant, aplicat 2026-11-15. Fara Google Ads / Facebook Ads."
+  },
+  {
+    "id": "answear",
+    "nume": "Answear",
+    "domeniu": "answear.ro",
+    "activ": false,
+    "sursa": "2performant",
+    "afiliere": {
+      "retea": "2performant"
+    },
+    "reducereMaxProcent": 70,
+    "nota": "2Performant, aplicat 2026-11-15. Fara Google Ads / Facebook Ads / TikTok Ads."
+  },
+  {
+    "id": "otter",
+    "nume": "Otter",
+    "domeniu": "otter.ro",
+    "activ": false,
+    "sursa": "2performant",
+    "afiliere": {
+      "retea": "2performant"
+    },
+    "reducereMaxProcent": 70,
+    "nota": "2Performant, aplicat 2026-11-15. Comision 5% la produse reduse."
   }
 ]

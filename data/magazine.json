@@ -99,14 +99,16 @@
     "id": "gsmnet",
     "nume": "GSMnet",
     "domeniu": "gsmnet.ro",
-    "activ": false,
+    "activ": true,
     "sursa": "2performant",
     "afiliere": {
       "retea": "2performant"
     },
     "reducereMaxProcent": 60,
     "faraBrandInSeo": true,
-    "nota": "2Performant, aplicat 2026-11-15. Fara cuvinte-cheie de brand; doar cupoane dedicate sunt comisionate; fara bannere proprii."
+    "nota": "2Performant, aprobat 2026-11-16 (feed Pretino GSMnet, ~26.000 produse). Fara cuvinte-cheie de brand; doar cupoanele dedicate sunt comisionate; fara bannere proprii.",
+    "categorieImplicita": "electronice",
+    "feedPropriu": true
   },
   {
     "id": "libris",
@@ -119,7 +121,8 @@
     },
     "reducereMaxProcent": 60,
     "faraBrandInSeo": true,
-    "nota": "2Performant, aplicat 2026-11-15. Fara cuvinte-cheie de brand; nu activ in mai multe platforme de afiliere simultan."
+    "nota": "2Performant, aplicat 2026-11-15. Fara cuvinte-cheie de brand; nu activ in mai multe platforme de afiliere simultan.",
+    "feedPropriu": true
   },
   {
     "id": "noriel",
@@ -131,7 +134,8 @@
       "retea": "2performant"
     },
     "reducereMaxProcent": 60,
-    "nota": "2Performant, aplicat 2026-11-15. Fara Google Ads / Facebook Ads."
+    "nota": "2Performant, aplicat 2026-11-15. Fara Google Ads / Facebook Ads.",
+    "feedPropriu": true
   },
   {
     "id": "answear",
@@ -143,18 +147,21 @@
       "retea": "2performant"
     },
     "reducereMaxProcent": 70,
-    "nota": "2Performant, aplicat 2026-11-15. Fara Google Ads / Facebook Ads / TikTok Ads."
+    "nota": "2Performant, aplicat 2026-11-15. Fara Google Ads / Facebook Ads / TikTok Ads.",
+    "feedPropriu": true
   },
   {
     "id": "otter",
     "nume": "Otter",
     "domeniu": "otter.ro",
-    "activ": false,
+    "activ": true,
     "sursa": "2performant",
     "afiliere": {
       "retea": "2performant"
     },
     "reducereMaxProcent": 70,
-    "nota": "2Performant, aplicat 2026-11-15. Comision 5% la produse reduse."
+    "nota": "2Performant, aprobat 2026-11-16 (feed Pretino Otter = Produse Otter, ~4.100 produse). Comision 5% la produse reduse.",
+    "categorieImplicita": "moda",
+    "feedPropriu": true
   }
 ]

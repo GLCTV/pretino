@@ -1,10 +1,13 @@
 // Sursa 2Performant: feed-uri CSV de produse. Secrete (doar în secrete.env, dedicate Pretino):
 // PRETINO_TWOPERF_FEEDS=url1 url2 ; PRETINO_TWOPERF_AFF_CODE=codul de afiliat pentru pretino.ro (pentru linkuri Quicklink dacă feed-ul nu le dă).
 // Codul campaniei („unique”) se pune în data/magazine.json → afiliere.unique.
+// Feed separat per magazin (optional): PRETINO_TWOPERF_FEED_<ID> (ex. PRETINO_TWOPERF_FEED_GSMNET=https://api.2performant.com/feed/xxxx.csv). Un magazin fara cheie proprie foloseste PRETINO_TWOPERF_FEEDS.
+// Astfel „Actualizeaza” pe un singur magazin descarca doar feed-ul lui, nu toate feed-urile.
 import { parseCsv } from "../lib/csv.js";
 import { parsePret, idOferta, inStoc, mapCategorie } from "../lib/oferta.js";
 import { gasesteMagazin } from "../lib/magazine.js";
 
+const RESIGILAT = /refurbished|second ?hand|resigilat|desigilat|reconditionat|recondi[tț]ionat/i;
 const pick = (x, ...ks) => { for (const k of ks) if (x[k]) return x[k]; return ""; };
 
 export function dinRand(x, magazine, affCode) {
@@ -21,13 +24,26 @@ export function dinRand(x, magazine, affCode) {
   const url = aff || link;
   if (!pret || !url || !titlu) return { omis: "date incomplete" };
   const img = pick(x, "image_urls", "image_url", "image", "product_pic", "images").split(/[,|\s]+/)[0];
-  return { oferta: { id: idOferta("2p", link || url), sursa: "2performant", titlu, categorie: mapCategorie([pick(x, "category", "category_name"), pick(x, "subcategories", "subcategory")].join(" ")), magazin: m.id, pret, ...(vechi && vechi > pret ? { pretVechi: vechi } : {}), url, afiliat: Boolean(aff), ...(img ? { imagine: img } : {}) } };
+  const catText = [pick(x, "category", "category_name"), pick(x, "subcategories", "subcategory")].join(" ");
+  let categorie = mapCategorie(catText);
+  // magazin specializat (ex. GSMnet = telefoane/accesorii, Otter = incaltaminte): categoria implicita daca textul din feed nu se potriveste, dar niciodata pentru produse resigilate/refurbished
+  if (!categorie && m.categorieImplicita && !RESIGILAT.test(`${titlu} ${catText}`)) categorie = m.categorieImplicita;
+  return { oferta: { id: idOferta("2p", link || url), sursa: "2performant", titlu, categorie, magazin: m.id, pret, ...(vechi && vechi > pret ? { pretVechi: vechi } : {}), url, afiliat: Boolean(aff), ...(img ? { imagine: img } : {}) } };
 }
 
 export async function citeste(magazine, secrete, fetchFn = fetch) {
-  const feeds = (secrete.PRETINO_TWOPERF_FEEDS ?? "").split(/[\s,]+/).filter(Boolean);
-  if (!feeds.length) throw new Error("lipsește PRETINO_TWOPERF_FEEDS din secrete.env");
-  const oferte = [], omise = {};
+  const lista = (v) => String(v ?? "").split(/[\s,]+/).filter(Boolean);
+  const feeds = [], oferte = [], omise = {};
+  let generale = false;
+  for (const m of magazine) {
+    const cheie = `PRETINO_TWOPERF_FEED_${m.id.toUpperCase()}`, proprii = lista(secrete[cheie]);
+    if (proprii.length) feeds.push(...proprii);
+    else if (m.feedPropriu) omise[`magazin sarit: lipseste ${cheie} din secrete.env`] = 1; // magazin cu feed propriu, nesetat: nu blocam celelalte magazine
+    else generale = true;
+  }
+  if (generale) feeds.push(...lista(secrete.PRETINO_TWOPERF_FEEDS));
+  if (!feeds.length && !Object.keys(omise).length) throw new Error("lipsește feed-ul din secrete.env (PRETINO_TWOPERF_FEEDS sau PRETINO_TWOPERF_FEED_<ID>, ex. PRETINO_TWOPERF_FEED_GSMNET)");
+  feeds.splice(0, feeds.length, ...new Set(feeds));
   let esantion = "";
   const categorii = {};
   for (const f of feeds) {

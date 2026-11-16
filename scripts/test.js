@@ -73,12 +73,30 @@ ok(i.x.length === 2 && i.x[1].p === 8, "istoric: preț schimbat adaugă intrare"
   const tp = await import("./surse/2performant.js");
   const mg = JSON.parse(readFileSync("data/magazine.json", "utf8"));
   const noi = ["gsmnet", "libris", "noriel", "answear", "otter"];
-  ok(noi.every((id) => { const m = mg.find((x) => x.id === id); return m && m.activ === false && m.sursa === "2performant" && m.domeniu === `${id}.ro` && m.reducereMaxProcent > 0; }), "magazine noi (gsmnet, libris, noriel, answear, otter): oprite pana la aprobare, sursa 2performant");
+  ok(noi.every((id) => { const m = mg.find((x) => x.id === id); return m && m.activ === (id === "gsmnet" || id === "otter") && m.sursa === "2performant" && m.domeniu === `${id}.ro` && m.reducereMaxProcent > 0; }), "magazine noi (gsmnet, libris, noriel, answear, otter): gsmnet+otter active (aprobate 2026-11-16), restul oprite pana la aprobare, sursa 2performant");
   ok(["gsmnet", "libris"].every((id) => mg.find((x) => x.id === id).faraBrandInSeo === true) && !mg.some((x) => noi.slice(2).includes(x.id) && x.faraBrandInSeo), "gsmnet si libris: fara brand in SEO (regula afiliere)");
   ok(!mg.some((x) => /farm|drmax|petmax|medic/i.test(x.id + x.domeniu)), "farmaciile / magazinele cu medicamente nu sunt in lista de magazine");
   const r = parseCsv(readFileSync("tests/fixtures/2performant-noi.csv", "utf8")).map((x) => tp.dinRand(x, mg, "AFF"));
   ok(noi.every((id, i) => r[i].oferta?.magazin === id && areReducereReala(r[i].oferta) && r[i].oferta.afiliat === true), "2performant: cate o oferta cu reducere reala si link afiliat pentru fiecare magazin nou");
   ok(r[5].omis === "fara stoc", "2performant: produs epuizat omis (magazin nou)");
+  { // feed propriu per magazin: GSMnet/Otter isi descarca doar feed-ul lor; evoMAG ramane pe feed-ul general; lipsa cheii nu opreste celelalte magazine
+    const csv = readFileSync("tests/fixtures/2performant-noi.csv", "utf8"), cereri = [];
+    const fetchFals = async (u) => { cereri.push(u); return { ok: true, text: async () => csv }; };
+    const activ = mg.filter((x) => ["evomag", "gsmnet", "otter"].includes(x.id)).map((x) => ({ ...x, activ: true }));
+    const r1 = await tp.citeste(activ, { PRETINO_TWOPERF_FEEDS: "https://f/general.csv", PRETINO_TWOPERF_FEED_GSMNET: "https://f/gsmnet.csv", PRETINO_TWOPERF_FEED_OTTER: "https://f/otter.csv" }, fetchFals);
+    ok(cereri.length === 3 && cereri.includes("https://f/gsmnet.csv") && cereri.includes("https://f/otter.csv") && cereri.includes("https://f/general.csv"), "2performant: fiecare magazin cu feed propriu isi citeste feed-ul, evoMAG pe cel general");
+    cereri.length = 0;
+    await tp.citeste(activ.filter((x) => x.id === "gsmnet"), { PRETINO_TWOPERF_FEEDS: "https://f/general.csv", PRETINO_TWOPERF_FEED_GSMNET: "https://f/gsmnet.csv" }, fetchFals);
+    ok(cereri.length === 1 && cereri[0] === "https://f/gsmnet.csv", "2performant: actualizare doar GSMnet descarca doar feed-ul GSMnet");
+    cereri.length = 0;
+    const r3 = await tp.citeste(activ, { PRETINO_TWOPERF_FEEDS: "https://f/general.csv" }, fetchFals);
+    ok(cereri.length === 1 && Object.keys(r3.omise).some((k) => /lipseste PRETINO_TWOPERF_FEED_GSMNET/.test(k)) && Object.keys(r3.omise).some((k) => /lipseste PRETINO_TWOPERF_FEED_OTTER/.test(k)), "2performant: feed propriu nesetat => magazinul e sarit si raportat, restul merg");
+    const fara = { categorie: "x" };
+    const rez = tp.dinRand({ product_title: "Husa X", category: "Cuvant necunoscut", availability: "in_stock", sale_price: "40", old_price: "80", product_url: "https://www.gsmnet.ro/x", marketer_link: "https://event.2performant.com/x" }, mg);
+    ok(rez.oferta?.categorie === "electronice", "gsmnet: categorie implicita electronice cand textul din feed nu se potriveste");
+    ok(!tp.dinRand({ product_title: "Telefon X Resigilat", category: "Cuvant necunoscut", availability: "in_stock", sale_price: "40", old_price: "80", product_url: "https://www.gsmnet.ro/x2", marketer_link: "https://event.2performant.com/x2" }, mg).oferta?.categorie, "gsmnet: resigilat/refurbished nu primeste categorie implicita (nu intra pe site)");
+    ok(tp.dinRand({ product_title: "Sandale Y", category: "Altceva", availability: "in_stock", sale_price: "100", old_price: "200", product_url: "https://www.otter.ro/y", marketer_link: "https://event.2performant.com/y" }, mg).oferta?.categorie === "moda", "otter: categorie implicita moda");
+  }
 }
 ok(existsSync("CLAUDE.md") && existsSync("README.md") && existsSync("PROGRES.md"), "CLAUDE.md, README.md, PROGRES.md există");
 { const { PAGINI_LEGALE } = await import("./lib/legal.js");

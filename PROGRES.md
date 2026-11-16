@@ -311,3 +311,9 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Teste noi în `scripts/test.js` (+ `tests/fixtures/2performant-noi.csv`); verificat build cu gsmnet activ într-o copie temporară (pagină noindex, titluri fără brand). Site-ul generat actual: identic cu înainte.
 - 4 teste eșuau deja înainte (seo ghid x2, campanii x2) – nelegate de această modificare, de verificat separat.
 - DE FĂCUT după aprobare: în 2Performant luat `unique` per campanie (în `data/magazine.json` → afiliere.unique, dacă feed-ul nu dă link) și feed-ul CSV al fiecărui magazin → `PRETINO_TWOPERF_FEEDS` în `%LOCALAPPDATA%\Pretino\secrete.env`; verificat adaptorul pe date reale (coloane, categorii); apoi „Pornește” magazinul din program, preview, OK → main → PUBLICĂ LIVE.
+
+## v1.73 (2026-11-16) – GSMnet + Otter active
+- Aprobate la 2Performant: gsmnet.ro, otter.ro → `activ:true`. Libris, Noriel, Answear rămân oprite (în așteptare).
+- Adaptor 2Performant: feed propriu per magazin (`PRETINO_TWOPERF_FEED_<ID>` în secrete.env); magazin cu feed propriu nesetat e sărit și raportat, nu blochează restul. `categorieImplicita` (gsmnet=electronice, otter=moda) când categoria din feed nu se potrivește; resigilat/refurbished exclus.
+- De făcut pe PC: în `%LOCALAPPDATA%\Pretino\secrete.env` adaugă `PRETINO_TWOPERF_FEED_GSMNET` și `PRETINO_TWOPERF_FEED_OTTER`; apoi butoanele de actualizare GSMnet/Otter; verifică `rapoarte/categorii-2performant.txt` și `esantion-2performant.txt`.
+- Teste: 4 eșecuri vechi (seo ghid x2, campanii x2), fără legătură.

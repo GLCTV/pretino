@@ -317,3 +317,9 @@ Open Graph + Twitter Card cu imagine proprie `public/og.png` (sursa: `docs/og-su
 - Adaptor 2Performant: feed propriu per magazin (`PRETINO_TWOPERF_FEED_<ID>` în secrete.env); magazin cu feed propriu nesetat e sărit și raportat, nu blochează restul. `categorieImplicita` (gsmnet=electronice, otter=moda) când categoria din feed nu se potrivește; resigilat/refurbished exclus.
 - De făcut pe PC: în `%LOCALAPPDATA%\Pretino\secrete.env` adaugă `PRETINO_TWOPERF_FEED_GSMNET` și `PRETINO_TWOPERF_FEED_OTTER`; apoi butoanele de actualizare GSMnet/Otter; verifică `rapoarte/categorii-2performant.txt` și `esantion-2performant.txt`.
 - Teste: 4 eșecuri vechi (seo ghid x2, campanii x2), fără legătură.
+
+## v1.74 (2026-11-19) – corectări de informații pe site
+- Black Friday: în România campania principală = 6 noiembrie (eMAG); internațional = 27 noiembrie; Cyber Monday = 30 noiembrie (constante `BF_RO`, `BF_DATA`, `CM_DATA` în `src/seo.js`). Bannerul de pe prima pagină nu mai are numărătoare „începe în X zile”, ci afișează datele. Pagina /black-friday/ (intro, FAQ) explică diferența.
+- „Prețuri scăzute azi”: scos „Revino zilnic” (catalogul se actualizează manual, nu zilnic automat).
+- Verificate fără modificări: ghidul „Cum interpretăm reducerile”, paginile legale, cadouri, Cyber Monday.
+- Teste: 5 eșuate, toate cauzate de datele locale mai vechi de 3 zile (PC Garage/campanii) și vechile 4; neschimbate de această modificare. Se rezolvă după „Actualizează campanii și oferte”.

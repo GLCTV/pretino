@@ -6,7 +6,9 @@ export const MIN_TIP_PAGINA = 15;     // un tip de produs (ex. Mouse-uri in Peri
 export const MIN_MAGAZIN_INDEX = 5;   // pagina unui magazin cu mai putine oferte ramane accesibila, dar noindex si fara intrare in sitemap
 export const ZILE_DATE_VECHI = 7;     // ofertele unei surse neverificate cu succes de mai mult de atatea zile nu se mai afiseaza (politica „date prea vechi”)
 export const BRAND = "Pretino";
-export const BF_DATA = "27 noiembrie 2026"; // Black Friday 2026 = a patra vineri din noiembrie
+export const BF_RO = "6 noiembrie 2026";    // Black Friday in Romania: campania principala eMAG (prima vineri din noiembrie)
+export const BF_DATA = "27 noiembrie 2026"; // Black Friday international 2026 = a patra vineri din noiembrie
+export const CM_DATA = "30 noiembrie 2026"; // Cyber Monday 2026 = luni dupa Black Friday international
 
 // text de nume cu majuscule corecte pentru siglele din limba romana (Electronice si IT, Componente PC, Monitoare si TV)
 export const jos = (nume) => String(nume).toLowerCase().replace(/\bpc\b/g, "PC").replace(/\btv\b/g, "TV").replace(/\bit\b/g, "IT");
